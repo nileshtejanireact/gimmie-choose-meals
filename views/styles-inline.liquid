@@ -1,0 +1,586 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap');
+
+.gimmie-build-box,
+.gimmie-build-box *,
+.gimmie-build-box *::before,
+.gimmie-build-box *::after {
+  box-sizing: border-box;
+}
+
+.gimmie-build-box {
+  --gimmie-bg: #f6f1e7;
+  --gimmie-panel: #fffdf7;
+  --gimmie-text: #102b10;
+  --gimmie-accent: #8faf8f;
+  --gimmie-muted: rgba(16, 43, 16, 0.72);
+  --gimmie-border: #102b10;
+  --gimmie-error: #b42318;
+  --gimmie-success: #2f6b2f;
+  --gimmie-heading-font: "Prompt", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  
+  background: var(--gimmie-bg) !important;
+  color: var(--gimmie-text) !important;
+  font-family: var(--gimmie-heading-font) !important;
+  margin: 0;
+  padding: 0;
+  min-height: 80vh;
+  width: 100%;
+}
+
+.gimmie-build-box__section {
+  padding: clamp(28px, 5vw, 64px) 18px;
+}
+
+.gimmie-build-box__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.gimmie-build-box__header {
+  max-width: 850px;
+  margin: 0 auto 36px;
+  text-align: center;
+}
+
+.gimmie-build-box__eyebrow {
+  margin: 0 0 10px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gimmie-muted);
+}
+
+.gimmie-build-box__heading {
+  margin: 0;
+  font-size: clamp(2.8rem, 6vw, 5.5rem);
+  line-height: 0.95;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: var(--gimmie-text);
+}
+
+.gimmie-build-box__intro {
+  max-width: 650px;
+  margin: 18px auto 0;
+  color: var(--gimmie-muted);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  font-weight: 500;
+}
+
+.gimmie-build-box__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 28px;
+  align-items: start;
+}
+
+.gimmie-build-box__main {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+
+.gimmie-build-box__panel,
+.gimmie-build-box__summary {
+  border: 2.5px solid var(--gimmie-border) !important;
+  border-radius: 24px !important;
+  background: var(--gimmie-panel) !important;
+  box-shadow: 6px 6px 0 var(--gimmie-border) !important;
+  min-width: 0;
+}
+
+.gimmie-build-box__surface {
+  padding: clamp(20px, 3.5vw, 28px);
+}
+
+.gimmie-build-box__panel-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.gimmie-build-box__panel-header--meals {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.gimmie-build-box__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.gimmie-build-box__step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 2.5px solid var(--gimmie-border);
+  border-radius: 999px;
+  font-size: 1.15rem;
+  font-weight: 900;
+  line-height: 1;
+  background: var(--gimmie-accent);
+  color: var(--gimmie-text);
+  flex: 0 0 auto;
+}
+
+.gimmie-build-box__panel-title,
+.gimmie-build-box__summary-title {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  line-height: 1;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--gimmie-text);
+}
+
+.gimmie-build-box__description {
+  margin: 0;
+  color: var(--gimmie-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.gimmie-build-box__details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.gimmie-build-box__detail {
+  border: 2px solid var(--gimmie-border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  background: var(--gimmie-bg);
+}
+
+.gimmie-build-box__detail strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gimmie-muted);
+}
+
+.gimmie-build-box__detail span {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+/* Quota Counter Badge */
+.gimmie-build-box__counter {
+  border: 2px solid var(--gimmie-border);
+  border-radius: 999px;
+  padding: 10px 18px;
+  background: var(--gimmie-bg);
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gimmie-build-box__counter.is-complete {
+  background: #d4edd4;
+  color: var(--gimmie-success);
+  border-color: var(--gimmie-success);
+}
+
+/* Meals Grid */
+.gimmie-build-box__meals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 22px;
+  margin-top: 20px;
+}
+
+.gimmie-build-box__meal {
+  display: flex;
+  flex-direction: column;
+  border: 2.5px solid var(--gimmie-border);
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--gimmie-panel);
+  box-shadow: 4px 4px 0 var(--gimmie-border);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  position: relative;
+}
+
+.gimmie-build-box__meal:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0 var(--gimmie-border);
+}
+
+.gimmie-build-box__meal-image-wrap {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--gimmie-bg);
+  cursor: pointer;
+}
+
+.gimmie-build-box__meal-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 300ms ease;
+}
+
+.gimmie-build-box__meal:hover .gimmie-build-box__meal-image {
+  transform: scale(1.06);
+}
+
+.gimmie-build-box__info-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 2px solid var(--gimmie-border);
+  background: var(--gimmie-panel);
+  color: var(--gimmie-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--gimmie-border);
+}
+
+.gimmie-build-box__meal-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  padding: 18px;
+}
+
+.gimmie-build-box__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.gimmie-build-box__badge {
+  border: 1.5px solid var(--gimmie-border);
+  border-radius: 999px;
+  background: var(--gimmie-accent);
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gimmie-text);
+}
+
+.gimmie-build-box__meal-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1.1;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.gimmie-build-box__meal-description {
+  margin: 8px 0 0;
+  color: var(--gimmie-muted);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.gimmie-build-box__meal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.gimmie-build-box__meal-meta span {
+  border: 1.5px solid var(--gimmie-border);
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: var(--gimmie-bg);
+}
+
+/* Quantity Control Buttons */
+.gimmie-build-box__qty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.gimmie-build-box__qty-button {
+  width: 44px;
+  height: 44px;
+  border: 2.5px solid var(--gimmie-border);
+  border-radius: 999px;
+  background: var(--gimmie-accent);
+  color: var(--gimmie-text);
+  font-size: 1.6rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--gimmie-border);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  user-select: none;
+}
+
+.gimmie-build-box__qty-button:not(:disabled):hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 var(--gimmie-border);
+}
+
+.gimmie-build-box__qty-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.gimmie-build-box__qty-value {
+  min-width: 32px;
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+/* Summary Box */
+.gimmie-build-box__summary {
+  position: sticky;
+  top: 24px;
+}
+
+.gimmie-build-box__progress-bar {
+  height: 12px;
+  border: 2px solid var(--gimmie-border);
+  border-radius: 999px;
+  background: var(--gimmie-bg);
+  overflow: hidden;
+  margin: 16px 0;
+}
+
+.gimmie-build-box__progress-fill {
+  height: 100%;
+  background: var(--gimmie-accent);
+  width: 0%;
+  transition: width 200ms ease;
+}
+
+.gimmie-build-box__selected-meals {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.gimmie-build-box__selected-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--gimmie-bg);
+  border: 1.5px solid var(--gimmie-border);
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.gimmie-build-box__button {
+  width: 100%;
+  min-height: 56px;
+  margin-top: 20px;
+  border: 2.5px solid var(--gimmie-border);
+  border-radius: 999px;
+  background: var(--gimmie-accent);
+  color: var(--gimmie-text);
+  box-shadow: 4px 4px 0 var(--gimmie-border);
+  cursor: pointer;
+  font-family: var(--gimmie-heading-font);
+  font-size: 1.05rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gimmie-build-box__button:not(:disabled):hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--gimmie-border);
+}
+
+.gimmie-build-box__button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.gimmie-build-box__status {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.gimmie-build-box__status.is-error {
+  color: var(--gimmie-error);
+}
+
+.gimmie-build-box__status.is-success {
+  color: var(--gimmie-success);
+}
+
+/* Nutrition Modal */
+.gimmie-modal[hidden] {
+  display: none !important;
+}
+
+.gimmie-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.gimmie-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.gimmie-modal__dialog {
+  position: relative;
+  z-index: 1;
+  width: min(850px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 3px solid var(--gimmie-border);
+  border-radius: 24px;
+  background: var(--gimmie-panel);
+  color: var(--gimmie-text);
+  box-shadow: 8px 8px 0 var(--gimmie-border);
+  padding: clamp(20px, 3vw, 32px);
+}
+
+.gimmie-modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--gimmie-border);
+  border-radius: 999px;
+  background: var(--gimmie-accent);
+  color: var(--gimmie-text);
+  font-size: 1.5rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--gimmie-border);
+}
+
+.gimmie-modal__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.gimmie-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 0.92rem;
+  border: 2px solid var(--gimmie-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.gimmie-modal__table th,
+.gimmie-modal__table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(16, 43, 16, 0.2);
+  text-align: left;
+}
+
+.gimmie-modal__table tr:last-child th,
+.gimmie-modal__table tr:last-child td {
+  border-bottom: 0;
+}
+
+.gimmie-modal__alert {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border: 2px solid var(--gimmie-border);
+  border-radius: 12px;
+  background: #fff0f0;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+/* Responsive Rules */
+@media (max-width: 989px) {
+  .gimmie-build-box__layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .gimmie-build-box__summary {
+    position: static;
+    order: 2;
+  }
+  
+  .gimmie-modal__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .gimmie-build-box__meals-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .gimmie-build-box__details {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

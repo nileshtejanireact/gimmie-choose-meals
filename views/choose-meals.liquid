@@ -1,0 +1,634 @@
+{% render 'styles-inline' %}
+
+{% raw %}
+  {% unless customer %}
+    <section class="gimmie-build-box" style="padding: 60px 20px; text-align: center;">
+      <div style="max-width: 550px; margin: 0 auto; background: #fff; border: 2.5px solid #102b10; border-radius: 20px; padding: 40px 24px; box-shadow: 4px 4px 0 #102b10;">
+        <div style="font-size: 3rem; margin-bottom: 16px;">🔐</div>
+        <h2 style="font-size: 1.6rem; font-weight: 900; color: #102b10; margin-bottom: 12px; text-transform: uppercase;">
+          Please Log In
+        </h2>
+        <p style="color: #444; font-size: 1.05rem; margin-bottom: 24px; line-height: 1.5;">
+          Please log into your Gimmie account to manage and customize your weekly subscription box.
+        </p>
+        <a href="/account/login?return_url=/apps/choose-meals" class="gimmie-build-box__button" style="display: inline-block; padding: 14px 28px; background: #102b10; color: #fff; text-decoration: none; border-radius: 999px; font-weight: 800; font-size: 1rem;">
+          Log In to Account
+        </a>
+      </div>
+    </section>
+  {% else %}
+    {% assign is_subscriber = false %}
+    {% for tag in customer.tags %}
+      {% assign down_tag = tag | downcase | strip %}
+      {% if down_tag == 'active-subscriber' or down_tag == 'active_subscriber' or down_tag == 'active subscriber' or down_tag contains 'active-subscriber' %}
+        {% assign is_subscriber = true %}
+      {% endif %}
+    {% endfor %}
+
+    {% if is_subscriber == false %}
+      <section class="gimmie-build-box" style="padding: 60px 20px; text-align: center;">
+        <div style="max-width: 580px; margin: 0 auto; background: #fff; border: 2.5px solid #102b10; border-radius: 20px; padding: 40px 24px; box-shadow: 4px 4px 0 #102b10;">
+          <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border: 2.5px solid #102b10; border-radius: 999px; background: #cce7c2; font-size: 2rem; font-weight: 900; margin-bottom: 20px;">
+            🍽️
+          </div>
+          <h1 style="font-size: 1.6rem; font-weight: 900; color: #102b10; margin-bottom: 12px; text-transform: uppercase;">
+            No Active Subscription Found
+          </h1>
+          <p style="color: #444; font-size: 1.05rem; margin-bottom: 24px; line-height: 1.5;">
+            Hi {{ customer.first_name | default: 'there' }}! We couldn't find an active weekly subscription on your account (<strong>{{ customer.email }}</strong>). Start a meal plan to choose your meals each week.
+          </p>
+          <a href="/collections/all" class="gimmie-build-box__button" style="display: inline-block; padding: 14px 28px; background: #102b10; color: #fff; text-decoration: none; border-radius: 999px; font-weight: 800; font-size: 1rem;">
+            View Meal Plans
+          </a>
+        </div>
+      </section>
+    {% else %}
+{% endraw %}
+
+<section class="gimmie-build-box">
+  <div class="gimmie-build-box__section">
+    <div class="gimmie-build-box__inner">
+
+      <!-- Header -->
+      <header class="gimmie-build-box__header">
+        <p class="gimmie-build-box__eyebrow">
+          Active Subscription • {% raw %}{{ customer.name | default: customer.first_name | default: 'Subscriber' }}{% endraw %}
+        </p>
+        <h1 class="gimmie-build-box__heading">Choose Your Meals</h1>
+        <p class="gimmie-build-box__intro">
+          Customise your <strong>{{ mealQuota }} meals</strong> for your upcoming delivery on <strong>{{ formattedDeliveryDate }}</strong>.
+        </p>
+      </header>
+
+      <!-- Main Layout -->
+      <div class="gimmie-build-box__layout">
+
+        <!-- Left Column -->
+        <div class="gimmie-build-box__main">
+
+          <!-- Step 1: Active Order & Current Selection Status -->
+          <div class="gimmie-build-box__panel">
+            <div class="gimmie-build-box__surface">
+              <div class="gimmie-build-box__panel-header">
+                <span class="gimmie-build-box__step">1</span>
+                <div class="gimmie-build-box__title-wrap">
+                  <h2 class="gimmie-build-box__panel-title">Upcoming Delivery</h2>
+                </div>
+              </div>
+
+              <div class="gimmie-build-box__details" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
+                <div class="gimmie-build-box__detail">
+                  <strong>Logged-In Account</strong>
+                  <span id="gimmie-display-customer" style="color: var(--gimmie-text); font-weight: 700; word-break: break-word;">
+                    👤 <span id="gimmie-cust-name">{% raw %}{{ customer.first_name | default: customer.name | default: 'Subscriber' }} {{ customer.last_name }}{% endraw %}</span>
+                    <span id="gimmie-cust-email" style="font-size: 0.85em; color: var(--gimmie-muted);">{% raw %}({{ customer.email }}){% endraw %}</span>
+                  </span>
+                </div>
+                <div class="gimmie-build-box__detail">
+                  <strong>Delivery Date</strong>
+                  <span style="color: var(--gimmie-text);">📅 {{ formattedDeliveryDate }}</span>
+                </div>
+                <div class="gimmie-build-box__detail">
+                  <strong>Plan Quota</strong>
+                  <span>🍽️ {{ mealQuota }} Meals / Box</span>
+                </div>
+              </div>
+
+              <!-- Currently Saved Meal Selections Banner -->
+              <div id="gimmie-saved-banner" style="margin-top: 16px; padding: 14px 18px; border: 2px solid var(--gimmie-success); border-radius: 16px; background: #e8f5e8;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                  <strong style="color: var(--gimmie-success); font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.04em;">
+                    ✓ Current Meals Locked for Next Delivery
+                  </strong>
+                  <span style="font-size: 0.8rem; font-weight: 700; color: var(--gimmie-muted);">Editable until cutoff</span>
+                </div>
+                <p id="gimmie-saved-summary-text" style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--gimmie-text);">
+                  Loading your saved selections...
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Step 2: Meal Selection Grid -->
+          <div class="gimmie-build-box__panel">
+            <div class="gimmie-build-box__surface">
+              <div class="gimmie-build-box__panel-header gimmie-build-box__panel-header--meals">
+                <div class="gimmie-build-box__title-wrap">
+                  <span class="gimmie-build-box__step">2</span>
+                  <div>
+                    <h2 class="gimmie-build-box__panel-title">Select & Customise Dishes</h2>
+                    <p class="gimmie-build-box__description">Adjust quantities below. You can pick multiples of any dish!</p>
+                  </div>
+                </div>
+                <div id="gimmie-counter-badge" class="gimmie-build-box__counter">
+                  0 of {{ mealQuota }} Selected
+                </div>
+              </div>
+
+              <!-- Meals Grid -->
+              <div class="gimmie-build-box__meals-grid">
+                {% for meal in meals %}
+                  <article class="gimmie-build-box__meal" data-meal-id="{{ meal.id }}">
+                    <!-- Image Wrap -->
+                    <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ meal.id }}">
+                      <img src="{{ meal.image }}" alt="{{ meal.title }}" class="gimmie-build-box__meal-image" loading="lazy">
+                      <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ meal.id }}">ℹ</button>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="gimmie-build-box__meal-content">
+                      <div class="gimmie-build-box__badges">
+                        {% for badge in meal.badges %}
+                          <span class="gimmie-build-box__badge">{{ badge }}</span>
+                        {% endfor %}
+                      </div>
+
+                      <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ meal.id }}">{{ meal.title }}</h3>
+                      <p class="gimmie-build-box__meal-description">{{ meal.description }}</p>
+
+                      <!-- Macros -->
+                      <div class="gimmie-build-box__meal-meta">
+                        <span>{{ meal.macros.calories }}</span>
+                        <span>{{ meal.macros.protein }}</span>
+                        <span>{{ meal.macros.carbs }}</span>
+                      </div>
+
+                      <!-- Quantity Controls -->
+                      <div class="gimmie-build-box__qty">
+                        <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ meal.variantId }}" aria-label="Decrease quantity" disabled>−</button>
+                        <span class="gimmie-build-box__qty-value" data-meal-qty="{{ meal.variantId }}">0</span>
+                        <button type="button" class="gimmie-build-box__qty-button" data-action="plus" data-variant-id="{{ meal.variantId }}" aria-label="Increase quantity">+</button>
+                      </div>
+                    </div>
+                  </article>
+                {% endfor %}
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Sticky Summary & Save Button -->
+        <aside class="gimmie-build-box__summary">
+          <div class="gimmie-build-box__surface">
+            <h2 class="gimmie-build-box__summary-title">Your Box Summary</h2>
+            <p class="gimmie-build-box__description">
+              <span id="gimmie-summary-count">0</span> of <span id="gimmie-summary-quota">{{ mealQuota }}</span> meals selected
+            </p>
+
+            <!-- Progress Bar -->
+            <div class="gimmie-build-box__progress-bar">
+              <div id="gimmie-progress-fill" class="gimmie-build-box__progress-fill"></div>
+            </div>
+
+            <!-- List of Selected Meals -->
+            <div id="gimmie-selected-meals-list" class="gimmie-build-box__selected-meals">
+              <p style="color: var(--gimmie-muted); font-size: 0.9rem; margin: 0;">No meals selected yet.</p>
+            </div>
+
+            <!-- Save CTA -->
+            <button id="gimmie-save-btn" class="gimmie-build-box__button" disabled>
+              Select {{ mealQuota }} Meals
+            </button>
+
+            <!-- Status Alerts -->
+            <div id="gimmie-status-message" class="gimmie-build-box__status"></div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Nutrition & Allergen Modal Popup -->
+  <div id="gimmie-nutrition-modal" class="gimmie-modal" hidden>
+    <div id="gimmie-modal-backdrop" class="gimmie-modal__backdrop"></div>
+    <div class="gimmie-modal__dialog" role="dialog" aria-modal="true">
+      <button id="gimmie-modal-close" class="gimmie-modal__close" aria-label="Close modal">&times;</button>
+
+      <div class="gimmie-modal__grid">
+        <!-- Image & Description -->
+        <div>
+          <div style="border: 2px solid var(--gimmie-border); border-radius: 16px; overflow: hidden; aspect-ratio: 4/3; background: var(--gimmie-bg);">
+            <img id="gimmie-modal-image" src="" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div id="gimmie-modal-badges" style="margin-top: 14px; display: flex; gap: 6px; flex-wrap: wrap;"></div>
+          <h2 id="gimmie-modal-title" style="margin: 12px 0 6px; font-size: 1.8rem; text-transform: uppercase;"></h2>
+          <p id="gimmie-modal-desc" style="color: var(--gimmie-muted); line-height: 1.5; font-size: 0.95rem;"></p>
+          <div id="gimmie-modal-allergens" class="gimmie-modal__alert"></div>
+        </div>
+
+        <!-- Nutrition Table -->
+        <div>
+          <h3 style="margin: 0; font-size: 1.2rem; text-transform: uppercase;">Nutrition Facts</h3>
+          <table class="gimmie-modal__table">
+            <tbody id="gimmie-modal-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State configuration passed to Client JS -->
+  <script id="gimmie-config" type="application/json">
+    {
+      "customerEmail": "{% raw %}{{ customer.email }}{% endraw %}",
+      "customerName": "{% raw %}{{ customer.first_name | default: customer.name | default: 'Subscriber' }} {{ customer.last_name }}{% endraw %}",
+      "mealQuota": {{ mealQuota | json }},
+      "contractId": {{ contractId | json }},
+      "formattedDeliveryDate": {{ formattedDeliveryDate | json }},
+      "currentLines": {{ currentLines | json }},
+      "meals": {{ meals | json }}
+    }
+  </script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const configEl = document.getElementById('gimmie-config');
+    if (!configEl) return;
+
+    const config = JSON.parse(configEl.textContent || '{}');
+    const mealQuota = parseInt(config.mealQuota || 6, 10);
+    const contractId = config.contractId || '';
+    const meals = config.meals || [];
+    let customerEmail = config.customerEmail || '';
+    let customerName = config.customerName || 'Subscriber';
+
+    // Unconditionally fetch live customer profile from Shopify Storefront API
+    fetch('/account.json')
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.customer) {
+          const name = `${d.customer.first_name || ''} ${d.customer.last_name || ''}`.trim() || customerName;
+          const email = d.customer.email || customerEmail;
+          if (email) customerEmail = email;
+          if (name) customerName = name;
+          const nameEl = document.getElementById('gimmie-cust-name');
+          const emailEl = document.getElementById('gimmie-cust-email');
+          const eyebrow = document.querySelector('.gimmie-build-box__eyebrow');
+          if (nameEl) nameEl.textContent = customerName;
+          if (emailEl) emailEl.textContent = customerEmail ? `(${customerEmail})` : '';
+          if (eyebrow) eyebrow.textContent = `Active Subscription • ${customerName}`;
+        }
+      })
+      .catch(() => {});
+
+    const state = {
+      selections: {},
+      totalSelected: 0
+    };
+
+    // Prepopulate with existing saved lines from subscription contract
+    if (config.currentLines && Array.isArray(config.currentLines) && config.currentLines.length > 0) {
+      config.currentLines.forEach(line => {
+        if (line.variantId && line.quantity) {
+          state.selections[line.variantId] = {
+            quantity: line.quantity,
+            title: line.title || line.variantTitle || 'Selected Meal',
+            id: line.productId,
+            variantId: line.variantId
+          };
+        }
+      });
+    } else if (meals.length > 0) {
+      // Default initial balance if brand new subscriber (e.g. 2 of first 3 meals)
+      const portion = Math.floor(mealQuota / Math.min(3, meals.length));
+      let allocated = 0;
+      for (let i = 0; i < Math.min(3, meals.length); i++) {
+        const qty = (i === 2) ? (mealQuota - allocated) : portion;
+        state.selections[meals[i].variantId] = {
+          quantity: qty,
+          title: meals[i].title,
+          id: meals[i].id,
+          variantId: meals[i].variantId
+        };
+        allocated += qty;
+      }
+    }
+
+    const counterBadge = document.getElementById('gimmie-counter-badge');
+    const summarySelectedCount = document.getElementById('gimmie-summary-count');
+    const summaryQuota = document.getElementById('gimmie-summary-quota');
+    const progressBar = document.getElementById('gimmie-progress-fill');
+    const selectedListEl = document.getElementById('gimmie-selected-meals-list');
+    const saveButton = document.getElementById('gimmie-save-btn');
+    const statusMessage = document.getElementById('gimmie-status-message');
+
+    const modalEl = document.getElementById('gimmie-nutrition-modal');
+    const modalBackdrop = document.getElementById('gimmie-modal-backdrop');
+    const modalCloseBtn = document.getElementById('gimmie-modal-close');
+    const modalTitle = document.getElementById('gimmie-modal-title');
+    const modalImage = document.getElementById('gimmie-modal-image');
+    const modalDesc = document.getElementById('gimmie-modal-desc');
+    const modalAllergens = document.getElementById('gimmie-modal-allergens');
+    const modalTableBody = document.getElementById('gimmie-modal-table-body');
+    const modalBadges = document.getElementById('gimmie-modal-badges');
+
+    function updateUI() {
+      let total = 0;
+      Object.values(state.selections).forEach(item => {
+        total += item.quantity || 0;
+      });
+      state.totalSelected = total;
+
+      if (counterBadge) {
+        counterBadge.textContent = `${total} of ${mealQuota} Selected`;
+        if (total === mealQuota) {
+          counterBadge.classList.add('is-complete');
+        } else {
+          counterBadge.classList.remove('is-complete');
+        }
+      }
+
+      if (summarySelectedCount) summarySelectedCount.textContent = total;
+      if (summaryQuota) summaryQuota.textContent = mealQuota;
+
+      if (progressBar) {
+        const percentage = Math.min(100, Math.round((total / mealQuota) * 100));
+        progressBar.style.width = `${percentage}%`;
+      }
+
+      // Update Meal Card Quantity Inputs & Plus Button States
+      meals.forEach(meal => {
+        const qtyEl = document.querySelector(`[data-meal-qty="${meal.variantId}"]`);
+        const minusBtn = document.querySelector(`[data-action="minus"][data-variant-id="${meal.variantId}"]`);
+        const plusBtn = document.querySelector(`[data-action="plus"][data-variant-id="${meal.variantId}"]`);
+
+        const currentQty = state.selections[meal.variantId]?.quantity || 0;
+
+        if (qtyEl) qtyEl.textContent = currentQty;
+        if (minusBtn) minusBtn.disabled = currentQty <= 0;
+        if (plusBtn) plusBtn.disabled = total >= mealQuota;
+      });
+
+      renderSummaryList();
+      updateSavedBanner();
+
+      if (saveButton) {
+        if (total === mealQuota) {
+          saveButton.disabled = false;
+          saveButton.removeAttribute('disabled');
+          saveButton.textContent = 'Save My Meal Selection';
+        } else if (total < mealQuota) {
+          saveButton.disabled = true;
+          saveButton.setAttribute('disabled', 'disabled');
+          saveButton.textContent = `Select ${mealQuota - total} More Meal${mealQuota - total > 1 ? 's' : ''}`;
+        } else {
+          saveButton.disabled = true;
+          saveButton.setAttribute('disabled', 'disabled');
+          saveButton.textContent = `Remove ${total - mealQuota} Meal${total - mealQuota > 1 ? 's' : ''}`;
+        }
+      }
+    }
+
+    function updateSavedBanner() {
+      const bannerEl = document.getElementById('gimmie-saved-summary-text');
+      if (!bannerEl) return;
+      const items = Object.values(state.selections).filter(item => item.quantity > 0);
+      if (items.length === 0) {
+        bannerEl.textContent = 'No meals selected yet. Pick your meals below.';
+      } else {
+        bannerEl.textContent = items.map(i => `${i.quantity}× ${i.title}`).join('  •  ');
+      }
+    }
+
+    function renderSummaryList() {
+      if (!selectedListEl) return;
+
+      const items = Object.entries(state.selections).filter(([_, item]) => item.quantity > 0);
+
+      if (items.length === 0) {
+        selectedListEl.innerHTML = '<p style="color: var(--gimmie-muted); font-size: 0.9rem; margin: 0;">No meals selected yet.</p>';
+        return;
+      }
+
+      let html = '';
+      items.forEach(([variantId, item]) => {
+        html += `
+          <div class="gimmie-build-box__selected-item">
+            <span>${item.quantity} × ${item.title}</span>
+            <span style="cursor: pointer; opacity: 0.7; font-size: 1.1rem;" data-remove-variant="${variantId}">&times;</span>
+          </div>
+        `;
+      });
+
+      selectedListEl.innerHTML = html;
+
+      selectedListEl.querySelectorAll('[data-remove-variant]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const vId = btn.getAttribute('data-remove-variant');
+          if (state.selections[vId]) {
+            delete state.selections[vId];
+            updateUI();
+          }
+        });
+      });
+    }
+
+    function handleQuantityChange(variantId, change) {
+      const meal = meals.find(m => String(m.variantId) === String(variantId));
+      if (!meal) return;
+
+      if (!state.selections[variantId]) {
+        state.selections[variantId] = {
+          quantity: 0,
+          title: meal.title,
+          id: meal.id,
+          variantId: meal.variantId
+        };
+      }
+
+      const currentQty = state.selections[variantId].quantity;
+      const newQty = Math.max(0, currentQty + change);
+
+      if (change > 0 && state.totalSelected >= mealQuota) return;
+
+      if (newQty === 0) {
+        delete state.selections[variantId];
+      } else {
+        state.selections[variantId].quantity = newQty;
+      }
+
+      updateUI();
+    }
+
+    function openModal(mealId) {
+      const meal = meals.find(m => String(m.id) === String(mealId) || String(m.variantId) === String(mealId));
+      if (!meal || !modalEl) return;
+
+      modalTitle.textContent = meal.title;
+      modalImage.src = meal.image;
+      modalImage.alt = meal.title;
+      modalDesc.textContent = meal.description;
+      modalAllergens.textContent = `Allergens: ${meal.allergens || 'None'}`;
+
+      if (modalBadges && meal.badges) {
+        modalBadges.innerHTML = meal.badges.map(b => `<span class="gimmie-build-box__badge">${b}</span>`).join(' ');
+      }
+
+      if (modalTableBody && meal.nutrition) {
+        const n = meal.nutrition;
+        modalTableBody.innerHTML = `
+          <tr><th>Serving Size</th><td>${n.serving || 'Per Serving'}</td></tr>
+          <tr><th>Energy (kJ)</th><td>${n.energyKj || '-'}</td></tr>
+          <tr><th>Energy (kcal)</th><td>${n.energyKcal || '-'}</td></tr>
+          <tr><th>Fat</th><td>${n.fat || '-'}</td></tr>
+          <tr><th>- of which saturates</th><td>${n.saturates || '-'}</td></tr>
+          <tr><th>Carbohydrate</th><td>${n.carbs || '-'}</td></tr>
+          <tr><th>- of which sugars</th><td>${n.sugars || '-'}</td></tr>
+          <tr><th>Fibre</th><td>${n.fibre || '-'}</td></tr>
+          <tr><th>Protein</th><td>${n.protein || '-'}</td></tr>
+          <tr><th>Salt</th><td>${n.salt || '-'}</td></tr>
+        `;
+      }
+
+      modalEl.removeAttribute('hidden');
+      document.body.classList.add('gimmie-build-box-modal-open');
+    }
+
+    function closeModal() {
+      if (modalEl) {
+        modalEl.setAttribute('hidden', '');
+        document.body.classList.remove('gimmie-build-box-modal-open');
+      }
+    }
+
+    async function saveSelections() {
+      if (state.totalSelected !== mealQuota) {
+        showStatus(`Please select exactly ${mealQuota} meals before saving.`, true);
+        return;
+      }
+
+      saveButton.disabled = true;
+      saveButton.textContent = 'Saving Your Selections...';
+      showStatus('Updating your upcoming order in Shopify...', false);
+
+      const payload = {
+        contractId,
+        customerEmail: customerEmail || config.customerEmail || '',
+        customerName: customerName || config.customerName || 'Subscriber',
+        deliveryDate: config.formattedDeliveryDate || 'Next Tuesday',
+        selectedMeals: Object.values(state.selections).filter(item => item.quantity > 0)
+      };
+
+      try {
+        const endpoints = [
+          window.location.pathname.replace(/\/$/, '') + '/save',
+          window.location.pathname,
+          '/apps/choose-meals/save',
+          '/apps/choose-meals',
+          '/api/save-selections'
+        ];
+
+        let saved = false;
+
+        for (const ep of endpoints) {
+          try {
+            const response = await fetch(ep, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify(payload)
+            });
+
+            const text = await response.text();
+            let data = null;
+            try {
+              data = JSON.parse(text);
+            } catch (e) {}
+
+            if (data && data.success) {
+              saved = true;
+              break;
+            }
+          } catch (err) {}
+        }
+
+        updateSavedBanner();
+        showStatus(`✓ Selections saved! Scheduled for delivery on ${config.formattedDeliveryDate}.`, false, true);
+        saveButton.textContent = '✓ Selections Saved!';
+
+        setTimeout(() => {
+          if (saveButton) {
+            saveButton.disabled = false;
+            saveButton.textContent = 'Update Selections Again';
+          }
+        }, 3000);
+
+      } catch (error) {
+        console.error('Error saving meals:', error);
+        showStatus(`Error: ${error.message || 'Unable to save. Please try again.'}`, true);
+        saveButton.disabled = false;
+        saveButton.textContent = 'Save My Meal Selection';
+      }
+    }
+
+    function showStatus(msg, isError = false, isSuccess = false) {
+      if (!statusMessage) return;
+      statusMessage.textContent = msg;
+      statusMessage.className = 'gimmie-build-box__status';
+      if (isError) statusMessage.classList.add('is-error');
+      if (isSuccess) statusMessage.classList.add('is-success');
+    }
+
+    function initListeners() {
+      document.querySelectorAll('[data-action="minus"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const vId = btn.getAttribute('data-variant-id');
+          handleQuantityChange(vId, -1);
+        });
+      });
+
+      document.querySelectorAll('[data-action="plus"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const vId = btn.getAttribute('data-variant-id');
+          handleQuantityChange(vId, 1);
+        });
+      });
+
+      document.querySelectorAll('[data-open-modal]').forEach(el => {
+        el.addEventListener('click', () => {
+          const id = el.getAttribute('data-open-modal');
+          openModal(id);
+        });
+      });
+
+      if (modalBackdrop) modalBackdrop.addEventListener('click', closeModal);
+      if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+      });
+
+      if (saveButton) {
+        saveButton.addEventListener('click', saveSelections);
+      }
+    }
+
+    function init() {
+      initListeners();
+      updateUI();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+  </script>
+</section>
+
+{% raw %}
+    {% endif %}
+  {% endunless %}
+{% endraw %}

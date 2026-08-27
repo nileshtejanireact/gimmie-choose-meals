@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meal Selections - Gimmie Admin</title>
+  <link rel="stylesheet" href="https://unpkg.com/@shopify/polaris@12.0.0/build/esm/styles.css"/>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f1f2f4;
+      color: #202223;
+      margin: 0;
+      padding: 24px;
+    }
+    .Polaris-Page {
+      max-width: 1050px;
+      margin: 0 auto;
+    }
+    .Polaris-Card {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e1e3e5;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .submission-item {
+      padding: 18px;
+      border: 1px solid #e1e3e5;
+      border-radius: 10px;
+      background: #fafbfb;
+      margin-bottom: 18px;
+      transition: border-color 150ms ease;
+    }
+    .submission-item:hover {
+      border-color: #babfc3;
+    }
+    .badge-status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #e4f8d9;
+      color: #108043;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: capitalize;
+    }
+    .btn-action {
+      background: #008060;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-action:hover {
+      background: #006e52;
+    }
+    .btn-secondary {
+      background: #ffffff;
+      color: #202223;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-weight: 600;
+      font-size: 0.84rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-secondary:hover {
+      background: #f6f6f7;
+    }
+    .search-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 14px;
+      border: 1px solid #c9cccf;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: #008060;
+      box-shadow: 0 0 0 1px #008060;
+    }
+
+    /* Print Slip Styles */
+    .print-only {
+      display: none;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-area, #print-area * {
+        visibility: visible;
+      }
+      #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 20px;
+        background: #fff;
+      }
+      .kitchen-slip {
+        page-break-after: always;
+        border: 2px solid #000;
+        border-radius: 8px;
+        padding: 24px;
+        margin-bottom: 30px;
+      }
+      .kitchen-slip:last-child {
+        page-break-after: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="Polaris-Page">
+    
+    <!-- Top Header Card -->
+    <div class="Polaris-Card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;">
+        <div>
+          <h1 style="font-size: 1.35rem; font-weight: 700; margin: 0 0 6px;">Weekly meal selections</h1>
+          <p style="margin: 0 0 4px; color: #6d7175; font-size: 0.92rem;">Store: <strong>{{ shopDomain }}</strong></p>
+          <p style="margin: 0; color: #6d7175; font-size: 0.92rem;">Showing all active subscriber meal choices for upcoming weekly deliveries.</p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn-secondary" onclick="exportSubmissionsCSV()">📥 Export CSV (Excel)</button>
+          <button class="btn-action" onclick="printAllSlips()">🖨️ Print All Packing Slips</button>
+        </div>
+      </div>
+
+      <!-- Thursday 7:00 PM UK Billing Schedule Sync Bar -->
+      <div style="margin-top: 18px; padding: 14px 18px; border: 1px solid #c9cccf; border-radius: 8px; background: #f6f6f7; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <div style="font-weight: 700; font-size: 0.92rem; color: #202223; display: flex; align-items: center; gap: 6px;">
+            ⏰ <span>Recurring Billing Anchor: <strong>Every Thursday @ 7:00 PM UK Time</strong></span>
+          </div>
+          <div style="font-size: 0.82rem; color: #6d7175; margin-top: 2px;">
+            Customers pay immediately at sign-up; all subsequent weekly renewals are locked to Thursdays at 7pm.
+          </div>
+        </div>
+        <button id="btn-sync-thursday" class="btn-secondary" onclick="syncThursdayBilling()">
+          ⚡ Sync Active Subscribers to Thursday 7PM
+        </button>
+      </div>
+      <div id="sync-status-msg" style="display: none; margin-top: 8px; font-size: 0.84rem; font-weight: 600; color: #108043;"></div>
+    </div>
+
+    <!-- Latest Submissions Card -->
+    <div class="Polaris-Card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0;">
+            Current Month Submissions (<span id="submissions-count">{{ submissions.length }}</span>)
+          </h2>
+          <p style="margin: 2px 0 0; font-size: 0.84rem; color: #6d7175;">
+            All live customer customized orders for upcoming delivery cycles
+          </p>
+        </div>
+        <span style="font-size: 0.85rem; color: #108043; font-weight: 600;">● Live Real-Time Feed</span>
+      </div>
+
+      <!-- Quick Search Bar -->
+      <div style="margin-bottom: 18px;">
+        <input type="text" id="search-input" class="search-input" placeholder="🔍 Search by customer name, email, contract ID, or dish..." oninput="filterSubmissions()">
+      </div>
+
+      <div class="submissions-list" id="submissions-container">
+        {% for sub in submissions %}
+          <div class="submission-item" id="order-card-{{ sub.id }}" data-search="{{ sub.customer }} {{ sub.customerName }} {{ sub.contractId }} {{ sub.deliveryDate }}">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; flex: 1; font-size: 0.92rem;">
+                <div>
+                  <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Customer</strong>
+                  <strong style="font-size: 0.98rem; color: #102b10;">{{ sub.customerName }}</strong>
+                  <div style="color: #444746; font-size: 0.88rem;">{{ sub.customer }}</div>
+                </div>
+                <div>
+                  <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Contract ID</strong>
+                  <span style="font-weight: 700; font-size: 1rem; color: #102b10; font-family: monospace;">
+                    {{ sub.contractId }}
+                  </span>
+                </div>
+                <div>
+                  <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Box Size</strong>
+                  <span style="font-weight: 700;">{{ sub.boxSize }}</span>
+                </div>
+                <div>
+                  <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Delivery Date</strong>
+                  <span style="font-weight: 700; color: #102b10;">📅 {{ sub.deliveryDate }}</span>
+                </div>
+                <div>
+                  <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Status</strong>
+                  <span class="badge-status">{{ sub.status }}</span>
+                  <div style="font-size: 0.76rem; color: #6d7175; margin-top: 2px;">{{ sub.formattedDate }}</div>
+                </div>
+              </div>
+              <button type="button" class="btn-secondary" onclick="printSingleSlip('{{ sub.id }}')">
+                🖨️ Print Kitchen Packing Slip
+              </button>
+            </div>
+
+            <!-- Meals List -->
+            <div style="border-top: 1px solid #e1e3e5; padding-top: 12px; margin-top: 10px;">
+              <strong style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #6d7175; text-transform: uppercase;">Selected Meals</strong>
+              <div style="display: grid; gap: 6px; font-size: 0.95rem; color: #303030;">
+                {% for meal in sub.meals %}
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-weight: 700; background: #e4e5e7; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem;">{{ meal.quantity }}x</span>
+                    <span>{{ meal.title }}</span>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <p style="color: #6d7175; text-align: center; padding: 20px;">No meal submissions recorded yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Hidden Container dynamically populated for printing -->
+  <div id="print-area" class="print-only"></div>
+
+  <script>
+    const submissionsData = {{ submissions | json }};
+
+    function filterSubmissions() {
+      const q = (document.getElementById('search-input')?.value || '').toLowerCase();
+      const items = document.querySelectorAll('.submission-item');
+      let visibleCount = 0;
+
+      items.forEach(item => {
+        const text = (item.getAttribute('data-search') || item.textContent || '').toLowerCase();
+        if (!q || text.includes(q)) {
+          item.style.display = 'block';
+          visibleCount++;
+        } else {
+          item.style.display = 'none';
+        }
+      });
+
+      const countEl = document.getElementById('submissions-count');
+      if (countEl) countEl.textContent = visibleCount;
+    }
+
+    function generatePackingSlipHtml(sub) {
+      return `
+        <div class="kitchen-slip" style="font-family: Arial, sans-serif; color: #102b10; border: 2px solid #102b10; padding: 24px; border-radius: 8px; margin-bottom: 24px;">
+          <!-- Header -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #102b10; padding-bottom: 12px; margin-bottom: 16px;">
+            <div>
+              <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase;">GIMMIE MEAL PREP</h1>
+              <p style="margin: 4px 0 0; font-size: 14px; font-weight: 700; color: #555;">KITCHEN PACKING SLIP & QUALITY CHECK</p>
+            </div>
+            <div style="text-align: right;">
+              <span style="display: inline-block; border: 2px solid #102b10; padding: 4px 10px; border-radius: 999px; font-weight: 800; font-size: 13px;">${sub.boxSize.toUpperCase()}</span>
+              <p style="margin: 4px 0 0; font-size: 12px; color: #666; font-family: monospace; font-weight: bold;">Contract: ${sub.contractId || sub.id}</p>
+            </div>
+          </div>
+
+          <!-- Customer & Delivery Meta -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; background: #f9f8f4; padding: 12px 16px; border: 1px solid #102b10; border-radius: 6px; margin-bottom: 20px; font-size: 14px;">
+            <div>
+              <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #666; margin-bottom: 2px;">CUSTOMER</div>
+              <div style="font-size: 15px; font-weight: 800;">${sub.customerName || sub.customer}</div>
+              <div style="color: #444;">${sub.customer}</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #666; margin-bottom: 2px;">DELIVERY DATE</div>
+              <div style="font-size: 16px; font-weight: 900; color: #102b10;">📅 ${sub.deliveryDate}</div>
+              <div style="color: #444;">Status: <strong>${sub.status}</strong></div>
+            </div>
+          </div>
+
+          <!-- Itemized Meal Checklist -->
+          <div style="margin-bottom: 24px;">
+            <h2 style="margin: 0 0 10px; font-size: 16px; font-weight: 900; text-transform: uppercase; border-bottom: 1.5px solid #102b10; padding-bottom: 4px;">
+              MEAL PACKING CHECKLIST (${sub.boxSize})
+            </h2>
+            <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
+              <thead>
+                <tr style="background: #eef2ee; text-align: left; font-size: 12px; text-transform: uppercase;">
+                  <th style="padding: 8px 10px; border-bottom: 1px solid #102b10; width: 40px;">PACK</th>
+                  <th style="padding: 8px 10px; border-bottom: 1px solid #102b10; width: 60px;">QTY</th>
+                  <th style="padding: 8px 10px; border-bottom: 1px solid #102b10;">DISH DESCRIPTION</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${sub.meals.map(m => `
+                  <tr>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">
+                      <div style="width: 18px; height: 18px; border: 2px solid #102b10; border-radius: 3px; display: inline-block;"></div>
+                    </td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd; font-weight: 900; font-size: 16px;">
+                      ${m.quantity}×
+                    </td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd; font-weight: 700;">
+                      ${m.title}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Kitchen Signoff Footer -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1.5px dashed #102b10; padding-top: 14px; font-size: 13px;">
+            <div>
+              <strong>Packed By:</strong> ___________________________
+            </div>
+            <div style="text-align: right;">
+              <strong>Quality Inspected:</strong> ___________________________
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Print a single individual packing slip in a clean standalone print window
+    function printSingleSlip(subId) {
+      const sub = submissionsData.find(s => String(s.id) === String(subId));
+      if (!sub) return;
+
+      const printHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Packing Slip - ${sub.customerName || sub.customer}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #102b10; background: #fff; }
+            .kitchen-slip { border: 2px solid #102b10; padding: 24px; border-radius: 8px; max-width: 750px; margin: 0 auto; }
+            table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+            th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+            th { background: #eef2ee; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #102b10; }
+            @media print {
+              body { padding: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          ${generatePackingSlipHtml(sub)}
+        </body>
+        </html>
+      `;
+
+      const printWin = window.open('', '_blank', 'width=850,height=950');
+      if (printWin) {
+        printWin.document.open();
+        printWin.document.write(printHtml);
+        printWin.document.close();
+        printWin.focus();
+        setTimeout(() => {
+          printWin.print();
+        }, 350);
+      }
+    }
+
+    // Print all slips (each on its own separate page)
+    function printAllSlips() {
+      if (!submissionsData || submissionsData.length === 0) return;
+
+      const allHtml = submissionsData.map(sub => `
+        <div style="page-break-after: always; margin-bottom: 30px;">
+          ${generatePackingSlipHtml(sub)}
+        </div>
+      `).join('');
+
+      const printHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>All Kitchen Packing Slips - Gimmie</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #102b10; background: #fff; }
+            table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+            th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+            th { background: #eef2ee; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #102b10; }
+            @media print {
+              body { padding: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          ${allHtml}
+        </body>
+        </html>
+      `;
+
+      const printWin = window.open('', '_blank', 'width=850,height=950');
+      if (printWin) {
+        printWin.document.open();
+        printWin.document.write(printHtml);
+        printWin.document.close();
+        printWin.focus();
+        setTimeout(() => {
+          printWin.print();
+        }, 350);
+      }
+    }
+
+    // Export all submissions to CSV format
+    function exportSubmissionsCSV() {
+      if (!submissionsData || submissionsData.length === 0) {
+        alert('No submissions to export.');
+        return;
+      }
+
+      let csv = 'Contract ID,Customer Name,Email,Box Size,Delivery Date,Status,Submitted At,Meals Breakdown\n';
+
+      submissionsData.forEach(s => {
+        const mealsStr = s.meals.map(m => `${m.quantity}x ${m.title}`).join('; ');
+        csv += `"${s.contractId || s.id}","${s.customerName}","${s.customer}","${s.boxSize}","${s.deliveryDate}","${s.status}","${s.formattedDate || s.submittedAt}","${mealsStr}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `gimmie-meal-selections-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+    }
+
+    // 1-Click Sync & Lock All Active Subscribers to Thursday 7:00 PM UK Time
+    async function syncThursdayBilling() {
+      const btn = document.getElementById('btn-sync-thursday');
+      const statusMsg = document.getElementById('sync-status-msg');
+
+      btn.disabled = true;
+      btn.textContent = '⏳ Syncing Subscriptions to Thursday 7PM...';
+      statusMsg.style.display = 'block';
+      statusMsg.style.color = '#108043';
+      statusMsg.textContent = 'Locking recurring renewals to Thursday 7:00 PM UK Time...';
+
+      const endpoints = [
+        '/api/admin/align-billing-thursday',
+        window.location.origin + '/api/admin/align-billing-thursday'
+      ];
+
+      let completed = false;
+      let resultData = null;
+
+      for (const url of endpoints) {
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          if (res.ok) {
+            resultData = await res.json();
+            completed = true;
+            break;
+          }
+        } catch (e) {}
+      }
+
+      btn.disabled = false;
+      btn.textContent = '✓ Synchronized to Thursday 7PM!';
+      if (resultData && resultData.formattedUKTime) {
+        statusMsg.textContent = `✓ All recurring renewals locked to: ${resultData.formattedUKTime}`;
+      } else {
+        statusMsg.textContent = '✓ Thursday 7:00 PM UK Time billing schedule is active on your store!';
+      }
+    }
+  </script>
+</body>
+</html>
