@@ -18,18 +18,38 @@
     </section>
   {% else %}
     {% assign is_subscriber = false %}
+    {% assign is_paused = false %}
+
     {% for tag in customer.tags %}
       {% assign down_tag = tag | downcase | strip %}
-      {% if down_tag contains 'subscriber' or down_tag contains 'active' or down_tag contains 'subscription' or down_tag contains 'meal' %}
+      {% if down_tag == 'paused' or down_tag == 'subscription-paused' or down_tag == 'inactive' or down_tag contains 'paused' %}
+        {% assign is_paused = true %}
+      {% endif %}
+      {% if down_tag == 'active-subscriber' or down_tag == 'active_subscriber' or down_tag == 'active subscriber' or down_tag contains 'active-subscriber' or down_tag contains 'active_subscriber' or down_tag contains 'active subscriber' %}
         {% assign is_subscriber = true %}
       {% endif %}
     {% endfor %}
 
-    {% if customer.orders_count > 0 or customer.email contains 'hannah' or customer.email contains 'adam' or customer.email contains 'declan' %}
-      {% assign is_subscriber = true %}
-    {% endif %}
-
-    {% if is_subscriber == false %}
+    {% if is_paused %}
+      <!-- 1. PAUSED SUBSCRIPTION SCREEN -->
+      <section class="gimmie-build-box" style="padding: 60px 20px; text-align: center;">
+        <div style="max-width: 580px; margin: 0 auto; background: #fff; border: 2.5px solid #102b10; border-radius: 20px; padding: 40px 24px; box-shadow: 4px 4px 0 #102b10;">
+          <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border: 2.5px solid #102b10; border-radius: 999px; background: #fff3cd; font-size: 2rem; font-weight: 900; margin-bottom: 20px;">
+            ⏸️
+          </div>
+          <h1 style="font-size: 1.6rem; font-weight: 900; color: #102b10; margin-bottom: 12px; text-transform: uppercase;">
+            Subscription Paused
+          </h1>
+          <p style="color: #444; font-size: 1.05rem; margin-bottom: 24px; line-height: 1.5;">
+            Hi {{ customer.first_name | default: 'there' }}! Your weekly meal subscription is currently paused. Please unpause or reactivate your subscription in your account to choose your weekly meals.
+          </p>
+          <a href="/account" class="gimmie-build-box__button" style="display: inline-block; padding: 14px 28px; background: #102b10; color: #fff; text-decoration: none; border-radius: 999px; font-weight: 800; font-size: 1rem;">
+            Manage Subscription in Account
+          </a>
+        </div>
+      </section>
+    {% elsif is_subscriber == false %}
+      <!-- 2. NON-SUBSCRIBER SCREEN -->
       <section class="gimmie-build-box" style="padding: 60px 20px; text-align: center;">
         <div style="max-width: 580px; margin: 0 auto; background: #fff; border: 2.5px solid #102b10; border-radius: 20px; padding: 40px 24px; box-shadow: 4px 4px 0 #102b10;">
           <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border: 2.5px solid #102b10; border-radius: 999px; background: #cce7c2; font-size: 2rem; font-weight: 900; margin-bottom: 20px;">
@@ -47,6 +67,7 @@
         </div>
       </section>
     {% else %}
+      <!-- 3. ACTIVE SUBSCRIBER SCREEN (Choose Meals Builder) -->
 {% endraw %}
 
 <section class="gimmie-build-box">
