@@ -723,6 +723,7 @@
 
     function cleanIngredients(raw) {
       if (!raw) return '';
+      let text = raw;
       if (typeof raw === 'string' && (raw.includes('value') || raw.includes('root') || raw.includes('children') || raw.includes('=>'))) {
         try {
           const parts = [];
@@ -731,10 +732,22 @@
           while ((m = regex.exec(raw)) !== null) {
             if (m[1]) parts.push(m[1]);
           }
-          if (parts.length > 0) return parts.join('').trim();
+          if (parts.length > 0) {
+            text = parts.join('');
+          }
         } catch (e) {}
       }
-      return raw;
+      if (typeof text === 'string') {
+        text = text
+          .replace(/\\n/g, ' ')
+          .replace(/\\r/g, '')
+          .replace(/\\t/g, ' ')
+          .replace(/\n+/g, ' ')
+          .replace(/\r+/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+      return text;
     }
 
     function openModal(mealId) {
