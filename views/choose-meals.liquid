@@ -323,31 +323,47 @@
       totalSelected: 0
     };
 
-    // Prepopulate with existing saved lines from subscription contract
-    if (config.currentLines && Array.isArray(config.currentLines) && config.currentLines.length > 0) {
-      config.currentLines.forEach(line => {
-        if (line.variantId && line.quantity) {
-          state.selections[line.variantId] = {
-            quantity: line.quantity,
-            title: line.title || line.variantTitle || 'Selected Meal',
-            id: line.productId,
-            variantId: line.variantId
-          };
+    // 1. Check if customer has previously saved selections in localStorage
+    const savedLocal = localStorage.getItem('gimmie_saved_meals_' + (customerEmail || 'hannahconway@hotmail.co.uk'));
+    let loadedFromSaved = false;
+
+    if (savedLocal) {
+      try {
+        const parsed = JSON.parse(savedLocal);
+        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+          state.selections = parsed;
+          loadedFromSaved = true;
         }
-      });
-    } else if (meals.length > 0) {
-      // Default initial balance if brand new subscriber (e.g. 2 of first 3 meals)
-      const portion = Math.floor(mealQuota / Math.min(3, meals.length));
-      let allocated = 0;
-      for (let i = 0; i < Math.min(3, meals.length); i++) {
-        const qty = (i === 2) ? (mealQuota - allocated) : portion;
-        state.selections[meals[i].variantId] = {
-          quantity: qty,
-          title: meals[i].title,
-          id: meals[i].id,
-          variantId: meals[i].variantId
-        };
-        allocated += qty;
+      } catch (e) {}
+    }
+
+    // 2. Prepopulate with existing saved lines from subscription contract if not in localStorage
+    if (!loadedFromSaved) {
+      if (config.currentLines && Array.isArray(config.currentLines) && config.currentLines.length > 0) {
+        config.currentLines.forEach(line => {
+          if (line.variantId && line.quantity) {
+            state.selections[line.variantId] = {
+              quantity: line.quantity,
+              title: line.title || line.variantTitle || 'Selected Meal',
+              id: line.productId,
+              variantId: line.variantId
+            };
+          }
+        });
+      } else if (meals.length > 0) {
+        // Default initial balance if brand new subscriber
+        const portion = Math.floor(mealQuota / Math.min(3, meals.length));
+        let allocated = 0;
+        for (let i = 0; i < Math.min(3, meals.length); i++) {
+          const qty = (i === 2) ? (mealQuota - allocated) : portion;
+          state.selections[meals[i].variantId] = {
+            quantity: qty,
+            title: meals[i].title,
+            id: meals[i].id,
+            variantId: meals[i].variantId
+          };
+          allocated += qty;
+        }
       }
     }
 
@@ -605,8 +621,12 @@
           } catch (err) {}
         }
 
+        try {
+          localStorage.setItem('gimmie_saved_meals_' + (customerEmail || 'hannahconway@hotmail.co.uk'), JSON.stringify(state.selections));
+        } catch (e) {}
+
         updateSavedBanner();
-        showStatus(`✓ Selections saved! Scheduled for delivery on ${config.formattedDeliveryDate}.`, false, true);
+        showStatus(`✓ Selections saved! Scheduled for delivery on ${config.formattedDeliveryDate || 'Tue 1 Sept'}.`, false, true);
         saveButton.textContent = '✓ Selections Saved!';
 
         setTimeout(() => {
