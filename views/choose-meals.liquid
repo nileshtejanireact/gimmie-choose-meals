@@ -253,32 +253,41 @@
                       {% assign m_ingr = meal_obj.ingredients.value | default: meal_obj.ingredients | default: meal_raw.ingredients | default: 'Fresh ingredients prepared by Gimmie chefs.' %}
                       {% assign m_aller = meal_obj.allergens.value | default: meal_obj.allergens | default: meal_raw.allergens | default: 'None' %}
 
+                      {% assign m_title_clean = m_title | strip_html | strip_newlines | escape %}
+                      {% assign m_desc_clean = m_desc | strip_html | strip_newlines | escape %}
+                      {% assign m_ingr_clean = m_ingr | strip_html | strip_newlines | escape %}
+                      {% assign m_aller_clean = m_aller | strip_html | strip_newlines | escape %}
+                      {% assign m_cals_clean = m_cals | strip_html | strip_newlines | escape %}
+                      {% assign m_prot_clean = m_prot | strip_html | strip_newlines | escape %}
+                      {% assign m_carbs_clean = m_carbs | strip_html | strip_newlines | escape %}
+                      {% assign m_fat_clean = m_fat | strip_html | strip_newlines | escape %}
+
                       <article class="gimmie-build-box__meal" 
                                data-meal-id="{{ m_id }}" 
-                               data-title="{{ m_title }}"
-                               data-image="{{ m_img }}"
-                               data-desc="{{ m_desc }}"
-                               data-ingredients="{{ m_ingr }}"
-                               data-allergens="{{ m_aller }}"
-                               data-cals="{{ m_cals }}"
-                               data-prot="{{ m_prot }}"
-                               data-carbs="{{ m_carbs }}"
-                               data-fat="{{ m_fat }}"
+                               data-title="{{ m_title_clean }}"
+                               data-image="{{ m_img | escape }}"
+                               data-desc="{{ m_desc_clean }}"
+                               data-ingredients="{{ m_ingr_clean }}"
+                               data-allergens="{{ m_aller_clean }}"
+                               data-cals="{{ m_cals_clean }}"
+                               data-prot="{{ m_prot_clean }}"
+                               data-carbs="{{ m_carbs_clean }}"
+                               data-fat="{{ m_fat_clean }}"
                                style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
                         <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ m_id }}">
-                          <img src="{{ m_img }}" alt="{{ m_title }}" class="gimmie-build-box__meal-image" loading="lazy" onerror="if(!this.dataset.errored){this.dataset.errored=true;this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';}">
+                          <img src="{{ m_img }}" alt="{{ m_title_clean }}" class="gimmie-build-box__meal-image" loading="lazy" onerror="if(!this.dataset.errored){this.dataset.errored=true;this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';}">
                           <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ m_id }}">ℹ</button>
                         </div>
                         <div class="gimmie-build-box__meal-content">
                           <div class="gimmie-build-box__badges">
                             <span class="gimmie-build-box__badge">CHEF ROTATION</span>
                           </div>
-                          <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ m_id }}">{{ m_title }}</h3>
-                          <p class="gimmie-build-box__meal-description">{{ m_desc }}</p>
+                          <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ m_id }}">{{ m_title | strip_html }}</h3>
+                          <p class="gimmie-build-box__meal-description">{{ m_desc | strip_html | truncate: 140 }}</p>
                           <div class="gimmie-build-box__meal-macros">
-                            <span>{{ m_cals }}</span>
+                            <span>{{ m_cals | strip_html }}</span>
                             <span class="dot">•</span>
-                            <span>{{ m_prot }}</span>
+                            <span>{{ m_prot | strip_html }}</span>
                           </div>
                           <div class="gimmie-build-box__qty">
                             <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ m_variant_id }}" aria-label="Decrease quantity" disabled>−</button>
