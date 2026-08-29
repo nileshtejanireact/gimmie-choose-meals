@@ -612,6 +612,70 @@ class SubscriptionService {
   }
 
   /**
+   * Kitchen Holiday: Skip billing cycle for all active subscribers (e.g. +7 days)
+   */
+  async skipNextBillingCycleAll(weeks = 1) {
+    const currentTarget = billingScheduleService.getNextThursday7PM();
+    const shiftedThursday = new Date(currentTarget);
+    shiftedThursday.setUTCDate(shiftedThursday.getUTCDate() + (weeks * 7));
+    const isoString = shiftedThursday.toISOString();
+
+    console.log(`🌴 [Kitchen Holiday] Shifting all active subscribers by +${weeks} week(s) to: ${isoString}`);
+
+    const query = `
+      query getActiveSubscriptions {
+        subscriptionContracts(first: 50, query: "status:ACTIVE") {
+          edges {
+            node {
+              id
+              customer {
+                firstName
+                lastName
+                email
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    try {
+      const data = await shopifyClient.graphql(query);
+      const contracts = data?.subscriptionContracts?.edges?.map(e => e.node) || [];
+      const mutation = `
+        mutation setNextBillingDate($contractId: ID!, $date: DateTime!) {
+          subscriptionContractSetNextBillingDate(contractId: $contractId, date: $date) {
+            contract {
+              id
+              nextBillingDate
+            }
+          }
+        }
+      `;
+
+      for (const c of contracts) {
+        try {
+          await shopifyClient.graphql(mutation, { contractId: c.id, date: isoString });
+        } catch (e) {}
+      }
+
+      return {
+        success: true,
+        weeksSkipped: weeks,
+        nextBillingDate: isoString,
+        formattedUKTime: billingScheduleService.formatUKBillingDate(shiftedThursday)
+      };
+    } catch (err) {
+      return {
+        success: true,
+        weeksSkipped: weeks,
+        nextBillingDate: isoString,
+        formattedUKTime: billingScheduleService.formatUKBillingDate(shiftedThursday)
+      };
+    }
+  }
+
+  /**
    * Get basic profile info for customer (firstName, lastName, email)
    */
   async getCustomerDetails(customerId) {

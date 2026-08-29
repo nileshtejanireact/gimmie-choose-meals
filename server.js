@@ -246,6 +246,35 @@ app.post('/api/admin/align-billing-thursday', async (req, res) => {
   }
 });
 
+/**
+ * Admin Action: Skip next billing cycle for all active subscribers (Kitchen Holiday)
+ */
+app.post('/api/admin/skip-billing-cycle', async (req, res) => {
+  try {
+    const weeks = parseInt(req.body.weeks || 1, 10);
+    const result = await subscriptionService.skipNextBillingCycleAll(weeks);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+/**
+ * Webhook: Auto-align any newly created subscription contract to Thursday 7PM (with 5-day grace period)
+ */
+app.post('/api/webhooks/subscription-contract-created', async (req, res) => {
+  try {
+    const contractId = req.body?.id || req.body?.admin_graphql_api_id;
+    if (contractId) {
+      console.log(`⚡ [Webhook Triggered] Auto-aligning new contract ${contractId} to Thursday 7PM`);
+      await subscriptionService.alignContractToThursday7PM(contractId);
+    }
+    res.status(200).send('Webhook processed');
+  } catch (e) {
+    res.status(200).send('Processed with notice');
+  }
+});
+
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`====================================================`);
