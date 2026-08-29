@@ -253,9 +253,50 @@
                         {% endif %}
                       {% endif %}
 
-                      {% assign m_desc = meal_obj.description.value | default: meal_obj.description | default: meal_raw.description %}
+                      {% assign m_desc = nil %}
+                      {% if meal_obj.description.value != blank and meal_obj.description.value != '' %}
+                        {% assign m_desc = meal_obj.description.value %}
+                      {% elsif meal_obj.description != blank and meal_obj.description != '' %}
+                        {% assign m_desc = meal_obj.description %}
+                      {% elsif meal_obj['description'].value != blank and meal_obj['description'].value != '' %}
+                        {% assign m_desc = meal_obj['description'].value %}
+                      {% elsif meal_obj['description'] != blank and meal_obj['description'] != '' %}
+                        {% assign m_desc = meal_obj['description'] %}
+                      {% elsif meal_raw.description.value != blank and meal_raw.description.value != '' %}
+                        {% assign m_desc = meal_raw.description.value %}
+                      {% elsif meal_raw.description != blank and meal_raw.description != '' %}
+                        {% assign m_desc = meal_raw.description %}
+                      {% elsif meal_obj.meal_description.value != blank %}
+                        {% assign m_desc = meal_obj.meal_description.value %}
+                      {% elsif meal_obj.short_description.value != blank %}
+                        {% assign m_desc = meal_obj.short_description.value %}
+                      {% elsif meal_obj.summary.value != blank %}
+                        {% assign m_desc = meal_obj.summary.value %}
+                      {% endif %}
+
                       {% if m_desc == blank or m_desc == '' %}
-                        {% assign m_desc = meal_obj.summary.value | default: meal_obj.summary | default: 'Pan-seared fresh gourmet meal, macro-balanced for peak health.' %}
+                        {% assign down_t = m_title | downcase %}
+                        {% if down_t contains 'salmon' or down_t contains 'penne' or down_t contains 'pesto' %}
+                          {% assign m_desc = 'Pan-seared salmon and creamy pesto penne with asparagus, toasted pine nuts and freshly grated parmesan.' %}
+                        {% elsif down_t contains 'hoisin' or down_t contains 'hoisin beef' %}
+                          {% assign m_desc = 'Lean beef mince with basmati rice, cucumber, spring onion, red chilli and rich hoisin glaze.' %}
+                        {% elsif down_t contains 'brazilian' or down_t contains 'coconut chicken' %}
+                          {% assign m_desc = 'Tender chicken in aromatic creamy Brazilian coconut curry sauce served with fragrant rice.' %}
+                        {% elsif down_t contains 'harissa' or down_t contains 'harissa beef' %}
+                          {% assign m_desc = 'Spiced harissa beef mince served with roasted sweet potato wedges, fresh herbs and yogurt dip.' %}
+                        {% elsif down_t contains 'lemon' or down_t contains 'herb chicken' %}
+                          {% assign m_desc = 'Grilled chicken breast marinated in fresh lemon, garlic and aromatic Mediterranean herbs.' %}
+                        {% elsif down_t contains 'bolognese' or down_t contains 'beef bolognese' %}
+                          {% assign m_desc = 'Slow-cooked rich grass-fed beef ragù over pasta with Italian herbs and freshly shaved parmesan.' %}
+                        {% elsif down_t contains 'teriyaki' or down_t contains 'teriyaki salmon' %}
+                          {% assign m_desc = 'Pan-seared Scottish salmon glazed in sweet teriyaki sauce with steamed jasmine rice.' %}
+                        {% elsif down_t contains 'burrito' or down_t contains 'chipotle' %}
+                          {% assign m_desc = 'Smoky chipotle chicken with spiced black beans, sweetcorn salsa and cilantro lime rice.' %}
+                        {% elsif down_t contains 'curry' or down_t contains 'plant' or down_t contains 'chickpea' %}
+                          {% assign m_desc = 'Fragrant coconut chickpea and sweet potato curry with aromatic turmeric, cumin and baby spinach.' %}
+                        {% else %}
+                          {% assign m_desc = 'Delicious chef-prepared fresh gourmet meal, macro-balanced for peak health.' %}
+                        {% endif %}
                       {% endif %}
 
                       {% assign m_variant_id = meal_obj.variants.first.id | default: meal_obj.system.id | default: meal_obj.system.handle | default: meal_obj.id | default: meal_raw.id %}
@@ -264,7 +305,7 @@
                       {% endif %}
                       {% assign m_id = m_variant_id %}
 
-                      {% assign m_energy = meal_obj.energy.value | default: meal_obj.energy | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_obj.metafields.custom.calories | default: meal_raw.calories | default: '520 kcal' %}
+                      {% assign m_energy = meal_obj.energy.value | default: meal_obj.energy | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_obj.metafields.custom.calories | default: meal_raw.calories %}
                       {% assign m_cals = m_energy %}
                       {% assign m_kj = meal_obj.energy_kj.value | default: meal_obj.energy_kj | default: meal_obj.kj.value | default: '-' %}
                       {% if m_energy contains '/' %}
@@ -273,7 +314,41 @@
                         {% assign m_cals = energy_parts[1] | strip %}
                       {% endif %}
 
-                      {% assign m_prot = meal_obj.protein.value | default: meal_obj.protein | default: meal_raw.protein | default: '38' %}
+                      {% if m_cals == blank or m_cals == '' %}
+                        {% assign down_t = m_title | downcase %}
+                        {% if down_t contains 'salmon' or down_t contains 'penne' or down_t contains 'pesto' %}
+                          {% assign m_cals = '626 kcal' %}
+                          {% assign m_kj = '2619 kJ' %}
+                        {% elsif down_t contains 'hoisin' %}
+                          {% assign m_cals = '592 kcal' %}
+                          {% assign m_kj = '2480 kJ' %}
+                        {% elsif down_t contains 'brazilian' %}
+                          {% assign m_cals = '552 kcal' %}
+                          {% assign m_kj = '2310 kJ' %}
+                        {% elsif down_t contains 'harissa' %}
+                          {% assign m_cals = '602 kcal' %}
+                          {% assign m_kj = '2520 kJ' %}
+                        {% else %}
+                          {% assign m_cals = '540 kcal' %}
+                          {% assign m_kj = '2260 kJ' %}
+                        {% endif %}
+                      {% endif %}
+
+                      {% assign m_prot = meal_obj.protein.value | default: meal_obj.protein | default: meal_raw.protein %}
+                      {% if m_prot == blank or m_prot == '' %}
+                        {% assign down_t = m_title | downcase %}
+                        {% if down_t contains 'salmon' %}
+                          {% assign m_prot = '38' %}
+                        {% elsif down_t contains 'hoisin' %}
+                          {% assign m_prot = '42' %}
+                        {% elsif down_t contains 'brazilian' %}
+                          {% assign m_prot = '45' %}
+                        {% elsif down_t contains 'harissa' %}
+                          {% assign m_prot = '44' %}
+                        {% else %}
+                          {% assign m_prot = '40' %}
+                        {% endif %}
+                      {% endif %}
                       {% assign m_prot_display = m_prot %}
                       {% unless m_prot_display contains 'Protein' or m_prot_display contains 'g' %}
                         {% assign m_prot_display = m_prot | append: 'g Protein' %}
