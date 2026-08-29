@@ -83,18 +83,16 @@
         {% assign meta_menus = shop.metaobjects.menu.values %}
       {% endif %}
 
-      {% comment %} 2. Find next week's menu (14th delivery date) for recurring subscribers {% endcomment %}
+      {% comment %} 2. Find September 7th menu for recurring subscribers {% endcomment %}
       {% assign next_week_menu = nil %}
       {% for menu_item in meta_menus %}
         {% assign date_val = menu_item.delivery_date.value | default: menu_item.delivery_date | default: menu_item.date | default: menu_item.title | default: menu_item.name | downcase %}
-        {% if date_val contains '14' %}
+        {% if date_val contains '7' or date_val contains 'sep 7' or date_val contains 'sept 7' or date_val contains 'september 7' %}
           {% assign next_week_menu = menu_item %}
         {% endif %}
       {% endfor %}
 
-      {% if next_week_menu == nil and meta_menus.size > 1 %}
-        {% assign next_week_menu = meta_menus[1] %}
-      {% elsif next_week_menu == nil and meta_menus.size > 0 %}
+      {% if next_week_menu == nil and meta_menus.size > 0 %}
         {% assign next_week_menu = meta_menus.first %}
       {% endif %}
 
@@ -105,13 +103,13 @@
         {% assign raw_deliv = next_week_menu.delivery_date.value | default: next_week_menu.delivery_date | default: next_week_menu.date | default: next_week_menu.display_name | default: next_week_menu.title %}
         {% assign active_delivery_date = raw_deliv | date: "%a %d %b" %}
         {% if active_delivery_date == blank or active_delivery_date contains '2026' or active_delivery_date == '' %}
-          {% assign active_delivery_date = 'Mon 14 Sept' %}
+          {% assign active_delivery_date = 'Mon 7 Sept' %}
         {% endif %}
 
         {% assign raw_cutoff = next_week_menu.cutoff_date_time.value | default: next_week_menu.cutoff_date_time | default: next_week_menu.cutoff_date %}
         {% assign active_cutoff_date = raw_cutoff | date: "%a %d %b @ 11:59 PM UK" %}
-        {% if active_cutoff_date == blank or active_cutoff_date contains '2026-09-10T' or active_cutoff_date == '' %}
-          {% assign active_cutoff_date = 'Thu 10 Sept @ 11:59 PM UK' %}
+        {% if active_cutoff_date == blank or active_cutoff_date contains '2026-09-03' or active_cutoff_date == '' %}
+          {% assign active_cutoff_date = 'Thu 3 Sept @ 11:59 PM UK' %}
         {% endif %}
 
         {% assign active_meta_meals = next_week_menu.meals.value | default: next_week_menu.meals | default: next_week_menu.products.value | default: next_week_menu.products | default: next_week_menu.dishes.value %}
@@ -129,7 +127,7 @@
         </p>
         <h1 class="gimmie-build-box__heading">Choose Your Meals</h1>
         <p class="gimmie-build-box__intro">
-          Customise your <strong>{{ mealQuota }} meals</strong> for your upcoming delivery on <strong>{% raw %}{{ active_delivery_date | default: 'Mon 14 Sept' }}{% endraw %}</strong>.
+          Select your <strong>{{ mealQuota }} meals</strong> for your upcoming delivery on <strong>{% raw %}{{ active_delivery_date | default: 'Mon 7 Sept' }}{% endraw %}</strong>.
         </p>
       </header>
 
@@ -159,7 +157,7 @@
                 </div>
                 <div class="gimmie-build-box__detail">
                   <strong>Delivery Date</strong>
-                  <span style="color: var(--gimmie-text);">📅 {% raw %}{{ active_delivery_date | default: 'Mon 14 Sept' }}{% endraw %}</span>
+                  <span style="color: var(--gimmie-text);">📅 {% raw %}{{ active_delivery_date | default: 'Mon 7 Sept' }}{% endraw %}</span>
                 </div>
                 <div class="gimmie-build-box__detail">
                   <strong>Your Box Size</strong>
@@ -167,7 +165,7 @@
                 </div>
                 <div class="gimmie-build-box__detail">
                   <strong>Cut-Off Time</strong>
-                  <span>⏰ {% raw %}{{ active_cutoff_date | default: 'Thu 10 Sept @ 11:59 PM UK' }}{% endraw %}</span>
+                  <span>⏰ {% raw %}{{ active_cutoff_date | default: 'Thu 3 Sept @ 11:59 PM UK' }}{% endraw %}</span>
                 </div>
               </div>
 
@@ -175,7 +173,7 @@
               <div id="gimmie-saved-banner" style="margin-top: 16px; padding: 14px 18px; border: 2px solid var(--gimmie-success); border-radius: 16px; background: #e8f5e8;">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
                   <strong style="color: var(--gimmie-success); font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.04em;">
-                    ✓ Current Meals Locked for Next Delivery
+                    ✓ Your current meal selection
                   </strong>
                   <span style="font-size: 0.8rem; font-weight: 700; color: var(--gimmie-muted);">Editable until Thursday 11:59 PM</span>
                 </div>
@@ -190,16 +188,13 @@
           <!-- Step 2: Meal Selection Grid -->
           <div class="gimmie-build-box__panel">
             <div class="gimmie-build-box__surface">
-              <div class="gimmie-build-box__panel-header gimmie-build-box__panel-header--meals">
-                <div class="gimmie-build-box__title-wrap">
+              <div class="gimmie-build-box__panel-header gimmie-build-box__panel-header--meals" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
                   <span class="gimmie-build-box__step">2</span>
-                  <div>
-                    <h2 class="gimmie-build-box__panel-title">Select & Customise Dishes</h2>
-                    <p class="gimmie-build-box__description">Adjust quantities below. You can pick multiples of any dish!</p>
-                  </div>
+                  <h2 class="gimmie-build-box__panel-title" style="margin: 0;">Pick your meals</h2>
                 </div>
-                <div id="gimmie-counter-badge" class="gimmie-build-box__counter">
-                  0 of {{ mealQuota }} Selected
+                <div id="gimmie-counter-badge" class="gimmie-build-box__counter" style="font-size: 0.9rem; font-weight: 700; color: var(--gimmie-muted);">
+                  <span id="gimmie-step2-count">0</span> of <span id="gimmie-step2-quota">{{ mealQuota }}</span> Selected
                 </div>
               </div>
 
@@ -353,7 +348,9 @@
                       {% assign down_t = m_title | downcase %}
                       {% if down_t contains 'harissa' or down_t contains 'harissa beef' %}
                         {% if m_desc == blank %}{% assign m_desc = 'Spiced harissa beef mince served with roasted sweet potato wedges, fresh herbs and yogurt dip.' %}{% endif %}
-                        {% if m_energy == blank %}{% assign m_energy = '1740 kj / 416 kcal' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '2146' or m_energy contains '520' %}
+                          {% assign m_energy = '1740 kj / 416 kcal' %}
+                        {% endif %}
                         {% if m_fat == blank %}{% assign m_fat = '10.4' %}{% endif %}
                         {% if m_saturates == blank %}{% assign m_saturates = '3.8' %}{% endif %}
                         {% if m_carbs == blank %}{% assign m_carbs = '42.8' %}{% endif %}
@@ -364,7 +361,9 @@
                         {% if m_aller == blank %}{% assign m_aller = 'Sesame' %}{% endif %}
                       {% elsif down_t contains 'brazilian' or down_t contains 'coconut chicken' %}
                         {% if m_desc == blank %}{% assign m_desc = 'Tender chicken in aromatic creamy Brazilian coconut curry sauce served with fragrant rice.' %}{% endif %}
-                        {% if m_energy == blank %}{% assign m_energy = '2376 kj / 568 kcal' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}
+                          {% assign m_energy = '2376 kj / 568 kcal' %}
+                        {% endif %}
                         {% if m_fat == blank %}{% assign m_fat = '20.1' %}{% endif %}
                         {% if m_saturates == blank %}{% assign m_saturates = '9.9' %}{% endif %}
                         {% if m_carbs == blank %}{% assign m_carbs = '47.8' %}{% endif %}
@@ -375,7 +374,9 @@
                         {% if m_aller == blank %}{% assign m_aller = 'Celery' %}{% endif %}
                       {% elsif down_t contains 'salmon' or down_t contains 'penne' or down_t contains 'pesto' %}
                         {% if m_desc == blank %}{% assign m_desc = 'Pan-seared salmon and creamy pesto penne with asparagus, toasted pine nuts and freshly grated parmesan.' %}{% endif %}
-                        {% if m_energy == blank %}{% assign m_energy = '2619 kj / 626 kcal' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}
+                          {% assign m_energy = '2619 kj / 626 kcal' %}
+                        {% endif %}
                         {% if m_fat == blank %}{% assign m_fat = '34.8' %}{% endif %}
                         {% if m_saturates == blank %}{% assign m_saturates = '7.7' %}{% endif %}
                         {% if m_carbs == blank %}{% assign m_carbs = '39.9' %}{% endif %}
@@ -386,7 +387,9 @@
                         {% if m_aller == blank %}{% assign m_aller = 'Fish, Wheat, Milk, Nuts, Celery' %}{% endif %}
                       {% elsif down_t contains 'hoisin' or down_t contains 'hoisin beef' %}
                         {% if m_desc == blank %}{% assign m_desc = 'Sticky beef in a hoisin-soy glaze over fluffy basmati rice with a side of fresh cucumber ribbons. Finished with red chillies, spring onion and sesame seeds.' %}{% endif %}
-                        {% if m_energy == blank %}{% assign m_energy = '2480 kj / 592 kcal' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}
+                          {% assign m_energy = '2480 kj / 592 kcal' %}
+                        {% endif %}
                         {% if m_fat == blank %}{% assign m_fat = '22.4' %}{% endif %}
                         {% if m_saturates == blank %}{% assign m_saturates = '6.8' %}{% endif %}
                         {% if m_carbs == blank %}{% assign m_carbs = '54.1' %}{% endif %}
@@ -491,15 +494,11 @@
                           <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ m_id }}">ℹ</button>
                         </div>
                         <div class="gimmie-build-box__meal-content">
-                          <div class="gimmie-build-box__badges">
-                            <span class="gimmie-build-box__badge">CHEF ROTATION</span>
-                          </div>
                           <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ m_id }}">{{ m_title | strip_html }}</h3>
                           <p class="gimmie-build-box__meal-description">{{ m_desc | strip_html }}</p>
                           <div class="gimmie-build-box__meal-macros">
-                            <span>{{ m_cals | strip_html }}</span>
-                            <span class="dot">•</span>
-                            <span>{{ m_prot_display | strip_html }}</span>
+                            <span class="gimmie-macro-bubble">{{ m_cals | strip_html | upcase }}</span>
+                            <span class="gimmie-macro-bubble">{{ m_prot_display | strip_html | upcase }}</span>
                           </div>
                           <div class="gimmie-build-box__qty">
                             <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ m_variant_id }}" aria-label="Decrease quantity" disabled>−</button>
@@ -518,17 +517,11 @@
                           <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ meal.id }}">ℹ</button>
                         </div>
                         <div class="gimmie-build-box__meal-content">
-                          <div class="gimmie-build-box__badges">
-                            {% for badge in meal.badges %}
-                              <span class="gimmie-build-box__badge">{{ badge }}</span>
-                            {% endfor %}
-                          </div>
                           <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ meal.id }}">{{ meal.title }}</h3>
                           <p class="gimmie-build-box__meal-description">{{ meal.description }}</p>
                           <div class="gimmie-build-box__meal-macros">
-                            <span>{{ meal.macros.calories }}</span>
-                            <span class="dot">•</span>
-                            <span>{{ meal.macros.protein }}</span>
+                            <span class="gimmie-macro-bubble">{{ meal.macros.calories | upcase }}</span>
+                            <span class="gimmie-macro-bubble">{{ meal.macros.protein | upcase }}</span>
                           </div>
                           <div class="gimmie-build-box__qty">
                             <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ meal.variantId }}" aria-label="Decrease quantity" disabled>−</button>
@@ -594,6 +587,11 @@
     <div class="gimmie-modal__content" role="dialog" aria-modal="true">
       <button id="gimmie-modal-close" class="gimmie-modal__close" aria-label="Close modal">&times;</button>
 
+      <!-- Meal Image in Popup -->
+      <div id="gimmie-modal-image-wrap" style="width: 100%; aspect-ratio: 16/10; border-radius: 16px; overflow: hidden; margin-bottom: 18px; border: 1.5px solid var(--gimmie-border); background: #EFECE6;">
+        <img id="gimmie-modal-image" src="" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+      </div>
+
       <div class="gimmie-modal__header">
         <h2 id="gimmie-modal-title" class="gimmie-modal__title"></h2>
         <p id="gimmie-modal-desc" class="gimmie-modal__desc"></p>
@@ -606,16 +604,10 @@
         <div id="gimmie-modal-allergens" style="margin-top: 10px; font-size: 0.85rem; font-weight: 700; color: #b42318;"></div>
       </div>
 
-      <!-- Nutrition Facts Table Matching Main Menu -->
+      <!-- Nutrition Facts Table Matching Main Menu (No Header, No Serving Size row, Normal weight) -->
       <div>
         <h3 class="gimmie-modal__section-title">Nutritional Information</h3>
         <table class="gimmie-modal__table">
-          <thead>
-            <tr>
-              <th>Nutrient</th>
-              <th id="gimmie-modal-serving-header">Per Serving</th>
-            </tr>
-          </thead>
           <tbody id="gimmie-modal-table-body">
             <!-- Dynamically populated -->
           </tbody>
@@ -631,7 +623,7 @@
       "customerName": "{% raw %}{{ customer.first_name | default: customer.name | default: 'Subscriber' }} {{ customer.last_name }}{% endraw %}",
       "mealQuota": {{ mealQuota | json }},
       "contractId": {{ contractId | json }},
-      "formattedDeliveryDate": "{% raw %}{{ active_delivery_date | default: 'Mon 14 Sept' }}{% endraw %}",
+      "formattedDeliveryDate": "{% raw %}{{ active_delivery_date | default: 'Mon 7 Sept' }}{% endraw %}",
       "currentLines": {{ currentLines | json }},
       "meals": {{ meals | json }}
     }
@@ -792,6 +784,11 @@
       });
 
       state.totalSelected = total;
+
+      const step2Count = document.getElementById('gimmie-step2-count');
+      const step2Quota = document.getElementById('gimmie-step2-quota');
+      if (step2Count) step2Count.textContent = total;
+      if (step2Quota) step2Quota.textContent = mealQuota;
 
       if (counterBadge) {
         counterBadge.textContent = `${total} of ${mealQuota} Selected`;
@@ -958,6 +955,19 @@
       );
       if (!meal || !modalEl) return;
 
+      // Populate Image
+      const modalImg = document.getElementById('gimmie-modal-image');
+      const modalImgWrap = document.getElementById('gimmie-modal-image-wrap');
+      if (modalImg && modalImgWrap) {
+        if (meal.image) {
+          modalImg.src = meal.image;
+          modalImg.alt = meal.title || '';
+          modalImgWrap.style.display = 'block';
+        } else {
+          modalImgWrap.style.display = 'none';
+        }
+      }
+
       if (modalTitle) modalTitle.textContent = meal.title;
       if (modalDesc) modalDesc.textContent = cleanIngredients(meal.description) || 'Delicious chef-prepared fresh gourmet meal, macro-balanced for peak health.';
 
@@ -974,19 +984,19 @@
 
       if (modalTableBody && meal.nutrition) {
         const n = meal.nutrition;
-        const servingHeader = document.getElementById('gimmie-modal-serving-header');
-        if (servingHeader) servingHeader.textContent = n.serving || 'Per Serving';
+        const cleanKj = (n.energyKj || '-').replace(/kj/i, '').trim();
+        const cleanKcal = (n.energyKcal || '-').replace(/kcal/i, '').trim();
+        const cleanProt = (n.protein || '-').replace(/protein/i, '').trim();
 
         modalTableBody.innerHTML = `
-          <tr><td>Serving Size</td><td><strong>${n.serving || 'Per Serving'}</strong></td></tr>
-          <tr><td>Energy (kJ)</td><td>${n.energyKj || '-'}</td></tr>
-          <tr><td>Energy (kcal)</td><td><strong>${n.energyKcal || '-'}</strong></td></tr>
+          <tr><td>Energy (kJ)</td><td>${cleanKj ? cleanKj + ' kJ' : '-'}</td></tr>
+          <tr><td>Energy (kcal)</td><td>${cleanKcal ? cleanKcal + ' kcal' : '-'}</td></tr>
           <tr><td>Fat</td><td>${n.fat || '-'}</td></tr>
           <tr><td>- of which saturates</td><td>${n.saturates || '-'}</td></tr>
           <tr><td>Carbohydrate</td><td>${n.carbs || '-'}</td></tr>
           <tr><td>- of which sugars</td><td>${n.sugars || '-'}</td></tr>
           <tr><td>Fibre</td><td>${n.fibre || '-'}</td></tr>
-          <tr><td>Protein</td><td><strong>${n.protein || '-'}</strong></td></tr>
+          <tr><td>Protein</td><td>${cleanProt}</td></tr>
           <tr><td>Salt</td><td>${n.salt || '-'}</td></tr>
         `;
       }

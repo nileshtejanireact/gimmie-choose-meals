@@ -243,7 +243,7 @@ async function handleAppProxy(req, res) {
     if (!subscription) {
       console.log(`⚡ Activating meal selection session for customer ID ${customerId}`);
       const custDetails = await subscriptionService.getCustomerDetails(customerId);
-      const formattedDeliveryDate = 'Mon 14 Sept';
+      const formattedDeliveryDate = 'Mon 7 Sept';
 
       subscription = {
         id: `gid://shopify/SubscriptionContract/cust_${customerId}`,
