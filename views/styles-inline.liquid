@@ -550,10 +550,48 @@
 
 @media (max-width: 900px) {
   .gimmie-build-box__layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
   .gimmie-build-box__summary {
-    position: static;
+    position: static !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .gimmie-build-box__section {
+    padding: 18px 8px !important;
+  }
+  .gimmie-build-box__surface {
+    padding: 16px 14px !important;
+  }
+  .gimmie-build-box__heading {
+    font-size: 2.1rem !important;
+  }
+  .gimmie-build-box__meals-grid,
+  .gimmie-build-box__grid {
+    grid-template-columns: 1fr !important;
+    gap: 18px !important;
+  }
+  .gimmie-build-box__panel-header {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .gimmie-build-box__panel-title {
+    font-size: 1.15rem !important;
+  }
+  .gimmie-build-box__details {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  .gimmie-build-box__detail {
+    padding: 10px 12px !important;
+  }
+  .gimmie-build-box__meal-content {
+    padding: 14px !important;
+  }
+  .gimmie-modal__content {
+    padding: 20px 16px !important;
+    max-height: 94vh !important;
   }
 }
 </style>

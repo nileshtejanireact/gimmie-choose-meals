@@ -198,8 +198,8 @@
                 </div>
               </div>
 
-              <!-- Meals Grid - Strictly 2 in Row -->
-              <div class="gimmie-build-box__meals-grid" style="display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 20px !important;">
+              <!-- Meals Grid - Responsive 2 in row desktop, 1 in row mobile -->
+              <div class="gimmie-build-box__meals-grid">
                 {% raw %}
                   {% if active_meta_meals and active_meta_meals.size > 0 %}
                     {% for meal_raw in active_meta_meals %}
@@ -420,8 +420,20 @@
                         {% if m_prot == blank %}{% assign m_prot = '46.0' %}{% endif %}
                         {% if m_salt == blank %}{% assign m_salt = '1.25' %}{% endif %}
                         {% if m_aller == blank %}{% assign m_aller = 'Celery' %}{% endif %}
-                      {% elsif down_t contains 'salmon' or down_t contains 'penne' or down_t contains 'pesto' %}
-                        {% if m_desc == blank %}{% assign m_desc = 'Pan-seared salmon and creamy pesto penne with asparagus, toasted pine nuts and freshly grated parmesan.' %}{% endif %}
+                      {% elsif down_t contains 'poke' or down_t contains 'salmon poke' %}
+                        {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Flaked roasted salmon over seasoned sushi rice with edamame beans, crunchy cucumber, pickled ginger and a toasted sesame soy dressing.' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '2345 kj / 560 kcal' %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = '22.0' %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = '3.8' %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = '52.0' %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = '6.5' %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = '4.5' %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = '38.0' %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = '1.30' %}{% endif %}
+                        {% if m_aller == blank %}{% assign m_aller = 'Fish, Soya, Sesame' %}{% endif %}
+                        {% if m_ingr == blank %}{% assign m_ingr = 'Atlantic Salmon (Fish), Sushi Rice, Edamame Beans (Soya), Cucumber, Pickled Ginger, Sesame Oil, Toasted Sesame Seeds, Soy Sauce (Soya, Wheat), Spring Onion.' %}{% endif %}
+                      {% elsif down_t contains 'pesto' or down_t contains 'penne' or down_t contains 'salmon pesto' %}
+                        {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Pan-seared salmon and creamy pesto penne with asparagus, toasted pine nuts and freshly grated parmesan.' %}{% endif %}
                         {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}
                           {% assign m_energy = '2619 kj / 626 kcal' %}
                         {% endif %}
