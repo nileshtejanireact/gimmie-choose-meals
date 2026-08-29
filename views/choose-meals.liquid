@@ -204,8 +204,23 @@
                       {% assign m_id = meal_obj.id | default: meal_raw.id %}
                       {% assign m_cals = meal_obj.metafields.custom.calories | default: meal_raw.calories | default: '520 kcal' %}
                       {% assign m_prot = meal_obj.metafields.custom.protein | default: meal_raw.protein | default: '44g Protein' %}
+                      {% assign m_carbs = meal_obj.metafields.custom.carbs | default: meal_raw.carbs | default: '38g Carbs' %}
+                      {% assign m_fat = meal_obj.metafields.custom.fat | default: meal_raw.fat | default: '14g Fat' %}
+                      {% assign m_ingr = meal_obj.ingredients | default: meal_raw.ingredients | default: 'Fresh ingredients prepared by Gimmie chefs.' %}
+                      {% assign m_aller = meal_obj.allergens | default: meal_raw.allergens | default: 'None' %}
 
-                      <article class="gimmie-build-box__meal" data-meal-id="{{ m_id }}" style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
+                      <article class="gimmie-build-box__meal" 
+                               data-meal-id="{{ m_id }}" 
+                               data-title="{{ m_title }}"
+                               data-image="{{ m_img }}"
+                               data-desc="{{ m_desc }}"
+                               data-ingredients="{{ m_ingr }}"
+                               data-allergens="{{ m_aller }}"
+                               data-cals="{{ m_cals }}"
+                               data-prot="{{ m_prot }}"
+                               data-carbs="{{ m_carbs }}"
+                               data-fat="{{ m_fat }}"
+                               style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
                         <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ m_id }}">
                           <img src="{{ m_img }}" alt="{{ m_title }}" class="gimmie-build-box__meal-image" loading="lazy">
                           <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ m_id }}">ℹ</button>
@@ -378,9 +393,28 @@
       activeMealList.push({
         id: mealId,
         variantId: variantId,
-        title: titleEl ? titleEl.textContent.trim() : 'Meal',
-        image: imgEl ? imgEl.src : '',
-        description: descEl ? descEl.textContent.trim() : ''
+        title: card.getAttribute('data-title') || (titleEl ? titleEl.textContent.trim() : 'Meal'),
+        image: card.getAttribute('data-image') || (imgEl ? imgEl.src : ''),
+        description: card.getAttribute('data-desc') || (descEl ? descEl.textContent.trim() : ''),
+        ingredients: card.getAttribute('data-ingredients') || 'Fresh natural ingredients prepared by Gimmie chefs.',
+        allergens: card.getAttribute('data-allergens') || 'None',
+        macros: {
+          calories: card.getAttribute('data-cals') || '520 kcal',
+          protein: card.getAttribute('data-prot') || '44g Protein',
+          carbs: card.getAttribute('data-carbs') || '38g Carbs',
+          fat: card.getAttribute('data-fat') || '14g Fat'
+        },
+        nutrition: {
+          serving: 'Per Serving (420g)',
+          energyKcal: card.getAttribute('data-cals') || '520 kcal',
+          protein: card.getAttribute('data-prot') || '44g',
+          fat: card.getAttribute('data-fat') || '14g',
+          saturates: '3.2g',
+          carbs: card.getAttribute('data-carbs') || '38g',
+          sugars: '4.8g',
+          fibre: '6.2g',
+          salt: '1.1g'
+        }
       });
     });
     const meals = activeMealList.length > 0 ? activeMealList : (config.meals || []);
