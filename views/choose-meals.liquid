@@ -688,21 +688,38 @@
       updateUI();
     }
 
+    function cleanIngredients(raw) {
+      if (!raw) return '';
+      if (typeof raw === 'string' && (raw.includes('value') || raw.includes('root') || raw.includes('children') || raw.includes('=>'))) {
+        try {
+          const parts = [];
+          const regex = /"value"\s*=>\s*"([^"]*)"/g;
+          let m;
+          while ((m = regex.exec(raw)) !== null) {
+            if (m[1]) parts.push(m[1]);
+          }
+          if (parts.length > 0) return parts.join('').trim();
+        } catch (e) {}
+      }
+      return raw;
+    }
+
     function openModal(mealId) {
       const meal = meals.find(m => String(m.id) === String(mealId) || String(m.variantId) === String(mealId));
       if (!meal || !modalEl) return;
 
       if (modalTitle) modalTitle.textContent = meal.title;
-      if (modalDesc) modalDesc.textContent = meal.description;
+      if (modalDesc) modalDesc.textContent = cleanIngredients(meal.description);
 
       const ingredientsEl = document.getElementById('gimmie-modal-ingredients');
       if (ingredientsEl) {
-        ingredientsEl.textContent = meal.ingredients || 'Fresh, natural ingredients prepared in our kitchen.';
+        ingredientsEl.textContent = cleanIngredients(meal.ingredients) || 'Fresh, natural ingredients prepared in our kitchen.';
       }
 
       if (modalAllergens) {
-        modalAllergens.textContent = meal.allergens && meal.allergens !== 'None' ? `⚠️ Allergens: ${meal.allergens}` : '✓ No common allergens listed.';
-        modalAllergens.style.color = meal.allergens && meal.allergens !== 'None' ? '#b42318' : '#1E6B24';
+        const cleanAllergens = cleanIngredients(meal.allergens);
+        modalAllergens.textContent = cleanAllergens && cleanAllergens !== 'None' ? `⚠️ Allergens: ${cleanAllergens}` : '✓ No common allergens listed.';
+        modalAllergens.style.color = cleanAllergens && cleanAllergens !== 'None' ? '#b42318' : '#1E6B24';
       }
 
       if (modalTableBody && meal.nutrition) {
