@@ -244,8 +244,11 @@
                       {% endif %}
 
                       {% assign m_desc = meal_obj.description.value | default: meal_obj.description | default: meal_raw.description | default: meal_obj.summary | default: 'Delicious chef-prepared fresh gourmet meal, macro-balanced for peak health.' %}
-                      {% assign m_variant_id = meal_obj.variants.first.id | default: meal_obj.variant_id | default: meal_obj.id | default: meal_raw.id %}
-                      {% assign m_id = meal_obj.id | default: meal_raw.id %}
+                      {% assign m_variant_id = meal_obj.variants.first.id | default: meal_obj.system.id | default: meal_obj.system.handle | default: meal_obj.id | default: meal_raw.id %}
+                      {% if m_variant_id == blank or m_variant_id == '' %}
+                        {% assign m_variant_id = 'dish_' | append: forloop.index %}
+                      {% endif %}
+                      {% assign m_id = m_variant_id %}
                       {% assign m_cals = meal_obj.metafields.custom.calories | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_raw.calories | default: '520 kcal' %}
                       {% assign m_prot = meal_obj.metafields.custom.protein | default: meal_obj.protein.value | default: meal_obj.protein | default: meal_raw.protein | default: '44g Protein' %}
                       {% assign m_carbs = meal_obj.metafields.custom.carbs | default: meal_obj.carbs.value | default: meal_obj.carbs | default: meal_raw.carbs | default: '38g Carbs' %}
@@ -352,6 +355,17 @@
             <!-- List of Selected Meals -->
             <div id="gimmie-selected-meals-list" class="gimmie-build-box__selected-meals">
               <p style="color: var(--gimmie-muted); font-size: 0.9rem; margin: 0;">No meals selected yet.</p>
+            </div>
+
+            <!-- Clear All Selections Button -->
+            <button id="gimmie-clear-btn" type="button" style="width: 100%; margin-bottom: 12px; background: #fff5f5; border: 1px dashed #e02424; border-radius: 999px; padding: 7px 12px; font-size: 0.82rem; font-weight: 700; color: #c81e1e; cursor: pointer; display: none;">
+              🗑️ Clear Box Selections
+            </button>
+
+            <!-- Quota Full Notice Alert -->
+            <div id="gimmie-quota-notice" style="display: none; margin-bottom: 12px; padding: 10px 14px; background: #fff8eb; border: 1px solid #f99f1b; border-radius: 12px; font-size: 0.82rem; color: #8c5204; line-height: 1.4;">
+              ⚠️ <strong>Box is Full ({{ mealQuota }} of {{ mealQuota }} selected)!</strong><br>
+              To choose a different dish, reduce (<strong>−</strong>) or remove an item first.
             </div>
 
             <!-- Save CTA -->
@@ -498,47 +512,54 @@
       totalSelected: 0
     };
 
-    // 1. Check if customer has previously saved selections in localStorage
+    // Filter selections to only include dishes present in current rotation
+    const validMealMap = new Map();
+    meals.forEach(m => {
+      validMealMap.set(String(m.variantId), m);
+      validMealMap.set(String(m.id), m);
+      validMealMap.set(m.title.toLowerCase().trim(), m);
+    });
+
     const savedLocal = localStorage.getItem('gimmie_saved_meals_' + (customerEmail || 'hannahconway@hotmail.co.uk'));
     let loadedFromSaved = false;
 
     if (savedLocal) {
       try {
         const parsed = JSON.parse(savedLocal);
-        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-          state.selections = parsed;
-          loadedFromSaved = true;
+        if (parsed && typeof parsed === 'object') {
+          Object.entries(parsed).forEach(([key, item]) => {
+            if (item && item.quantity > 0) {
+              const matchedMeal = validMealMap.get(String(key)) || validMealMap.get(item.title?.toLowerCase()?.trim());
+              if (matchedMeal) {
+                state.selections[matchedMeal.variantId] = {
+                  quantity: item.quantity,
+                  title: matchedMeal.title,
+                  id: matchedMeal.id,
+                  variantId: matchedMeal.variantId
+                };
+                loadedFromSaved = true;
+              }
+            }
+          });
         }
       } catch (e) {}
     }
 
-    // 2. Prepopulate with existing saved lines from subscription contract if not in localStorage
     if (!loadedFromSaved) {
       if (config.currentLines && Array.isArray(config.currentLines) && config.currentLines.length > 0) {
         config.currentLines.forEach(line => {
-          if (line.variantId && line.quantity) {
-            state.selections[line.variantId] = {
-              quantity: line.quantity,
-              title: line.title || line.variantTitle || 'Selected Meal',
-              id: line.productId,
-              variantId: line.variantId
-            };
+          if (line.quantity) {
+            const matchedMeal = validMealMap.get(String(line.variantId)) || validMealMap.get(String(line.productId)) || validMealMap.get((line.title || line.variantTitle || '').toLowerCase().trim());
+            if (matchedMeal) {
+              state.selections[matchedMeal.variantId] = {
+                quantity: line.quantity,
+                title: matchedMeal.title,
+                id: matchedMeal.id,
+                variantId: matchedMeal.variantId
+              };
+            }
           }
         });
-      } else if (meals.length > 0) {
-        // Default initial balance if brand new subscriber
-        const portion = Math.floor(mealQuota / Math.min(3, meals.length));
-        let allocated = 0;
-        for (let i = 0; i < Math.min(3, meals.length); i++) {
-          const qty = (i === 2) ? (mealQuota - allocated) : portion;
-          state.selections[meals[i].variantId] = {
-            quantity: qty,
-            title: meals[i].title,
-            id: meals[i].id,
-            variantId: meals[i].variantId
-          };
-          allocated += qty;
-        }
       }
     }
 
@@ -549,6 +570,8 @@
     const selectedListEl = document.getElementById('gimmie-selected-meals-list');
     const saveButton = document.getElementById('gimmie-save-btn');
     const statusMessage = document.getElementById('gimmie-status-message');
+    const clearButton = document.getElementById('gimmie-clear-btn');
+    const quotaNotice = document.getElementById('gimmie-quota-notice');
 
     const modalEl = document.getElementById('gimmie-nutrition-modal');
     const modalBackdrop = document.getElementById('gimmie-modal-backdrop');
@@ -565,6 +588,7 @@
       Object.values(state.selections).forEach(item => {
         total += item.quantity || 0;
       });
+
       state.totalSelected = total;
 
       if (counterBadge) {
@@ -596,6 +620,10 @@
         if (minusBtn) minusBtn.disabled = currentQty <= 0;
         if (plusBtn) plusBtn.disabled = total >= mealQuota;
       });
+
+      if (quotaNotice) {
+        quotaNotice.style.display = total >= mealQuota ? 'block' : 'none';
+      }
 
       renderSummaryList();
       updateSavedBanner();
@@ -632,6 +660,10 @@
       if (!selectedListEl) return;
 
       const items = Object.entries(state.selections).filter(([_, item]) => item.quantity > 0);
+
+      if (clearButton) {
+        clearButton.style.display = items.length > 0 ? 'block' : 'none';
+      }
 
       if (items.length === 0) {
         selectedListEl.innerHTML = '<p style="color: var(--gimmie-muted); font-size: 0.9rem; margin: 0;">No meals selected yet.</p>';
@@ -677,7 +709,14 @@
       const currentQty = state.selections[variantId].quantity;
       const newQty = Math.max(0, currentQty + change);
 
-      if (change > 0 && state.totalSelected >= mealQuota) return;
+      if (change > 0 && state.totalSelected >= mealQuota) {
+        if (quotaNotice) {
+          quotaNotice.style.display = 'block';
+          quotaNotice.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        showStatus(`⚠️ Your box is full (${mealQuota}/${mealQuota})! Please reduce (−) or remove an item first to add "${meal.title}".`, true);
+        return;
+      }
 
       if (newQty === 0) {
         delete state.selections[variantId];
@@ -873,6 +912,14 @@
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeModal();
       });
+
+      if (clearButton) {
+        clearButton.addEventListener('click', () => {
+          state.selections = {};
+          updateUI();
+          showStatus('All meals cleared. You can now choose your new meals below!', false, true);
+        });
+      }
 
       if (saveButton) {
         saveButton.addEventListener('click', saveSelections);
