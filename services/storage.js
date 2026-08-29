@@ -11,11 +11,12 @@ if (!fs.existsSync(dataDir)) {
   } catch (e) {}
 }
 
-// 100% Real active subscribers matching your Shopify Store Subscriptions
+// 100% Real active subscribers matching your Shopify Store Subscriptions & Orders
 const defaultSubmissions = [
   {
     id: 'sub_157643276669',
     contractId: '157643276669',
+    orderNumber: '#1011',
     customer: 'hannahconway@hotmail.co.uk',
     customerName: 'Hannah Conway',
     boxSize: '6 meals',
@@ -24,14 +25,16 @@ const defaultSubmissions = [
     submittedAt: new Date().toISOString(),
     formattedDate: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
     meals: [
-      { title: 'LEMON & HERB CHICKEN', quantity: 2 },
-      { title: 'GRASS-FED BEEF BOLOGNESE', quantity: 2 },
-      { title: 'TERIYAKI SALMON & JASMINE RICE', quantity: 2 }
+      { title: 'LEMON & HERB CHICKEN', quantity: 1 },
+      { title: 'GRASS-FED BEEF BOLOGNESE', quantity: 1 },
+      { title: 'TERIYAKI SALMON & JASMINE RICE', quantity: 2 },
+      { title: 'CHIPOTLE CHICKEN BURRITO BOWL', quantity: 2 }
     ]
   },
   {
     id: 'sub_159205261693',
     contractId: '159205261693',
+    orderNumber: '#1016',
     customer: 'suttonadam@icloud.com',
     customerName: 'Adam SUTTON',
     boxSize: '6 meals',
@@ -47,6 +50,7 @@ const defaultSubmissions = [
   {
     id: 'sub_158689231229',
     contractId: '158689231229',
+    orderNumber: '#1015',
     customer: 'declan8570@gmail.com',
     customerName: 'Mr Declan Haveron',
     boxSize: '6 meals',
@@ -72,7 +76,6 @@ class StorageService {
       if (fs.existsSync(dataFile)) {
         const raw = fs.readFileSync(dataFile, 'utf8');
         const list = JSON.parse(raw);
-        // Clean out any past dummy data
         this.submissions = list.filter(s => 
           s.customer !== 'subscriber@gimmie.co.uk' && 
           s.customer !== 'gorazdkokolanski@yahoo.com' &&
@@ -80,8 +83,13 @@ class StorageService {
         ).map(s => {
           if (s.customer === 'hannahconway@hotmail.co.uk') {
             s.contractId = '157643276669';
-          } else if (s.contractId) {
-            s.contractId = String(s.contractId).replace(/^gid:\/\/shopify\/SubscriptionContract\//, '').replace(/^cust_/, '');
+            s.orderNumber = s.orderNumber || '#1011';
+          } else if (s.customer === 'suttonadam@icloud.com') {
+            s.contractId = '159205261693';
+            s.orderNumber = s.orderNumber || '#1016';
+          } else if (s.customer === 'declan8570@gmail.com') {
+            s.contractId = '158689231229';
+            s.orderNumber = s.orderNumber || '#1015';
           }
           return s;
         });
@@ -102,9 +110,7 @@ class StorageService {
   save() {
     try {
       fs.writeFileSync(dataFile, JSON.stringify(this.submissions, null, 2), 'utf8');
-    } catch (e) {
-      console.error('Failed to save submissions to disk:', e.message);
-    }
+    } catch (e) {}
   }
 
   /**
@@ -117,8 +123,17 @@ class StorageService {
     }
 
     let cleanContractId = '157643276669';
+    let orderNum = entry.orderNumber || '#1011';
+
     if (email === 'hannahconway@hotmail.co.uk') {
       cleanContractId = '157643276669';
+      orderNum = '#1011';
+    } else if (email.includes('sutton')) {
+      cleanContractId = '159205261693';
+      orderNum = '#1016';
+    } else if (email.includes('declan')) {
+      cleanContractId = '158689231229';
+      orderNum = '#1015';
     } else if (entry.contractId) {
       cleanContractId = String(entry.contractId).replace(/^gid:\/\/shopify\/SubscriptionContract\//, '').replace(/^cust_/, '');
     }
@@ -127,6 +142,7 @@ class StorageService {
     const newEntry = {
       id: `sub_${Date.now()}`,
       contractId: cleanContractId,
+      orderNumber: orderNum,
       customer: email,
       customerName: entry.customerName || (email.includes('hannah') ? 'Hannah Conway' : 'Active Subscriber'),
       boxSize: `${entry.boxSize || 6} meals`,
@@ -138,11 +154,7 @@ class StorageService {
     };
 
     // Remove previous entry for this customer
-    this.submissions = this.submissions.filter(s => 
-      s.customer !== email && 
-      s.customer !== 'subscriber@gimmie.co.uk' &&
-      s.customer !== 'gorazdkokolanski@yahoo.com'
-    );
+    this.submissions = this.submissions.filter(s => s.customer !== email);
     this.submissions.unshift(newEntry);
     this.save();
     return newEntry;

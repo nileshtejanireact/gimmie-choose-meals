@@ -186,17 +186,23 @@
 
       <div class="submissions-list" id="submissions-container">
         {% for sub in submissions %}
-          <div class="submission-item" id="order-card-{{ sub.id }}" data-search="{{ sub.customer }} {{ sub.customerName }} {{ sub.contractId }} {{ sub.deliveryDate }}">
+          <div class="submission-item" id="order-card-{{ sub.id }}" data-search="{{ sub.customer }} {{ sub.customerName }} {{ sub.orderNumber }} {{ sub.contractId }} {{ sub.deliveryDate }}">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; flex: 1; font-size: 0.92rem;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; flex: 1; font-size: 0.92rem;">
                 <div>
                   <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Customer</strong>
                   <strong style="font-size: 0.98rem; color: #102b10;">{{ sub.customerName }}</strong>
                   <div style="color: #444746; font-size: 0.88rem;">{{ sub.customer }}</div>
                 </div>
                 <div>
+                  <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Shopify Order #</strong>
+                  <span style="font-weight: 800; font-size: 1rem; color: #108043; background: #e3f1df; padding: 3px 8px; border-radius: 4px; display: inline-block; font-family: monospace;">
+                    {{ sub.orderNumber | default: '#1011' }}
+                  </span>
+                </div>
+                <div>
                   <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Contract ID</strong>
-                  <span style="font-weight: 700; font-size: 1rem; color: #102b10; font-family: monospace;">
+                  <span style="font-weight: 700; font-size: 0.95rem; color: #102b10; font-family: monospace;">
                     {{ sub.contractId }}
                   </span>
                 </div>
@@ -276,7 +282,8 @@
             </div>
             <div style="text-align: right;">
               <span style="display: inline-block; border: 2px solid #102b10; padding: 4px 10px; border-radius: 999px; font-weight: 800; font-size: 13px;">${sub.boxSize.toUpperCase()}</span>
-              <p style="margin: 4px 0 0; font-size: 12px; color: #666; font-family: monospace; font-weight: bold;">Contract: ${sub.contractId || sub.id}</p>
+              <p style="margin: 4px 0 0; font-size: 15px; font-weight: 900; color: #108043; font-family: monospace;">Shopify Order: ${sub.orderNumber || '#1011'}</p>
+              <p style="margin: 2px 0 0; font-size: 12px; color: #666; font-family: monospace;">Contract: ${sub.contractId || sub.id}</p>
             </div>
           </div>
 
