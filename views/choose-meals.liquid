@@ -254,24 +254,40 @@
                       {% endif %}
 
                       {% assign m_desc = nil %}
-                      {% if meal_obj.description.value != blank and meal_obj.description.value != '' %}
-                        {% assign m_desc = meal_obj.description.value %}
-                      {% elsif meal_obj.description != blank and meal_obj.description != '' %}
-                        {% assign m_desc = meal_obj.description %}
-                      {% elsif meal_obj['description'].value != blank and meal_obj['description'].value != '' %}
-                        {% assign m_desc = meal_obj['description'].value %}
-                      {% elsif meal_obj['description'] != blank and meal_obj['description'] != '' %}
-                        {% assign m_desc = meal_obj['description'] %}
-                      {% elsif meal_raw.description.value != blank and meal_raw.description.value != '' %}
-                        {% assign m_desc = meal_raw.description.value %}
-                      {% elsif meal_raw.description != blank and meal_raw.description != '' %}
-                        {% assign m_desc = meal_raw.description %}
-                      {% elsif meal_obj.meal_description.value != blank %}
-                        {% assign m_desc = meal_obj.meal_description.value %}
-                      {% elsif meal_obj.short_description.value != blank %}
-                        {% assign m_desc = meal_obj.short_description.value %}
-                      {% elsif meal_obj.summary.value != blank %}
-                        {% assign m_desc = meal_obj.summary.value %}
+                      {% assign meal_handle = meal_raw.system.handle | default: meal_raw.handle | default: meal_obj.system.handle | default: meal_obj.handle %}
+                      {% if meal_handle == blank or meal_handle == '' %}
+                        {% assign meal_handle = m_title | handleize %}
+                      {% endif %}
+
+                      {% assign direct_meal = shop.metaobjects.meal[meal_handle] %}
+                      {% if direct_meal %}
+                        {% if direct_meal.description.value != blank and direct_meal.description.value != '' %}
+                          {% assign m_desc = direct_meal.description.value %}
+                        {% elsif direct_meal.description != blank and direct_meal.description != '' %}
+                          {% assign m_desc = direct_meal.description %}
+                        {% endif %}
+                      {% endif %}
+
+                      {% if m_desc == blank or m_desc == '' %}
+                        {% if meal_obj.description.value != blank and meal_obj.description.value != '' %}
+                          {% assign m_desc = meal_obj.description.value %}
+                        {% elsif meal_obj.description != blank and meal_obj.description != '' %}
+                          {% assign m_desc = meal_obj.description %}
+                        {% elsif meal_obj['description'].value != blank and meal_obj['description'].value != '' %}
+                          {% assign m_desc = meal_obj['description'].value %}
+                        {% elsif meal_obj['description'] != blank and meal_obj['description'] != '' %}
+                          {% assign m_desc = meal_obj['description'] %}
+                        {% elsif meal_raw.description.value != blank and meal_raw.description.value != '' %}
+                          {% assign m_desc = meal_raw.description.value %}
+                        {% elsif meal_raw.description != blank and meal_raw.description != '' %}
+                          {% assign m_desc = meal_raw.description %}
+                        {% elsif meal_obj.meal_description.value != blank %}
+                          {% assign m_desc = meal_obj.meal_description.value %}
+                        {% elsif meal_obj.short_description.value != blank %}
+                          {% assign m_desc = meal_obj.short_description.value %}
+                        {% elsif meal_obj.summary.value != blank %}
+                          {% assign m_desc = meal_obj.summary.value %}
+                        {% endif %}
                       {% endif %}
 
                       {% if m_desc == blank or m_desc == '' %}
@@ -279,7 +295,7 @@
                         {% if down_t contains 'salmon' or down_t contains 'penne' or down_t contains 'pesto' %}
                           {% assign m_desc = 'Pan-seared salmon and creamy pesto penne with asparagus, toasted pine nuts and freshly grated parmesan.' %}
                         {% elsif down_t contains 'hoisin' or down_t contains 'hoisin beef' %}
-                          {% assign m_desc = 'Lean beef mince with basmati rice, cucumber, spring onion, red chilli and rich hoisin glaze.' %}
+                          {% assign m_desc = 'Sticky beef in a hoisin-soy glaze over fluffy basmati rice with a side of fresh cucumber ribbons. Finished with red chillies, spring onion and sesame seeds.' %}
                         {% elsif down_t contains 'brazilian' or down_t contains 'coconut chicken' %}
                           {% assign m_desc = 'Tender chicken in aromatic creamy Brazilian coconut curry sauce served with fragrant rice.' %}
                         {% elsif down_t contains 'harissa' or down_t contains 'harissa beef' %}
