@@ -155,10 +155,10 @@
                 </div>
               </div>
 
-              <!-- Meals Grid -->
-              <div class="gimmie-build-box__meals-grid">
+              <!-- Meals Grid - Strictly 2 in Row -->
+              <div class="gimmie-build-box__meals-grid" style="display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 20px !important;">
                 {% for meal in meals %}
-                  <article class="gimmie-build-box__meal" data-meal-id="{{ meal.id }}">
+                  <article class="gimmie-build-box__meal" data-meal-id="{{ meal.id }}" style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
                     <!-- Image Wrap -->
                     <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ meal.id }}">
                       <img src="{{ meal.image }}" alt="{{ meal.title }}" class="gimmie-build-box__meal-image" loading="lazy">
