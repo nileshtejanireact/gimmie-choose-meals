@@ -61,11 +61,21 @@ class MenuService {
       const data = await shopifyClient.graphql(query, { query: searchQuery });
       const products = data?.products?.edges?.map(e => e.node) || [];
 
-      if (products.length === 0) {
-        return this.getFallbackMenu();
+      // Filter out non-meal items (test snowboards, box container)
+      const mealProducts = products.filter(p => {
+        const title = (p.title || '').toLowerCase();
+        const type = (p.productType || '').toLowerCase();
+        return !title.includes('snowboard') && 
+               !title.includes('weekly meal box') && 
+               !title.includes('box') &&
+               (type === 'meal' || p.tags?.includes('meal') || p.tags?.includes('dish'));
+      });
+
+      if (mealProducts.length >= 3) {
+        return mealProducts.map(p => this.formatProduct(p));
       }
 
-      return products.map(p => this.formatProduct(p));
+      return this.getFallbackMenu();
     } catch (error) {
       console.warn('⚠️ Could not fetch live menu from Shopify API, using default Gimmie menu:', error.message);
       return this.getFallbackMenu();
