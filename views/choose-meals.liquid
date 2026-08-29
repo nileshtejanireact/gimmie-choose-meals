@@ -263,6 +263,12 @@
                       {% assign m_prot = meal_obj.metafields.custom.protein | default: meal_obj.protein.value | default: meal_obj.protein | default: meal_raw.protein | default: '44g Protein' %}
                       {% assign m_carbs = meal_obj.metafields.custom.carbs | default: meal_obj.carbs.value | default: meal_obj.carbs | default: meal_raw.carbs | default: '38g Carbs' %}
                       {% assign m_fat = meal_obj.metafields.custom.fat | default: meal_obj.fat.value | default: meal_obj.fat | default: meal_raw.fat | default: '14g Fat' %}
+                      {% assign m_saturates = meal_obj.saturates.value | default: meal_obj.saturates | default: meal_obj.saturated_fat.value | default: meal_obj.saturated_fat | default: '3.2g' %}
+                      {% assign m_sugars = meal_obj.sugars.value | default: meal_obj.sugars | default: meal_obj.sugar.value | default: meal_obj.sugar | default: '4.8g' %}
+                      {% assign m_fibre = meal_obj.fibre.value | default: meal_obj.fibre | default: meal_obj.fiber.value | default: meal_obj.fiber | default: '6.2g' %}
+                      {% assign m_salt = meal_obj.salt.value | default: meal_obj.salt | default: meal_obj.sodium.value | default: meal_obj.sodium | default: '1.1g' %}
+                      {% assign m_serving = meal_obj.serving_size.value | default: meal_obj.serving_size | default: meal_obj.serving.value | default: meal_obj.serving | default: 'Per Serving (420g)' %}
+                      {% assign m_kj = meal_obj.energy_kj.value | default: meal_obj.energy_kj | default: meal_obj.kj.value | default: meal_obj.kj | default: '-' %}
                       {% assign m_ingr = meal_obj.ingredients.value | default: meal_obj.ingredients | default: meal_raw.ingredients | default: 'Fresh ingredients prepared by Gimmie chefs.' %}
                       {% assign m_aller = meal_obj.allergens.value | default: meal_obj.allergens | default: meal_raw.allergens | default: 'None' %}
 
@@ -274,6 +280,12 @@
                       {% assign m_prot_clean = m_prot | strip_html | strip_newlines | escape %}
                       {% assign m_carbs_clean = m_carbs | strip_html | strip_newlines | escape %}
                       {% assign m_fat_clean = m_fat | strip_html | strip_newlines | escape %}
+                      {% assign m_sat_clean = m_saturates | strip_html | strip_newlines | escape %}
+                      {% assign m_sug_clean = m_sugars | strip_html | strip_newlines | escape %}
+                      {% assign m_fib_clean = m_fibre | strip_html | strip_newlines | escape %}
+                      {% assign m_salt_clean = m_salt | strip_html | strip_newlines | escape %}
+                      {% assign m_serv_clean = m_serving | strip_html | strip_newlines | escape %}
+                      {% assign m_kj_clean = m_kj | strip_html | strip_newlines | escape %}
 
                       <article class="gimmie-build-box__meal" 
                                data-meal-id="{{ m_id }}" 
@@ -286,6 +298,12 @@
                                data-prot="{{ m_prot_clean }}"
                                data-carbs="{{ m_carbs_clean }}"
                                data-fat="{{ m_fat_clean }}"
+                               data-saturates="{{ m_sat_clean }}"
+                               data-sugars="{{ m_sug_clean }}"
+                               data-fibre="{{ m_fib_clean }}"
+                               data-salt="{{ m_salt_clean }}"
+                               data-serving="{{ m_serv_clean }}"
+                               data-kj="{{ m_kj_clean }}"
                                style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
                         <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ m_id }}">
                           <img src="{{ m_img }}" alt="{{ m_title_clean }}" class="gimmie-build-box__meal-image" loading="lazy" onerror="if(!this.dataset.errored){this.dataset.errored=true;this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';}">
@@ -474,15 +492,16 @@
           fat: card.getAttribute('data-fat') || '14g Fat'
         },
         nutrition: {
-          serving: 'Per Serving (420g)',
+          serving: card.getAttribute('data-serving') || 'Per Serving (420g)',
+          energyKj: card.getAttribute('data-kj') || '-',
           energyKcal: card.getAttribute('data-cals') || '520 kcal',
           protein: card.getAttribute('data-prot') || '44g',
           fat: card.getAttribute('data-fat') || '14g',
-          saturates: '3.2g',
+          saturates: card.getAttribute('data-saturates') || '3.2g',
           carbs: card.getAttribute('data-carbs') || '38g',
-          sugars: '4.8g',
-          fibre: '6.2g',
-          salt: '1.1g'
+          sugars: card.getAttribute('data-sugars') || '4.8g',
+          fibre: card.getAttribute('data-fibre') || '6.2g',
+          salt: card.getAttribute('data-salt') || '1.1g'
         }
       });
     });
@@ -751,11 +770,15 @@
     }
 
     function openModal(mealId) {
-      const meal = meals.find(m => String(m.id) === String(mealId) || String(m.variantId) === String(mealId));
+      const meal = meals.find(m => 
+        String(m.id) === String(mealId) || 
+        String(m.variantId) === String(mealId) || 
+        (m.title && mealId && m.title.toLowerCase().trim() === String(mealId).toLowerCase().trim())
+      );
       if (!meal || !modalEl) return;
 
       if (modalTitle) modalTitle.textContent = meal.title;
-      if (modalDesc) modalDesc.textContent = cleanIngredients(meal.description);
+      if (modalDesc) modalDesc.textContent = cleanIngredients(meal.description) || 'Delicious chef-prepared fresh gourmet meal, macro-balanced for peak health.';
 
       const ingredientsEl = document.getElementById('gimmie-modal-ingredients');
       if (ingredientsEl) {
@@ -770,6 +793,9 @@
 
       if (modalTableBody && meal.nutrition) {
         const n = meal.nutrition;
+        const servingHeader = document.getElementById('gimmie-modal-serving-header');
+        if (servingHeader) servingHeader.textContent = n.serving || 'Per Serving';
+
         modalTableBody.innerHTML = `
           <tr><td>Serving Size</td><td><strong>${n.serving || 'Per Serving'}</strong></td></tr>
           <tr><td>Energy (kJ)</td><td>${n.energyKj || '-'}</td></tr>
