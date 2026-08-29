@@ -195,14 +195,19 @@ async function handleSaveSelections(req, res) {
 
     const totalSelected = selectedMeals.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0);
 
-    // Commit changes to Shopify
+    // Commit changes to Shopify Subscription Contract
     const result = await subscriptionService.updateSubscriptionMeals(contractId, selectedMeals);
 
-    // Record submission into Admin Dashboard storage
+    // Also write directly to the customer's active Shopify Order Note & Tags
     const customerEmail = req.body.customerEmail || 'hannahconway@hotmail.co.uk';
     const customerName = req.body.customerName || 'Hannah Conway';
     const deliveryDate = req.body.deliveryDate || 'Tue 1 Sept';
 
+    try {
+      await subscriptionService.updateRecentOrderDetails(customerEmail, result.summary, deliveryDate);
+    } catch (e) {}
+
+    // Record submission into Admin Dashboard storage
     storageService.addSubmission({
       contractId: contractId,
       customer: customerEmail,

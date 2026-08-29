@@ -492,13 +492,80 @@ class SubscriptionService {
 
     const updatedContract = commitResult?.subscriptionDraftCommit?.contract;
     console.log(`\n🎉 [SUCCESS] Subscription Contract ${updatedContract.id} committed successfully!`);
-    console.log(`Updated Lines:`, updatedContract.lines?.edges?.map(e => `${e.node.quantity}x ${e.node.title}`));
+    // Step 5: Also update the latest Shopify Order Note & Tags if an order exists
+    try {
+      await this.updateRecentOrderDetails(customer?.email, mealSummaryText);
+    } catch (e) {}
 
     return {
       success: true,
       contractId: updatedContract.id,
       summary: mealSummaryText
     };
+  }
+
+  /**
+   * Update the latest unfulfilled order for this customer in Shopify with the selected meals in Note & Tags
+   */
+  async updateRecentOrderDetails(customerEmail, mealSummaryText, deliveryDate = 'Tuesday Delivery') {
+    if (!customerEmail) return;
+
+    try {
+      const query = `
+        query getCustomerRecentOrder($query: String!) {
+          orders(first: 3, query: $query, sortKey: CREATED_AT, reverse: true) {
+            edges {
+              node {
+                id
+                name
+                displayFulfillmentStatus
+                note
+                tags
+              }
+            }
+          }
+        }
+      `;
+
+      const data = await shopifyClient.graphql(query, { query: `email:${customerEmail}` });
+      const orders = data?.orders?.edges?.map(e => e.node) || [];
+      const targetOrder = orders.find(o => o.displayFulfillmentStatus === 'UNFULFILLED') || orders[0];
+
+      if (targetOrder) {
+        console.log(`📦 [Updating Shopify Order] Writing meal selections to Order ${targetOrder.name} (${targetOrder.id})`);
+        const updatedNote = `🍽️ CHOSEN MEALS: ${mealSummaryText}\n📅 Delivery: ${deliveryDate}\n🕒 Customer Customized`;
+        const updatedTags = Array.from(new Set([...(targetOrder.tags || []), 'Meals Selected', 'Gimmie Customized']));
+
+        const updateMutation = `
+          mutation orderUpdate($input: OrderInput!) {
+            orderUpdate(input: $input) {
+              order {
+                id
+                name
+                note
+                tags
+              }
+              userErrors {
+                field
+                message
+              }
+            }
+          }
+        `;
+
+        await shopifyClient.graphql(updateMutation, {
+          input: {
+            id: targetOrder.id,
+            note: updatedNote,
+            tags: updatedTags
+          }
+        });
+
+        console.log(`✓ [SUCCESS] Shopify Order ${targetOrder.name} Note & Tags updated!`);
+      }
+    } catch (err) {
+      console.warn('⚠️ Could not update recent order note directly:', err.message);
+    }
   }
 
   /**
