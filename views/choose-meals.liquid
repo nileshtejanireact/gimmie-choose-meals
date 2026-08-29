@@ -114,8 +114,12 @@
                   <span style="color: var(--gimmie-text);">📅 {{ formattedDeliveryDate }}</span>
                 </div>
                 <div class="gimmie-build-box__detail">
-                  <strong>Plan Quota</strong>
-                  <span>🍽️ {{ mealQuota }} Meals / Box</span>
+                  <strong>Your Box Size</strong>
+                  <span>🍽️ {{ mealQuota }} Meals / Week</span>
+                </div>
+                <div class="gimmie-build-box__detail">
+                  <strong>Cut-Off Time</strong>
+                  <span>⏰ Thu @ 11:59 PM UK</span>
                 </div>
               </div>
 
@@ -125,7 +129,7 @@
                   <strong style="color: var(--gimmie-success); font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.04em;">
                     ✓ Current Meals Locked for Next Delivery
                   </strong>
-                  <span style="font-size: 0.8rem; font-weight: 700; color: var(--gimmie-muted);">Editable until cutoff</span>
+                  <span style="font-size: 0.8rem; font-weight: 700; color: var(--gimmie-muted);">Editable until Thursday 11:59 PM</span>
                 </div>
                 <p id="gimmie-saved-summary-text" style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--gimmie-text);">
                   Loading your saved selections...
@@ -172,11 +176,11 @@
                       <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ meal.id }}">{{ meal.title }}</h3>
                       <p class="gimmie-build-box__meal-description">{{ meal.description }}</p>
 
-                      <!-- Macros -->
-                      <div class="gimmie-build-box__meal-meta">
+                      <!-- Clean Macros (No carb bubbles) -->
+                      <div class="gimmie-build-box__meal-macros">
                         <span>{{ meal.macros.calories }}</span>
+                        <span class="dot">•</span>
                         <span>{{ meal.macros.protein }}</span>
-                        <span>{{ meal.macros.carbs }}</span>
                       </div>
 
                       <!-- Quantity Controls -->
@@ -218,6 +222,11 @@
               Select {{ mealQuota }} Meals
             </button>
 
+            <!-- Cutoff notice in sidebar -->
+            <p style="margin: 12px 0 0; text-align: center; font-size: 0.78rem; color: var(--gimmie-muted);">
+              🔒 Selections lock Thursday at 11:59 PM UK Time
+            </p>
+
             <!-- Status Alerts -->
             <div id="gimmie-status-message" class="gimmie-build-box__status"></div>
           </div>
@@ -227,33 +236,38 @@
     </div>
   </div>
 
-  <!-- Nutrition & Allergen Modal Popup -->
+  <!-- Nutrition & Allergen Modal Popup Matching Main Menu -->
   <div id="gimmie-nutrition-modal" class="gimmie-modal" hidden>
     <div id="gimmie-modal-backdrop" class="gimmie-modal__backdrop"></div>
-    <div class="gimmie-modal__dialog" role="dialog" aria-modal="true">
+    <div class="gimmie-modal__content" role="dialog" aria-modal="true">
       <button id="gimmie-modal-close" class="gimmie-modal__close" aria-label="Close modal">&times;</button>
 
-      <div class="gimmie-modal__grid">
-        <!-- Image & Description -->
-        <div>
-          <div style="border: 2px solid var(--gimmie-border); border-radius: 16px; overflow: hidden; aspect-ratio: 4/3; background: var(--gimmie-bg);">
-            <img id="gimmie-modal-image" src="" alt="" style="width: 100%; height: 100%; object-fit: cover;">
-          </div>
-          <div id="gimmie-modal-badges" style="margin-top: 14px; display: flex; gap: 6px; flex-wrap: wrap;"></div>
-          <h2 id="gimmie-modal-title" style="margin: 12px 0 6px; font-size: 1.8rem; text-transform: uppercase;"></h2>
-          <p id="gimmie-modal-desc" style="color: var(--gimmie-muted); line-height: 1.5; font-size: 0.95rem;"></p>
-          <div id="gimmie-modal-allergens" class="gimmie-modal__alert"></div>
-        </div>
+      <div class="gimmie-modal__header">
+        <h2 id="gimmie-modal-title" class="gimmie-modal__title"></h2>
+        <p id="gimmie-modal-desc" class="gimmie-modal__desc"></p>
+      </div>
 
-        <!-- Nutrition Table -->
-        <div>
-          <h3 style="margin: 0; font-size: 1.2rem; text-transform: uppercase;">Nutrition Facts</h3>
-          <table class="gimmie-modal__table">
-            <tbody id="gimmie-modal-table-body">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
-        </div>
+      <!-- Ingredients Section -->
+      <div id="gimmie-modal-ingredients-wrap" style="margin-bottom: 20px;">
+        <h3 class="gimmie-modal__section-title">Ingredients</h3>
+        <p id="gimmie-modal-ingredients" class="gimmie-modal__ingredients"></p>
+        <div id="gimmie-modal-allergens" style="margin-top: 10px; font-size: 0.85rem; font-weight: 700; color: #b42318;"></div>
+      </div>
+
+      <!-- Nutrition Facts Table Matching Main Menu -->
+      <div>
+        <h3 class="gimmie-modal__section-title">Nutritional Information</h3>
+        <table class="gimmie-modal__table">
+          <thead>
+            <tr>
+              <th>Nutrient</th>
+              <th id="gimmie-modal-serving-header">Per Serving</th>
+            </tr>
+          </thead>
+          <tbody id="gimmie-modal-table-body">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -487,39 +501,44 @@
       const meal = meals.find(m => String(m.id) === String(mealId) || String(m.variantId) === String(mealId));
       if (!meal || !modalEl) return;
 
-      modalTitle.textContent = meal.title;
-      modalImage.src = meal.image;
-      modalImage.alt = meal.title;
-      modalDesc.textContent = meal.description;
-      modalAllergens.textContent = `Allergens: ${meal.allergens || 'None'}`;
+      if (modalTitle) modalTitle.textContent = meal.title;
+      if (modalDesc) modalDesc.textContent = meal.description;
 
-      if (modalBadges && meal.badges) {
-        modalBadges.innerHTML = meal.badges.map(b => `<span class="gimmie-build-box__badge">${b}</span>`).join(' ');
+      const ingredientsEl = document.getElementById('gimmie-modal-ingredients');
+      if (ingredientsEl) {
+        ingredientsEl.textContent = meal.ingredients || 'Fresh, natural ingredients prepared in our kitchen.';
+      }
+
+      if (modalAllergens) {
+        modalAllergens.textContent = meal.allergens && meal.allergens !== 'None' ? `⚠️ Allergens: ${meal.allergens}` : '✓ No common allergens listed.';
+        modalAllergens.style.color = meal.allergens && meal.allergens !== 'None' ? '#b42318' : '#1E6B24';
       }
 
       if (modalTableBody && meal.nutrition) {
         const n = meal.nutrition;
         modalTableBody.innerHTML = `
-          <tr><th>Serving Size</th><td>${n.serving || 'Per Serving'}</td></tr>
-          <tr><th>Energy (kJ)</th><td>${n.energyKj || '-'}</td></tr>
-          <tr><th>Energy (kcal)</th><td>${n.energyKcal || '-'}</td></tr>
-          <tr><th>Fat</th><td>${n.fat || '-'}</td></tr>
-          <tr><th>- of which saturates</th><td>${n.saturates || '-'}</td></tr>
-          <tr><th>Carbohydrate</th><td>${n.carbs || '-'}</td></tr>
-          <tr><th>- of which sugars</th><td>${n.sugars || '-'}</td></tr>
-          <tr><th>Fibre</th><td>${n.fibre || '-'}</td></tr>
-          <tr><th>Protein</th><td>${n.protein || '-'}</td></tr>
-          <tr><th>Salt</th><td>${n.salt || '-'}</td></tr>
+          <tr><td>Serving Size</td><td><strong>${n.serving || 'Per Serving'}</strong></td></tr>
+          <tr><td>Energy (kJ)</td><td>${n.energyKj || '-'}</td></tr>
+          <tr><td>Energy (kcal)</td><td><strong>${n.energyKcal || '-'}</strong></td></tr>
+          <tr><td>Fat</td><td>${n.fat || '-'}</td></tr>
+          <tr><td>- of which saturates</td><td>${n.saturates || '-'}</td></tr>
+          <tr><td>Carbohydrate</td><td>${n.carbs || '-'}</td></tr>
+          <tr><td>- of which sugars</td><td>${n.sugars || '-'}</td></tr>
+          <tr><td>Fibre</td><td>${n.fibre || '-'}</td></tr>
+          <tr><td>Protein</td><td><strong>${n.protein || '-'}</strong></td></tr>
+          <tr><td>Salt</td><td>${n.salt || '-'}</td></tr>
         `;
       }
 
       modalEl.removeAttribute('hidden');
+      modalEl.classList.add('is-open');
       document.body.classList.add('gimmie-build-box-modal-open');
     }
 
     function closeModal() {
       if (modalEl) {
         modalEl.setAttribute('hidden', '');
+        modalEl.classList.remove('is-open');
         document.body.classList.remove('gimmie-build-box-modal-open');
       }
     }
