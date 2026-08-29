@@ -253,22 +253,69 @@
                         {% endif %}
                       {% endif %}
 
-                      {% assign m_desc = meal_obj.description.value | default: meal_obj.description | default: meal_raw.description | default: meal_obj.summary | default: 'Delicious chef-prepared fresh gourmet meal, macro-balanced for peak health.' %}
+                      {% assign m_desc = meal_obj.description.value | default: meal_obj.description | default: meal_raw.description %}
+                      {% if m_desc == blank or m_desc == '' %}
+                        {% assign m_desc = meal_obj.summary.value | default: meal_obj.summary | default: 'Pan-seared fresh gourmet meal, macro-balanced for peak health.' %}
+                      {% endif %}
+
                       {% assign m_variant_id = meal_obj.variants.first.id | default: meal_obj.system.id | default: meal_obj.system.handle | default: meal_obj.id | default: meal_raw.id %}
                       {% if m_variant_id == blank or m_variant_id == '' %}
                         {% assign m_variant_id = 'dish_' | append: forloop.index %}
                       {% endif %}
                       {% assign m_id = m_variant_id %}
-                      {% assign m_cals = meal_obj.metafields.custom.calories | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_raw.calories | default: '520 kcal' %}
-                      {% assign m_prot = meal_obj.metafields.custom.protein | default: meal_obj.protein.value | default: meal_obj.protein | default: meal_raw.protein | default: '44g Protein' %}
-                      {% assign m_carbs = meal_obj.metafields.custom.carbs | default: meal_obj.carbs.value | default: meal_obj.carbs | default: meal_raw.carbs | default: '38g Carbs' %}
-                      {% assign m_fat = meal_obj.metafields.custom.fat | default: meal_obj.fat.value | default: meal_obj.fat | default: meal_raw.fat | default: '14g Fat' %}
-                      {% assign m_saturates = meal_obj.saturates.value | default: meal_obj.saturates | default: meal_obj.saturated_fat.value | default: meal_obj.saturated_fat | default: '3.2g' %}
-                      {% assign m_sugars = meal_obj.sugars.value | default: meal_obj.sugars | default: meal_obj.sugar.value | default: meal_obj.sugar | default: '4.8g' %}
-                      {% assign m_fibre = meal_obj.fibre.value | default: meal_obj.fibre | default: meal_obj.fiber.value | default: meal_obj.fiber | default: '6.2g' %}
-                      {% assign m_salt = meal_obj.salt.value | default: meal_obj.salt | default: meal_obj.sodium.value | default: meal_obj.sodium | default: '1.1g' %}
+
+                      {% assign m_energy = meal_obj.energy.value | default: meal_obj.energy | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_obj.metafields.custom.calories | default: meal_raw.calories | default: '520 kcal' %}
+                      {% assign m_cals = m_energy %}
+                      {% assign m_kj = meal_obj.energy_kj.value | default: meal_obj.energy_kj | default: meal_obj.kj.value | default: '-' %}
+                      {% if m_energy contains '/' %}
+                        {% assign energy_parts = m_energy | split: '/' %}
+                        {% assign m_kj = energy_parts[0] | strip %}
+                        {% assign m_cals = energy_parts[1] | strip %}
+                      {% endif %}
+
+                      {% assign m_prot = meal_obj.protein.value | default: meal_obj.protein | default: meal_raw.protein | default: '38' %}
+                      {% assign m_prot_display = m_prot %}
+                      {% unless m_prot_display contains 'Protein' or m_prot_display contains 'g' %}
+                        {% assign m_prot_display = m_prot | append: 'g Protein' %}
+                      {% endunless %}
+
+                      {% assign m_carbs = meal_obj.carbohydrates.value | default: meal_obj.carbohydrates | default: meal_obj.carbs.value | default: meal_obj.carbs | default: meal_raw.carbs | default: '38' %}
+                      {% assign m_carbs_display = m_carbs %}
+                      {% unless m_carbs_display contains 'g' %}
+                        {% assign m_carbs_display = m_carbs | append: 'g' %}
+                      {% endunless %}
+
+                      {% assign m_fat = meal_obj.fat.value | default: meal_obj.fat | default: meal_raw.fat | default: '14' %}
+                      {% assign m_fat_display = m_fat %}
+                      {% unless m_fat_display contains 'g' %}
+                        {% assign m_fat_display = m_fat | append: 'g' %}
+                      {% endunless %}
+
+                      {% assign m_saturates = meal_obj.of_which_saturates.value | default: meal_obj.of_which_saturates | default: meal_obj.saturates.value | default: meal_obj.saturates | default: '3.2' %}
+                      {% assign m_sat_display = m_saturates %}
+                      {% unless m_sat_display contains 'g' %}
+                        {% assign m_sat_display = m_saturates | append: 'g' %}
+                      {% endunless %}
+
+                      {% assign m_sugars = meal_obj.of_which_sugars.value | default: meal_obj.of_which_sugars | default: meal_obj.sugars.value | default: meal_obj.sugars | default: '4.2' %}
+                      {% assign m_sug_display = m_sugars %}
+                      {% unless m_sug_display contains 'g' %}
+                        {% assign m_sug_display = m_sugars | append: 'g' %}
+                      {% endunless %}
+
+                      {% assign m_fibre = meal_obj.fibre.value | default: meal_obj.fibre | default: meal_obj.fiber.value | default: meal_obj.fiber | default: '3.5' %}
+                      {% assign m_fib_display = m_fibre %}
+                      {% unless m_fib_display contains 'g' %}
+                        {% assign m_fib_display = m_fibre | append: 'g' %}
+                      {% endunless %}
+
+                      {% assign m_salt = meal_obj.salt.value | default: meal_obj.salt | default: meal_obj.sodium.value | default: '1.0' %}
+                      {% assign m_salt_display = m_salt %}
+                      {% unless m_salt_display contains 'g' %}
+                        {% assign m_salt_display = m_salt | append: 'g' %}
+                      {% endunless %}
+
                       {% assign m_serving = meal_obj.serving_size.value | default: meal_obj.serving_size | default: meal_obj.serving.value | default: meal_obj.serving | default: 'Per Serving (420g)' %}
-                      {% assign m_kj = meal_obj.energy_kj.value | default: meal_obj.energy_kj | default: meal_obj.kj.value | default: meal_obj.kj | default: '-' %}
                       {% assign m_ingr = meal_obj.ingredients.value | default: meal_obj.ingredients | default: meal_raw.ingredients | default: 'Fresh ingredients prepared by Gimmie chefs.' %}
                       {% assign m_aller = meal_obj.allergens.value | default: meal_obj.allergens | default: meal_raw.allergens | default: 'None' %}
 
@@ -277,13 +324,13 @@
                       {% assign m_ingr_clean = m_ingr | strip_html | strip_newlines | escape %}
                       {% assign m_aller_clean = m_aller | strip_html | strip_newlines | escape %}
                       {% assign m_cals_clean = m_cals | strip_html | strip_newlines | escape %}
-                      {% assign m_prot_clean = m_prot | strip_html | strip_newlines | escape %}
-                      {% assign m_carbs_clean = m_carbs | strip_html | strip_newlines | escape %}
-                      {% assign m_fat_clean = m_fat | strip_html | strip_newlines | escape %}
-                      {% assign m_sat_clean = m_saturates | strip_html | strip_newlines | escape %}
-                      {% assign m_sug_clean = m_sugars | strip_html | strip_newlines | escape %}
-                      {% assign m_fib_clean = m_fibre | strip_html | strip_newlines | escape %}
-                      {% assign m_salt_clean = m_salt | strip_html | strip_newlines | escape %}
+                      {% assign m_prot_clean = m_prot_display | strip_html | strip_newlines | escape %}
+                      {% assign m_carbs_clean = m_carbs_display | strip_html | strip_newlines | escape %}
+                      {% assign m_fat_clean = m_fat_display | strip_html | strip_newlines | escape %}
+                      {% assign m_sat_clean = m_sat_display | strip_html | strip_newlines | escape %}
+                      {% assign m_sug_clean = m_sug_display | strip_html | strip_newlines | escape %}
+                      {% assign m_fib_clean = m_fib_display | strip_html | strip_newlines | escape %}
+                      {% assign m_salt_clean = m_salt_display | strip_html | strip_newlines | escape %}
                       {% assign m_serv_clean = m_serving | strip_html | strip_newlines | escape %}
                       {% assign m_kj_clean = m_kj | strip_html | strip_newlines | escape %}
 
@@ -314,11 +361,11 @@
                             <span class="gimmie-build-box__badge">CHEF ROTATION</span>
                           </div>
                           <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ m_id }}">{{ m_title | strip_html }}</h3>
-                          <p class="gimmie-build-box__meal-description">{{ m_desc | strip_html | truncate: 140 }}</p>
+                          <p class="gimmie-build-box__meal-description">{{ m_desc | strip_html }}</p>
                           <div class="gimmie-build-box__meal-macros">
                             <span>{{ m_cals | strip_html }}</span>
                             <span class="dot">•</span>
-                            <span>{{ m_prot | strip_html }}</span>
+                            <span>{{ m_prot_display | strip_html }}</span>
                           </div>
                           <div class="gimmie-build-box__qty">
                             <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ m_variant_id }}" aria-label="Decrease quantity" disabled>−</button>
