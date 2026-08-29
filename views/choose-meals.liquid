@@ -68,6 +68,42 @@
       </section>
     {% else %}
       <!-- 3. ACTIVE SUBSCRIBER SCREEN (Choose Meals Builder) -->
+      {% comment %} 1. Fetch Weekly Menu metaobject entries from Shopify {% endcomment %}
+      {% assign meta_menus = shop.metaobjects.weekly_menu.values %}
+      {% if meta_menus == blank or meta_menus.size == 0 %}
+        {% assign meta_menus = shop.metaobjects.weekely_menu.values %}
+      {% endif %}
+      {% if meta_menus == blank or meta_menus.size == 0 %}
+        {% assign meta_menus = shop.metaobjects.weekly_menus.values %}
+      {% endif %}
+      {% if meta_menus == blank or meta_menus.size == 0 %}
+        {% assign meta_menus = shop.metaobjects.weeklymenu.values %}
+      {% endif %}
+      {% if meta_menus == blank or meta_menus.size == 0 %}
+        {% assign meta_menus = shop.metaobjects.menu.values %}
+      {% endif %}
+
+      {% comment %} 2. Find next week's menu (14th delivery date) for recurring subscribers {% endcomment %}
+      {% assign next_week_menu = nil %}
+      {% for menu_item in meta_menus %}
+        {% assign date_val = menu_item.delivery_date.value | default: menu_item.delivery_date | default: menu_item.date | default: menu_item.title | default: menu_item.name | downcase %}
+        {% if date_val contains '14' %}
+          {% assign next_week_menu = menu_item %}
+        {% endif %}
+      {% endfor %}
+
+      {% if next_week_menu == nil and meta_menus.size > 1 %}
+        {% assign next_week_menu = meta_menus[1] %}
+      {% elsif next_week_menu == nil and meta_menus.size > 0 %}
+        {% assign next_week_menu = meta_menus.first %}
+      {% endif %}
+
+      {% assign active_delivery_date = nil %}
+      {% assign active_meta_meals = nil %}
+      {% if next_week_menu %}
+        {% assign active_delivery_date = next_week_menu.delivery_date.value | default: next_week_menu.delivery_date | default: next_week_menu.date | default: next_week_menu.title %}
+        {% assign active_meta_meals = next_week_menu.meals.value | default: next_week_menu.meals | default: next_week_menu.products.value | default: next_week_menu.products | default: next_week_menu.dishes.value %}
+      {% endif %}
 {% endraw %}
 
 <section class="gimmie-build-box">
@@ -81,7 +117,7 @@
         </p>
         <h1 class="gimmie-build-box__heading">Choose Your Meals</h1>
         <p class="gimmie-build-box__intro">
-          Customise your <strong>{{ mealQuota }} meals</strong> for your upcoming delivery on <strong>{{ formattedDeliveryDate }}</strong>.
+          Customise your <strong>{{ mealQuota }} meals</strong> for your upcoming delivery on <strong>{% raw %}{{ active_delivery_date | default: 'Mon 14 Sept' }}{% endraw %}</strong>.
         </p>
       </header>
 
@@ -111,7 +147,7 @@
                 </div>
                 <div class="gimmie-build-box__detail">
                   <strong>Delivery Date</strong>
-                  <span style="color: var(--gimmie-text);">📅 {{ formattedDeliveryDate }}</span>
+                  <span style="color: var(--gimmie-text);">📅 {% raw %}{{ active_delivery_date | default: 'Mon 14 Sept' }}{% endraw %}</span>
                 </div>
                 <div class="gimmie-build-box__detail">
                   <strong>Your Box Size</strong>
@@ -157,41 +193,74 @@
 
               <!-- Meals Grid - Strictly 2 in Row -->
               <div class="gimmie-build-box__meals-grid" style="display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 20px !important;">
-                {% for meal in meals %}
-                  <article class="gimmie-build-box__meal" data-meal-id="{{ meal.id }}" style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
-                    <!-- Image Wrap -->
-                    <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ meal.id }}">
-                      <img src="{{ meal.image }}" alt="{{ meal.title }}" class="gimmie-build-box__meal-image" loading="lazy">
-                      <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ meal.id }}">ℹ</button>
-                    </div>
+                {% raw %}
+                  {% if active_meta_meals and active_meta_meals.size > 0 %}
+                    {% for meal_raw in active_meta_meals %}
+                      {% assign meal_obj = meal_raw.product | default: meal_raw %}
+                      {% assign m_title = meal_obj.title | default: meal_raw.title | default: meal_raw.name %}
+                      {% assign m_img = meal_obj.featured_image | default: meal_obj.image | default: meal_raw.image | image_url: width: 800 %}
+                      {% assign m_desc = meal_obj.description | default: meal_raw.description | default: meal_obj.summary | default: 'Delicious chef-prepared fresh gourmet meal, macro-balanced for peak health.' %}
+                      {% assign m_variant_id = meal_obj.variants.first.id | default: meal_obj.id | default: meal_raw.id %}
+                      {% assign m_id = meal_obj.id | default: meal_raw.id %}
+                      {% assign m_cals = meal_obj.metafields.custom.calories | default: meal_raw.calories | default: '520 kcal' %}
+                      {% assign m_prot = meal_obj.metafields.custom.protein | default: meal_raw.protein | default: '44g Protein' %}
 
-                    <!-- Content -->
-                    <div class="gimmie-build-box__meal-content">
-                      <div class="gimmie-build-box__badges">
-                        {% for badge in meal.badges %}
-                          <span class="gimmie-build-box__badge">{{ badge }}</span>
-                        {% endfor %}
-                      </div>
-
-                      <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ meal.id }}">{{ meal.title }}</h3>
-                      <p class="gimmie-build-box__meal-description">{{ meal.description }}</p>
-
-                      <!-- Clean Macros (No carb bubbles) -->
-                      <div class="gimmie-build-box__meal-macros">
-                        <span>{{ meal.macros.calories }}</span>
-                        <span class="dot">•</span>
-                        <span>{{ meal.macros.protein }}</span>
-                      </div>
-
-                      <!-- Quantity Controls -->
-                      <div class="gimmie-build-box__qty">
-                        <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ meal.variantId }}" aria-label="Decrease quantity" disabled>−</button>
-                        <span class="gimmie-build-box__qty-value" data-meal-qty="{{ meal.variantId }}">0</span>
-                        <button type="button" class="gimmie-build-box__qty-button" data-action="plus" data-variant-id="{{ meal.variantId }}" aria-label="Increase quantity">+</button>
-                      </div>
-                    </div>
-                  </article>
-                {% endfor %}
+                      <article class="gimmie-build-box__meal" data-meal-id="{{ m_id }}" style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
+                        <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ m_id }}">
+                          <img src="{{ m_img }}" alt="{{ m_title }}" class="gimmie-build-box__meal-image" loading="lazy">
+                          <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ m_id }}">ℹ</button>
+                        </div>
+                        <div class="gimmie-build-box__meal-content">
+                          <div class="gimmie-build-box__badges">
+                            <span class="gimmie-build-box__badge">CHEF ROTATION</span>
+                          </div>
+                          <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ m_id }}">{{ m_title }}</h3>
+                          <p class="gimmie-build-box__meal-description">{{ m_desc }}</p>
+                          <div class="gimmie-build-box__meal-macros">
+                            <span>{{ m_cals }}</span>
+                            <span class="dot">•</span>
+                            <span>{{ m_prot }}</span>
+                          </div>
+                          <div class="gimmie-build-box__qty">
+                            <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ m_variant_id }}" aria-label="Decrease quantity" disabled>−</button>
+                            <span class="gimmie-build-box__qty-value" data-meal-qty="{{ m_variant_id }}">0</span>
+                            <button type="button" class="gimmie-build-box__qty-button" data-action="plus" data-variant-id="{{ m_variant_id }}" aria-label="Increase quantity">+</button>
+                          </div>
+                        </div>
+                      </article>
+                    {% endfor %}
+                  {% else %}
+                {% endraw %}
+                    {% for meal in meals %}
+                      <article class="gimmie-build-box__meal" data-meal-id="{{ meal.id }}" style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
+                        <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ meal.id }}">
+                          <img src="{{ meal.image }}" alt="{{ meal.title }}" class="gimmie-build-box__meal-image" loading="lazy">
+                          <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ meal.id }}">ℹ</button>
+                        </div>
+                        <div class="gimmie-build-box__meal-content">
+                          <div class="gimmie-build-box__badges">
+                            {% for badge in meal.badges %}
+                              <span class="gimmie-build-box__badge">{{ badge }}</span>
+                            {% endfor %}
+                          </div>
+                          <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ meal.id }}">{{ meal.title }}</h3>
+                          <p class="gimmie-build-box__meal-description">{{ meal.description }}</p>
+                          <div class="gimmie-build-box__meal-macros">
+                            <span>{{ meal.macros.calories }}</span>
+                            <span class="dot">•</span>
+                            <span>{{ meal.macros.protein }}</span>
+                          </div>
+                          <div class="gimmie-build-box__qty">
+                            <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ meal.variantId }}" aria-label="Decrease quantity" disabled>−</button>
+                            <span class="gimmie-build-box__qty-value" data-meal-qty="{{ meal.variantId }}">0</span>
+                            <button type="button" class="gimmie-build-box__qty-button" data-action="plus" data-variant-id="{{ meal.variantId }}" aria-label="Increase quantity">+</button>
+                          </div>
+                        </div>
+                      </article>
+                    {% endfor %}
+                {% raw %}
+                  {% endif %}
+                {% endraw %}
               </div>
 
             </div>
@@ -279,7 +348,7 @@
       "customerName": "{% raw %}{{ customer.first_name | default: customer.name | default: 'Subscriber' }} {{ customer.last_name }}{% endraw %}",
       "mealQuota": {{ mealQuota | json }},
       "contractId": {{ contractId | json }},
-      "formattedDeliveryDate": {{ formattedDeliveryDate | json }},
+      "formattedDeliveryDate": "{% raw %}{{ active_delivery_date | default: 'Mon 14 Sept' }}{% endraw %}",
       "currentLines": {{ currentLines | json }},
       "meals": {{ meals | json }}
     }
@@ -295,7 +364,26 @@
     const config = JSON.parse(configEl.textContent || '{}');
     const mealQuota = parseInt(config.mealQuota || 6, 10);
     const contractId = config.contractId || '';
-    const meals = config.meals || [];
+    
+    // Scan DOM for all rendered meal articles (supports both metaobjects and fallback)
+    const renderedMealCards = document.querySelectorAll('.gimmie-build-box__meal');
+    const activeMealList = [];
+    renderedMealCards.forEach(card => {
+      const mealId = card.getAttribute('data-meal-id');
+      const plusBtn = card.querySelector('[data-action="plus"]');
+      const variantId = plusBtn ? plusBtn.getAttribute('data-variant-id') : mealId;
+      const titleEl = card.querySelector('.gimmie-build-box__meal-title');
+      const imgEl = card.querySelector('.gimmie-build-box__meal-image');
+      const descEl = card.querySelector('.gimmie-build-box__meal-description');
+      activeMealList.push({
+        id: mealId,
+        variantId: variantId,
+        title: titleEl ? titleEl.textContent.trim() : 'Meal',
+        image: imgEl ? imgEl.src : '',
+        description: descEl ? descEl.textContent.trim() : ''
+      });
+    });
+    const meals = activeMealList.length > 0 ? activeMealList : (config.meals || []);
     let customerEmail = config.customerEmail || '';
     let customerName = config.customerName || 'Subscriber';
 
