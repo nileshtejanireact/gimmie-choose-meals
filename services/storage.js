@@ -47,7 +47,7 @@ const defaultSubmissions = [
   {
     id: 'sub_158689231229',
     contractId: '158689231229',
-    customer: 'declan.haveron@gmail.com',
+    customer: 'declan8570@gmail.com',
     customerName: 'Mr Declan Haveron',
     boxSize: '6 meals',
     deliveryDate: 'Tue 1 Sept',
