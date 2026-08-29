@@ -199,17 +199,59 @@
                   {% if active_meta_meals and active_meta_meals.size > 0 %}
                     {% for meal_raw in active_meta_meals %}
                       {% assign meal_obj = meal_raw.product | default: meal_raw %}
-                      {% assign m_title = meal_obj.title | default: meal_raw.title | default: meal_raw.name %}
-                      {% assign m_img = meal_obj.featured_image | default: meal_obj.image | default: meal_raw.image | image_url: width: 800 %}
-                      {% assign m_desc = meal_obj.description | default: meal_raw.description | default: meal_obj.summary | default: 'Delicious chef-prepared fresh gourmet meal, macro-balanced for peak health.' %}
-                      {% assign m_variant_id = meal_obj.variants.first.id | default: meal_obj.id | default: meal_raw.id %}
+                      {% assign m_title = meal_obj.title.value | default: meal_obj.title | default: meal_raw.title | default: meal_raw.name.value | default: meal_raw.name %}
+                      
+                      {% assign m_img = nil %}
+                      {% if meal_obj.image.value %}
+                        {% assign m_img = meal_obj.image.value | image_url: width: 800 %}
+                      {% elsif meal_obj.image %}
+                        {% assign m_img = meal_obj.image | image_url: width: 800 %}
+                      {% elsif meal_obj.photo.value %}
+                        {% assign m_img = meal_obj.photo.value | image_url: width: 800 %}
+                      {% elsif meal_obj.photo %}
+                        {% assign m_img = meal_obj.photo | image_url: width: 800 %}
+                      {% elsif meal_obj.featured_image.value %}
+                        {% assign m_img = meal_obj.featured_image.value | image_url: width: 800 %}
+                      {% elsif meal_obj.featured_image %}
+                        {% assign m_img = meal_obj.featured_image | image_url: width: 800 %}
+                      {% elsif meal_obj.meal_image.value %}
+                        {% assign m_img = meal_obj.meal_image.value | image_url: width: 800 %}
+                      {% elsif meal_obj.meal_image %}
+                        {% assign m_img = meal_obj.meal_image | image_url: width: 800 %}
+                      {% elsif meal_obj.picture.value %}
+                        {% assign m_img = meal_obj.picture.value | image_url: width: 800 %}
+                      {% elsif meal_obj.picture %}
+                        {% assign m_img = meal_obj.picture | image_url: width: 800 %}
+                      {% elsif meal_obj.thumbnail.value %}
+                        {% assign m_img = meal_obj.thumbnail.value | image_url: width: 800 %}
+                      {% elsif meal_obj.thumbnail %}
+                        {% assign m_img = meal_obj.thumbnail | image_url: width: 800 %}
+                      {% endif %}
+
+                      {% if m_img == blank or m_img == '' %}
+                        {% assign down_t = m_title | downcase %}
+                        {% if down_t contains 'salmon' or down_t contains 'penne' or down_t contains 'pesto' or down_t contains 'fish' %}
+                          {% assign m_img = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80' %}
+                        {% elsif down_t contains 'beef' or down_t contains 'hoisin' or down_t contains 'bolognese' or down_t contains 'steak' %}
+                          {% assign m_img = 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80' %}
+                        {% elsif down_t contains 'chicken' or down_t contains 'burrito' or down_t contains 'tuscan' %}
+                          {% assign m_img = 'https://images.unsplash.com/photo-1547496502-affa22d38842?auto=format&fit=crop&w=800&q=80' %}
+                        {% elsif down_t contains 'curry' or down_t contains 'plant' or down_t contains 'vegan' or down_t contains 'potato' %}
+                          {% assign m_img = 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80' %}
+                        {% else %}
+                          {% assign m_img = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80' %}
+                        {% endif %}
+                      {% endif %}
+
+                      {% assign m_desc = meal_obj.description.value | default: meal_obj.description | default: meal_raw.description | default: meal_obj.summary | default: 'Delicious chef-prepared fresh gourmet meal, macro-balanced for peak health.' %}
+                      {% assign m_variant_id = meal_obj.variants.first.id | default: meal_obj.variant_id | default: meal_obj.id | default: meal_raw.id %}
                       {% assign m_id = meal_obj.id | default: meal_raw.id %}
-                      {% assign m_cals = meal_obj.metafields.custom.calories | default: meal_raw.calories | default: '520 kcal' %}
-                      {% assign m_prot = meal_obj.metafields.custom.protein | default: meal_raw.protein | default: '44g Protein' %}
-                      {% assign m_carbs = meal_obj.metafields.custom.carbs | default: meal_raw.carbs | default: '38g Carbs' %}
-                      {% assign m_fat = meal_obj.metafields.custom.fat | default: meal_raw.fat | default: '14g Fat' %}
-                      {% assign m_ingr = meal_obj.ingredients | default: meal_raw.ingredients | default: 'Fresh ingredients prepared by Gimmie chefs.' %}
-                      {% assign m_aller = meal_obj.allergens | default: meal_raw.allergens | default: 'None' %}
+                      {% assign m_cals = meal_obj.metafields.custom.calories | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_raw.calories | default: '520 kcal' %}
+                      {% assign m_prot = meal_obj.metafields.custom.protein | default: meal_obj.protein.value | default: meal_obj.protein | default: meal_raw.protein | default: '44g Protein' %}
+                      {% assign m_carbs = meal_obj.metafields.custom.carbs | default: meal_obj.carbs.value | default: meal_obj.carbs | default: meal_raw.carbs | default: '38g Carbs' %}
+                      {% assign m_fat = meal_obj.metafields.custom.fat | default: meal_obj.fat.value | default: meal_obj.fat | default: meal_raw.fat | default: '14g Fat' %}
+                      {% assign m_ingr = meal_obj.ingredients.value | default: meal_obj.ingredients | default: meal_raw.ingredients | default: 'Fresh ingredients prepared by Gimmie chefs.' %}
+                      {% assign m_aller = meal_obj.allergens.value | default: meal_obj.allergens | default: meal_raw.allergens | default: 'None' %}
 
                       <article class="gimmie-build-box__meal" 
                                data-meal-id="{{ m_id }}" 
@@ -224,7 +266,7 @@
                                data-fat="{{ m_fat }}"
                                style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
                         <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ m_id }}">
-                          <img src="{{ m_img }}" alt="{{ m_title }}" class="gimmie-build-box__meal-image" loading="lazy">
+                          <img src="{{ m_img }}" alt="{{ m_title }}" class="gimmie-build-box__meal-image" loading="lazy" onerror="if(!this.dataset.errored){this.dataset.errored=true;this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';}">
                           <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ m_id }}">ℹ</button>
                         </div>
                         <div class="gimmie-build-box__meal-content">
