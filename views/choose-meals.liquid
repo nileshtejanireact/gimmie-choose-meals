@@ -277,19 +277,37 @@
                       {% assign m_ingr = nil %}
                       {% assign m_aller = nil %}
 
+                      {% comment %} Extract via field iterator for direct metaobject Drops {% endcomment %}
+                      {% if meal_raw.fields %}
+                        {% for field in meal_raw.fields %}
+                          {% if field.key == 'description' and field.value != blank %}{% assign m_desc = field.value %}{% endif %}
+                          {% if field.key == 'energy' and field.value != blank %}{% assign m_energy = field.value %}{% endif %}
+                          {% if field.key == 'protein' and field.value != blank %}{% assign m_prot = field.value %}{% endif %}
+                          {% if field.key == 'fat' and field.value != blank %}{% assign m_fat = field.value %}{% endif %}
+                          {% if field.key == 'of_which_saturates' or field.key == 'saturates' and field.value != blank %}{% assign m_saturates = field.value %}{% endif %}
+                          {% if field.key == 'carbohydrates' or field.key == 'carbs' and field.value != blank %}{% assign m_carbs = field.value %}{% endif %}
+                          {% if field.key == 'of_which_sugars' or field.key == 'sugars' and field.value != blank %}{% assign m_sugars = field.value %}{% endif %}
+                          {% if field.key == 'fibre' or field.key == 'fiber' and field.value != blank %}{% assign m_fibre = field.value %}{% endif %}
+                          {% if field.key == 'salt' and field.value != blank %}{% assign m_salt = field.value %}{% endif %}
+                          {% if field.key == 'serving_size' and field.value != blank %}{% assign m_serving = field.value %}{% endif %}
+                          {% if field.key == 'allergens' and field.value != blank %}{% assign m_aller = field.value %}{% endif %}
+                          {% if field.key == 'ingredients' and field.value != blank %}{% assign m_ingr = field.value %}{% endif %}
+                        {% endfor %}
+                      {% endif %}
+
                       {% if direct_meal %}
-                        {% assign m_desc = direct_meal.description.value | default: direct_meal.description %}
-                        {% assign m_energy = direct_meal.energy.value | default: direct_meal.energy %}
-                        {% assign m_prot = direct_meal.protein.value | default: direct_meal.protein %}
-                        {% assign m_fat = direct_meal.fat.value | default: direct_meal.fat %}
-                        {% assign m_saturates = direct_meal.of_which_saturates.value | default: direct_meal.of_which_saturates | default: direct_meal.saturates.value | default: direct_meal.saturates %}
-                        {% assign m_carbs = direct_meal.carbohydrates.value | default: direct_meal.carbohydrates | default: direct_meal.carbs.value | default: direct_meal.carbs %}
-                        {% assign m_sugars = direct_meal.of_which_sugars.value | default: direct_meal.of_which_sugars | default: direct_meal.sugars.value | default: direct_meal.sugars %}
-                        {% assign m_fibre = direct_meal.fibre.value | default: direct_meal.fibre | default: direct_meal.fiber.value | default: direct_meal.fiber %}
-                        {% assign m_salt = direct_meal.salt.value | default: direct_meal.salt %}
-                        {% assign m_serving = direct_meal.serving_size.value | default: direct_meal.serving_size %}
-                        {% assign m_aller = direct_meal.allergens.value | default: direct_meal.allergens %}
-                        {% assign m_ingr = direct_meal.ingredients.value | default: direct_meal.ingredients %}
+                        {% if m_desc == blank %}{% assign m_desc = direct_meal.description.value | default: direct_meal.description %}{% endif %}
+                        {% if m_energy == blank %}{% assign m_energy = direct_meal.energy.value | default: direct_meal.energy %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = direct_meal.protein.value | default: direct_meal.protein %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = direct_meal.fat.value | default: direct_meal.fat %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = direct_meal.of_which_saturates.value | default: direct_meal.of_which_saturates | default: direct_meal.saturates.value | default: direct_meal.saturates %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = direct_meal.carbohydrates.value | default: direct_meal.carbohydrates | default: direct_meal.carbs.value | default: direct_meal.carbs %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = direct_meal.of_which_sugars.value | default: direct_meal.of_which_sugars | default: direct_meal.sugars.value | default: direct_meal.sugars %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = direct_meal.fibre.value | default: direct_meal.fibre | default: direct_meal.fiber.value | default: direct_meal.fiber %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = direct_meal.salt.value | default: direct_meal.salt %}{% endif %}
+                        {% if m_serving == blank %}{% assign m_serving = direct_meal.serving_size.value | default: direct_meal.serving_size %}{% endif %}
+                        {% if m_aller == blank %}{% assign m_aller = direct_meal.allergens.value | default: direct_meal.allergens %}{% endif %}
+                        {% if m_ingr == blank %}{% assign m_ingr = direct_meal.ingredients.value | default: direct_meal.ingredients %}{% endif %}
                         {% if direct_meal.meal_image.value %}
                           {% assign m_img = direct_meal.meal_image.value | image_url: width: 800 %}
                         {% endif %}
@@ -333,7 +351,18 @@
                       {% endif %}
 
                       {% assign down_t = m_title | downcase %}
-                      {% if down_t contains 'brazilian' or down_t contains 'coconut chicken' %}
+                      {% if down_t contains 'harissa' or down_t contains 'harissa beef' %}
+                        {% if m_desc == blank %}{% assign m_desc = 'Spiced harissa beef mince served with roasted sweet potato wedges, fresh herbs and yogurt dip.' %}{% endif %}
+                        {% if m_energy == blank %}{% assign m_energy = '1740 kj / 416 kcal' %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = '10.4' %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = '3.8' %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = '42.8' %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = '6.9' %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = '5.2' %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = '36.0' %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = '1.15' %}{% endif %}
+                        {% if m_aller == blank %}{% assign m_aller = 'Sesame' %}{% endif %}
+                      {% elsif down_t contains 'brazilian' or down_t contains 'coconut chicken' %}
                         {% if m_desc == blank %}{% assign m_desc = 'Tender chicken in aromatic creamy Brazilian coconut curry sauce served with fragrant rice.' %}{% endif %}
                         {% if m_energy == blank %}{% assign m_energy = '2376 kj / 568 kcal' %}{% endif %}
                         {% if m_fat == blank %}{% assign m_fat = '20.1' %}{% endif %}
@@ -366,17 +395,6 @@
                         {% if m_prot == blank %}{% assign m_prot = '42.0' %}{% endif %}
                         {% if m_salt == blank %}{% assign m_salt = '1.45' %}{% endif %}
                         {% if m_aller == blank %}{% assign m_aller = 'Soya, Wheat, Sesame, Fish' %}{% endif %}
-                      {% elsif down_t contains 'harissa' or down_t contains 'harissa beef' %}
-                        {% if m_desc == blank %}{% assign m_desc = 'Spiced harissa beef mince served with roasted sweet potato wedges, fresh herbs and yogurt dip.' %}{% endif %}
-                        {% if m_energy == blank %}{% assign m_energy = '2520 kj / 602 kcal' %}{% endif %}
-                        {% if m_fat == blank %}{% assign m_fat = '24.0' %}{% endif %}
-                        {% if m_saturates == blank %}{% assign m_saturates = '7.2' %}{% endif %}
-                        {% if m_carbs == blank %}{% assign m_carbs = '51.0' %}{% endif %}
-                        {% if m_sugars == blank %}{% assign m_sugars = '9.4' %}{% endif %}
-                        {% if m_fibre == blank %}{% assign m_fibre = '6.8' %}{% endif %}
-                        {% if m_prot == blank %}{% assign m_prot = '44.0' %}{% endif %}
-                        {% if m_salt == blank %}{% assign m_salt = '1.30' %}{% endif %}
-                        {% if m_aller == blank %}{% assign m_aller = 'Milk' %}{% endif %}
                       {% endif %}
 
                       {% assign m_variant_id = meal_obj.variants.first.id | default: meal_obj.system.id | default: meal_obj.system.handle | default: meal_obj.id | default: meal_raw.id %}
