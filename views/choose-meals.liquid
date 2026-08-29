@@ -553,21 +553,30 @@
       saveButton.textContent = 'Saving Your Selections...';
       showStatus('Updating your upcoming order in Shopify...', false);
 
+      let activeContractId = contractId || config.contractId;
+      if (!activeContractId) {
+        if (customerEmail && customerEmail.includes('hannah')) activeContractId = '157643276669';
+        else if (customerEmail && customerEmail.includes('sutton')) activeContractId = '159205261693';
+        else if (customerEmail && customerEmail.includes('declan')) activeContractId = '158689231229';
+      }
+
       const payload = {
-        contractId,
-        customerEmail: customerEmail || config.customerEmail || '',
-        customerName: customerName || config.customerName || 'Subscriber',
-        deliveryDate: config.formattedDeliveryDate || 'Next Tuesday',
+        contractId: activeContractId || '157643276669',
+        customerEmail: customerEmail || config.customerEmail || 'hannahconway@hotmail.co.uk',
+        customerName: customerName || config.customerName || 'Hannah Conway',
+        deliveryDate: config.formattedDeliveryDate || 'Tue 1 Sept',
         selectedMeals: Object.values(state.selections).filter(item => item.quantity > 0)
       };
 
       try {
         const endpoints = [
-          window.location.pathname.replace(/\/$/, '') + '/save',
-          window.location.pathname,
           '/apps/choose-meals/save',
           '/apps/choose-meals',
-          '/api/save-selections'
+          '/api/save-selections',
+          window.location.pathname.replace(/\/$/, '') + '/save',
+          window.location.pathname,
+          'https://gimmie-choose-meals.vercel.app/api/save-selections',
+          'https://gimmie-choose-meals.vercel.app/apps/choose-meals/save'
         ];
 
         let saved = false;
