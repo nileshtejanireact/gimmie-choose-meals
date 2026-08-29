@@ -53,17 +53,32 @@ app.get('/health', (req, res) => {
   });
 });
 
-/**
- * Embedded Shopify Admin Dashboard Routes
- */
 async function renderAdminDashboard(req, res) {
-  const shopDomain = req.query.shop || process.env.SHOPIFY_SHOP_DOMAIN || 'iknacn-wq.myshopify.com';
-  const submissions = await subscriptionService.getAllActiveSubmissionsLive();
+  try {
+    const shopDomain = req.query.shop || process.env.SHOPIFY_SHOP_DOMAIN || 'iknacn-wq.myshopify.com';
+    res.setHeader('Content-Security-Policy', `frame-ancestors https://admin.shopify.com https://${shopDomain} https://*.myshopify.com https://*.spin.dev`);
 
-  res.render('admin-selections', {
-    shopDomain,
-    submissions
-  });
+    let submissions = storageService.getSubmissions();
+    try {
+      const live = await subscriptionService.getAllActiveSubmissionsLive();
+      if (live && live.length > 0) {
+        submissions = live;
+      }
+    } catch (e) {
+      console.warn('Live API fallback:', e.message);
+    }
+
+    return res.render('admin-selections', {
+      shopDomain,
+      submissions
+    });
+  } catch (error) {
+    console.error('Error rendering admin dashboard:', error);
+    return res.render('admin-selections', {
+      shopDomain: 'iknacn-wq.myshopify.com',
+      submissions: storageService.getSubmissions()
+    });
+  }
 }
 
 app.get('/admin', renderAdminDashboard);
