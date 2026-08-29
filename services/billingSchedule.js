@@ -4,13 +4,13 @@
 class BillingScheduleService {
   /**
    * Get the next upcoming Thursday at 19:00 (7:00 PM) UK time.
-   * Handles London GMT (UTC+0) and BST (UTC+1) daylight saving automatically.
+   * Ensures new subscribers are NEVER charged in the same billing week.
    * 
    * @param {Date} [fromDate=new Date()]
-   * @param {number} [cutoffHours=24] - Minimum buffer hours after initial checkout before a renewal can trigger
+   * @param {number} [minBufferDays=5] - Minimum buffer days after initial checkout (default 5 days = 120 hours)
    * @returns {Date} Target Date object in UTC corresponding to Thursday 19:00 London time
    */
-  getNextThursday7PM(fromDate = new Date(), cutoffHours = 24) {
+  getNextThursday7PM(fromDate = new Date(), minBufferDays = 5) {
     // Current time in UTC
     const now = new Date(fromDate);
 
@@ -36,9 +36,12 @@ class BillingScheduleService {
       0
     ));
 
-    // If candidate is within the cutoff window from checkout (e.g. less than 24 hours away or in the past), push to following Thursday
+    // Minimum buffer hours (e.g. 5 days = 120 hours)
+    const minBufferHours = minBufferDays * 24;
     const hoursDifference = (candidate.getTime() - now.getTime()) / (1000 * 60 * 60);
-    if (hoursDifference < cutoffHours) {
+
+    // If candidate Thursday is within the same week / too close to signup, push to following week's Thursday
+    if (hoursDifference < minBufferHours) {
       candidate.setUTCDate(candidate.getUTCDate() + 7);
     }
 
