@@ -56,9 +56,9 @@ app.get('/health', (req, res) => {
 /**
  * Embedded Shopify Admin Dashboard Routes
  */
-function renderAdminDashboard(req, res) {
+async function renderAdminDashboard(req, res) {
   const shopDomain = req.query.shop || process.env.SHOPIFY_SHOP_DOMAIN || 'iknacn-wq.myshopify.com';
-  const submissions = storageService.getSubmissions();
+  const submissions = await subscriptionService.getAllActiveSubmissionsLive();
 
   res.render('admin-selections', {
     shopDomain,
