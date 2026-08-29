@@ -32,10 +32,10 @@ const defaultSubmissions = [
   {
     id: 'sub_159205261693',
     contractId: '159205261693',
-    customer: 'adamsutton@gmail.com',
+    customer: 'suttonadam@icloud.com',
     customerName: 'Adam SUTTON',
     boxSize: '6 meals',
-    deliveryDate: 'Wed 2 Sept',
+    deliveryDate: 'Tue 1 Sept',
     status: 'Active',
     submittedAt: new Date(Date.now() - 3600000).toISOString(),
     formattedDate: new Date(Date.now() - 3600000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
