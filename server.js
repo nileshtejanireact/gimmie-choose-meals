@@ -56,14 +56,47 @@ app.get('/auth/callback', async (req, res) => {
   const shop = req.query.shop || process.env.SHOPIFY_SHOP_DOMAIN || 'iknacn-wq.myshopify.com';
   const code = req.query.code;
   const apiKey = process.env.SHOPIFY_API_KEY || '31bce292c2aff18a8158b7d853389698';
-  const apiSecret = process.env.SHOPIFY_API_SECRET_KEY || '';
+  let apiSecret = process.env.SHOPIFY_API_SECRET_KEY || 
+                  process.env.SHOPIFY_SECRET || 
+                  process.env.SHOPIFY_API_SECRET || 
+                  process.env.SHOPIFY_SECRET_KEY || 
+                  req.query.secret || 
+                  req.body?.secret || '';
 
   if (!code) {
     return res.status(400).send(`Missing authorization code. Query parameters received: ${JSON.stringify(req.query)}`);
   }
 
   if (!apiSecret) {
-    return res.status(500).send('SHOPIFY_API_SECRET_KEY is missing in Vercel Environment Variables. Please set SHOPIFY_API_SECRET_KEY in Vercel settings.');
+    return res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Connect Gimmie to Shopify</title>
+        <style>
+          body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f4f6f8; }
+          .card { background: #fff; padding: 40px; border-radius: 10px; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 550px; text-align: left; }
+          h2 { color: #102b10; margin-top: 0; }
+          input { width: 100%; box-sizing: border-box; padding: 12px; margin: 12px 0 20px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
+          button { background: #008060; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; }
+          button:hover { background: #006e52; }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <h2>🔐 One Final Step to Complete Connection</h2>
+          <p>Please enter your <strong>SHOPIFY_API_SECRET_KEY</strong> below to generate your permanent token:</p>
+          <form method="GET" action="/auth/callback">
+            <input type="hidden" name="code" value="${code}">
+            <input type="hidden" name="shop" value="${shop}">
+            <label style="font-weight: bold; font-size: 14px;">API Secret Key (starts with shpss_...):</label>
+            <input type="text" name="secret" placeholder="shpss_..." required autofocus>
+            <button type="submit">Complete Connection & Activate Token →</button>
+          </form>
+        </div>
+      </body>
+      </html>
+    `);
   }
 
   try {
