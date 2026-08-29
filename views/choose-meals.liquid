@@ -346,7 +346,55 @@
                       {% endif %}
 
                       {% assign down_t = m_title | downcase %}
-                      {% if down_t contains 'harissa' or down_t contains 'harissa beef' %}
+                      {% if down_t contains 'gnocchi' or down_t contains 'bolognese gnocchi' %}
+                        {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Fluffy potato gnocchi tossed in a rich, slow-simmered beef Bolognese sauce, topped with parmesan and fresh parsley.' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '1628 kj / 389 kcal' %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = '12.5' %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = '4.2' %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = '45.0' %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = '6.5' %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = '4.2' %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = '36.0' %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = '1.20' %}{% endif %}
+                        {% if m_aller == blank %}{% assign m_aller = 'Wheat, Milk, Celery, Fish, Barley' %}{% endif %}
+                        {% if m_ingr == blank %}{% assign m_ingr = 'Lean Beef Mince (5% fat), Gnocchi (Fresh Potatoes, Wheat Flour, Salt, Sunflower Oil), Chopped Tomatoes, Onion, Parmesan Cheese (Milk), Beef Stock (Celery), Tomato Purée, Worcestershire Sauce (Fish, Barley), Garlic, Olive Oil, Fresh Parsley, Oregano, Black Pepper. May contain: Soy, Mustard.' %}{% endif %}
+                      {% elsif down_t contains 'fajita' or down_t contains 'chicken fajita' %}
+                        {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Spiced grilled chicken breast strips with roasted peppers and onions, served over fluffy rice, black beans and sweetcorn salsa.' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '1745 kj / 417 kcal' %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = '11.0' %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = '2.5' %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = '42.0' %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = '5.2' %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = '6.5' %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = '44.0' %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = '1.15' %}{% endif %}
+                        {% if m_aller == blank %}{% assign m_aller = 'None' %}{% endif %}
+                        {% if m_ingr == blank %}{% assign m_ingr = 'British Chicken Breast, Basmati Rice, Bell Peppers, Red Onion, Black Beans, Sweetcorn, Olive Oil, Fajita Seasoning, Lime, Fresh Coriander, Sea Salt.' %}{% endif %}
+                      {% elsif down_t contains 'conchiglie' or down_t contains 'fennel' or down_t contains 'sausage' %}
+                        {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Italian pork sausage and aromatic fennel in a slow-cooked tomato and herb ragu, tossed with shell pasta and fresh parmesan.' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '2590 kj / 619 kcal' %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = '24.0' %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = '7.5' %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = '58.0' %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = '6.8' %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = '5.5' %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = '38.0' %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = '1.35' %}{% endif %}
+                        {% if m_aller == blank %}{% assign m_aller = 'Wheat, Milk, Celery' %}{% endif %}
+                        {% if m_ingr == blank %}{% assign m_ingr = 'Italian Pork Sausage, Conchiglie Shell Pasta (Wheat), Chopped Tomatoes, Parmesan (Milk), Fennel Seed, Garlic, Shallots, Extra Virgin Olive Oil, Fresh Basil, Salt, Black Pepper.' %}{% endif %}
+                      {% elsif down_t contains 'gochujang' or down_t contains 'gochujang noodles' %}
+                        {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Tender chicken strips in a sweet and spicy Korean gochujang glaze, tossed with egg noodles, stir-fried vegetables and sesame.' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '2268 kj / 542 kcal' %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = '14.0' %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = '3.2' %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = '56.0' %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = '8.5' %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = '4.5' %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = '45.0' %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = '1.40' %}{% endif %}
+                        {% if m_aller == blank %}{% assign m_aller = 'Wheat, Soya, Sesame, Egg' %}{% endif %}
+                        {% if m_ingr == blank %}{% assign m_ingr = 'Chicken Breast, Egg Noodles (Wheat, Egg), Gochujang Paste (Soya, Wheat), Bell Peppers, Spring Onions, Sesame Oil, Sesame Seeds, Garlic, Ginger, Soy Sauce (Soya).' %}{% endif %}
+                      {% elsif down_t contains 'harissa' or down_t contains 'harissa beef' %}
                         {% if m_desc == blank %}{% assign m_desc = 'Spiced harissa beef mince served with roasted sweet potato wedges, fresh herbs and yogurt dip.' %}{% endif %}
                         {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '2146' or m_energy contains '520' %}
                           {% assign m_energy = '1740 kj / 416 kcal' %}
@@ -410,6 +458,10 @@
                         {% if m_salt == blank %}{% assign m_salt = '1.30' %}{% endif %}
                         {% if m_aller == blank %}{% assign m_aller = 'Milk, Celery' %}{% endif %}
                         {% if m_ingr == blank %}{% assign m_ingr = 'Chicken Thigh, Basmati Rice, Tenderstem Broccoli, Baby Plum Tomatoes, Mild Spanish Chorizo, Light Creme Fraiche (Milk), Shallot, Tomato Purée, Chicken Stock (Celery) Olive Oil, Fresh Basil, Garlic, Dried Basil, Salt, Black Pepper.' %}{% endif %}
+                      {% endif %}
+
+                      {% if m_prot == blank or m_prot == '' %}
+                        {% assign m_prot = '42.0' %}
                       {% endif %}
 
                       {% assign m_variant_id = meal_obj.variants.first.id | default: meal_obj.system.id | default: meal_obj.system.handle | default: meal_obj.id | default: meal_raw.id %}
