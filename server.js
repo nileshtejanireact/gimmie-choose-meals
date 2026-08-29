@@ -36,7 +36,75 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.resolve(__dirname, 'public')));
+const axios = require('axios');
+
+/**
+ * 🔐 Automated 1-Click OAuth Token Generator
+ */
+app.get('/auth', (req, res) => {
+  const shop = req.query.shop || process.env.SHOPIFY_SHOP_DOMAIN || 'iknacn-wq.myshopify.com';
+  const apiKey = process.env.SHOPIFY_API_KEY || '31bce292c2aff18a8158b7d853389698';
+  const scopes = 'write_orders,read_orders,write_customers,read_customers,write_own_subscription_contracts,read_own_subscription_contracts,read_products';
+  const host = req.get('host');
+  const protocol = req.protocol === 'https' || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http';
+  const redirectUri = `${protocol}://${host}/auth/callback`;
+
+  const installUrl = `https://${shop}/admin/oauth/authorize?client_id=${apiKey}&scope=${scopes}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+  console.log(`🔐 Initiating 1-Click OAuth for shop ${shop} -> ${installUrl}`);
+  res.redirect(installUrl);
+});
+
+app.get('/auth/callback', async (req, res) => {
+  const { shop, code } = req.query;
+  const apiKey = process.env.SHOPIFY_API_KEY || '';
+  const apiSecret = process.env.SHOPIFY_API_SECRET_KEY || '';
+
+  if (!code || !shop) {
+    return res.status(400).send('Missing authorization code or shop domain.');
+  }
+
+  try {
+    const tokenResponse = await axios.post(`https://${shop}/admin/oauth/access_token`, {
+      client_id: apiKey,
+      client_secret: apiSecret,
+      code: code
+    });
+
+    const accessToken = tokenResponse.data.access_token;
+    console.log(`🎉 [SUCCESS] Obtained Live Store Access Token: ${accessToken}`);
+
+    // Set token dynamically in memory & shopify config
+    process.env.SHOPIFY_ADMIN_API_ACCESS_TOKEN = accessToken;
+    const shopifyClient = require('./config/shopify');
+    shopifyClient.accessToken = accessToken;
+
+    return res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>App Connected Successfully</title>
+        <style>
+          body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f4f6f8; }
+          .card { background: #fff; padding: 40px; border-radius: 10px; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+          h1 { color: #108043; }
+          code { background: #eef2ee; padding: 8px 12px; border-radius: 6px; font-size: 16px; font-weight: bold; }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <h1>🎉 Connected to Shopify Successfully!</h1>
+          <p>Your Access Token has been generated and activated live.</p>
+          <p><strong>Your Token:</strong> <code>${accessToken}</code></p>
+          <p style="margin-top: 20px;"><a href="https://${shop}/admin/apps" style="color: #008060; font-weight: bold;">Return to Shopify Admin</a></p>
+        </div>
+      </body>
+      </html>
+    `);
+  } catch (err) {
+    console.error('OAuth Callback Error:', err.response?.data || err.message);
+    return res.status(500).send(`Authentication failed: ${JSON.stringify(err.response?.data || err.message)}`);
+  }
+});
 
 /**
  * Health & Diagnostics endpoint
