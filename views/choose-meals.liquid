@@ -99,9 +99,11 @@
       {% endif %}
 
       {% assign active_delivery_date = nil %}
+      {% assign active_cutoff_date = nil %}
       {% assign active_meta_meals = nil %}
       {% if next_week_menu %}
-        {% assign active_delivery_date = next_week_menu.delivery_date.value | default: next_week_menu.delivery_date | default: next_week_menu.date | default: next_week_menu.title %}
+        {% assign active_delivery_date = next_week_menu.delivery_date.value | default: next_week_menu.delivery_date | default: next_week_menu.date | default: next_week_menu.display_name | default: next_week_menu.title %}
+        {% assign active_cutoff_date = next_week_menu.cutoff_date_time.value | default: next_week_menu.cutoff_date_time | default: next_week_menu.cutoff_date | default: 'Thu Sep 10 (11:59 PM)' %}
         {% assign active_meta_meals = next_week_menu.meals.value | default: next_week_menu.meals | default: next_week_menu.products.value | default: next_week_menu.products | default: next_week_menu.dishes.value %}
       {% endif %}
 {% endraw %}
@@ -155,7 +157,7 @@
                 </div>
                 <div class="gimmie-build-box__detail">
                   <strong>Cut-Off Time</strong>
-                  <span>⏰ Thu @ 11:59 PM UK</span>
+                  <span>⏰ {% raw %}{{ active_cutoff_date | default: 'Thu Sep 10 (11:59 PM)' }}{% endraw %}</span>
                 </div>
               </div>
 
