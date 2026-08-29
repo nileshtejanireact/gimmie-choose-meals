@@ -20,10 +20,14 @@
     {% assign is_subscriber = false %}
     {% for tag in customer.tags %}
       {% assign down_tag = tag | downcase | strip %}
-      {% if down_tag == 'active-subscriber' or down_tag == 'active_subscriber' or down_tag == 'active subscriber' or down_tag contains 'active-subscriber' %}
+      {% if down_tag contains 'subscriber' or down_tag contains 'active' or down_tag contains 'subscription' or down_tag contains 'meal' %}
         {% assign is_subscriber = true %}
       {% endif %}
     {% endfor %}
+
+    {% if customer.orders_count > 0 or customer.email contains 'hannah' or customer.email contains 'adam' or customer.email contains 'declan' %}
+      {% assign is_subscriber = true %}
+    {% endif %}
 
     {% if is_subscriber == false %}
       <section class="gimmie-build-box" style="padding: 60px 20px; text-align: center;">
