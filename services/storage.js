@@ -50,7 +50,7 @@ const defaultSubmissions = [
     customer: 'declan.haveron@gmail.com',
     customerName: 'Mr Declan Haveron',
     boxSize: '6 meals',
-    deliveryDate: 'Fri 28 Aug',
+    deliveryDate: 'Tue 1 Sept',
     status: 'Active',
     submittedAt: new Date(Date.now() - 7200000).toISOString(),
     formattedDate: new Date(Date.now() - 7200000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
