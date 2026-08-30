@@ -144,27 +144,6 @@
           <button class="btn-action" onclick="printAllSlips()">🖨️ Print All Packing Slips</button>
         </div>
       </div>
-
-      <!-- Thursday 11:59 PM UK Billing Schedule Sync & Kitchen Holiday Bar -->
-      <div style="margin-top: 18px; padding: 14px 18px; border: 1px solid #c9cccf; border-radius: 8px; background: #f6f6f7; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-        <div>
-          <div style="font-weight: 700; font-size: 0.92rem; color: #202223; display: flex; align-items: center; gap: 6px;">
-            ⏰ <span>Recurring Billing & Cut-Off Anchor: <strong>Every Thursday @ 11:59 PM UK Time</strong> (Smart Grace Period Active)</span>
-          </div>
-          <div style="font-size: 0.82rem; color: #6d7175; margin-top: 2px;">
-            New subscribers pay immediately at checkout; their first recurring payment skips to the following week's Thursday 11:59 PM.
-          </div>
-        </div>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button id="btn-sync-thursday" class="btn-secondary" onclick="syncThursdayBilling()">
-            ⚡ Sync to Thursday 11:59 PM
-          </button>
-          <button id="btn-skip-holiday" class="btn-secondary" style="display: none;" onclick="skipKitchenHoliday()">
-            🌴 Skip Next Cycle (+1 Wk Holiday)
-          </button>
-        </div>
-      </div>
-      <div id="sync-status-msg" style="display: none; margin-top: 8px; font-size: 0.84rem; font-weight: 600; color: #108043;"></div>
     </div>
 
     <!-- Latest Submissions Card -->
@@ -449,95 +428,6 @@
       a.href = url;
       a.download = `gimmie-meal-selections-${new Date().toISOString().slice(0, 10)}.csv`;
       a.click();
-    }
-
-    // 1-Click Sync & Lock All Active Subscribers to Thursday 7:00 PM UK Time
-    async function syncThursdayBilling() {
-      const btn = document.getElementById('btn-sync-thursday');
-      const statusMsg = document.getElementById('sync-status-msg');
-
-      btn.disabled = true;
-      btn.textContent = '⏳ Syncing Subscriptions to Thursday 7PM...';
-      statusMsg.style.display = 'block';
-      statusMsg.style.color = '#108043';
-      statusMsg.textContent = 'Locking recurring renewals to Thursday 7:00 PM UK Time...';
-
-      const endpoints = [
-        '/api/admin/align-billing-thursday',
-        window.location.origin + '/api/admin/align-billing-thursday'
-      ];
-
-      let completed = false;
-      let resultData = null;
-
-      for (const url of endpoints) {
-        try {
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-          });
-          if (res.ok) {
-            resultData = await res.json();
-            completed = true;
-            break;
-          }
-        } catch (e) {}
-      }
-
-      btn.disabled = false;
-      btn.textContent = '✓ Synchronized to Thursday 7PM!';
-      if (resultData && resultData.formattedUKTime) {
-        statusMsg.textContent = `✓ All recurring renewals locked to: ${resultData.formattedUKTime}`;
-      } else {
-        statusMsg.textContent = '✓ Thursday 7:00 PM UK Time billing schedule is active on your store!';
-      }
-    }
-
-    // 1-Click Kitchen Holiday: Skip next billing cycle for all subscribers (+1 week)
-    async function skipKitchenHoliday() {
-      const btn = document.getElementById('btn-skip-holiday');
-      const statusMsg = document.getElementById('sync-status-msg');
-
-      if (!confirm('🌴 Skip Next Billing Cycle for Kitchen Holiday?\n\nThis will shift all active subscriber renewals forward by +1 week (to the following Thursday 7PM) so no customers are billed during your holiday week.')) {
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = '⏳ Shifting Renewals +1 Week...';
-      statusMsg.style.display = 'block';
-      statusMsg.style.color = '#108043';
-      statusMsg.textContent = 'Applying kitchen holiday (+1 week skip) to all subscribers...';
-
-      const endpoints = [
-        '/api/admin/skip-billing-cycle',
-        window.location.origin + '/api/admin/skip-billing-cycle'
-      ];
-
-      let completed = false;
-      let resultData = null;
-
-      for (const url of endpoints) {
-        try {
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ weeks: 1 })
-          });
-          if (res.ok) {
-            resultData = await res.json();
-            completed = true;
-            break;
-          }
-        } catch (e) {}
-      }
-
-      btn.disabled = false;
-      btn.textContent = '✓ Holiday Applied (+1 Week)';
-      if (resultData && resultData.formattedUKTime) {
-        statusMsg.textContent = `✓ Kitchen Holiday Active: Next billing cycle moved to: ${resultData.formattedUKTime}`;
-      } else {
-        statusMsg.textContent = '✓ Kitchen holiday applied: All subscriber renewals shifted forward by +1 week.';
-      }
     }
   </script>
 </body>
