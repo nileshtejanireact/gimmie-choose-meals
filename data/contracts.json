@@ -1,0 +1,272 @@
+[
+  {
+    "id": "gid://shopify/SubscriptionContract/160046449021",
+    "contractId": "160046449021",
+    "customerName": "Maeve O'Sullivan",
+    "customerEmail": "maeveosullivan@hotmail.co.uk",
+    "status": "ACTIVE",
+    "productTitle": "Weekly Meal Box - 8 Pack",
+    "price": "£48.00",
+    "shippingAddress": "Flat 69 Jersey Wharf, 68 Jersey Street, Manchester, M4 6NN, United Kingdom",
+    "paymentMethod": "Apple Pay Mastercard •••• 5705 (Expires 06/29)",
+    "rawBillingDate": "2026-09-11T05:00:00.000Z",
+    "nextBillingDateFormatted": "Fri 11 Sep 2026",
+    "totalMeals": 8,
+    "upcomingSchedule": [
+      {
+        "date": "September 4, 2026",
+        "skipped": true
+      },
+      {
+        "date": "September 11, 2026",
+        "skipped": false
+      },
+      {
+        "date": "September 18, 2026",
+        "skipped": false
+      },
+      {
+        "date": "September 25, 2026",
+        "skipped": false
+      },
+      {
+        "date": "October 2, 2026",
+        "skipped": false
+      },
+      {
+        "date": "October 9, 2026",
+        "skipped": false
+      }
+    ],
+    "meals": [
+      {
+        "title": "Chicken Fajita Bowl",
+        "quantity": 2
+      },
+      {
+        "title": "Bolognese Gnocchi",
+        "quantity": 2
+      },
+      {
+        "title": "Beef Lasagne",
+        "quantity": 2
+      },
+      {
+        "title": "Salmon Poke Bowl",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "id": "gid://shopify/SubscriptionContract/159644582269",
+    "contractId": "159644582269",
+    "customerName": "Jennifer Mccloskey",
+    "customerEmail": "jennifermccloskey@example.com",
+    "status": "ACTIVE",
+    "productTitle": "Weekly Meal Box - 6 Pack",
+    "price": "£48.00",
+    "shippingAddress": "12 Willow Road, Liverpool, L1 8JQ, United Kingdom",
+    "paymentMethod": "Visa •••• 1024",
+    "rawBillingDate": "2026-09-10T05:00:00.000Z",
+    "nextBillingDateFormatted": "Thu 10 Sep 2026",
+    "totalMeals": 6,
+    "upcomingSchedule": [
+      {
+        "date": "September 10, 2026",
+        "skipped": false
+      },
+      {
+        "date": "September 17, 2026",
+        "skipped": false
+      }
+    ],
+    "meals": [
+      {
+        "title": "Chicken Fajita Bowl",
+        "quantity": 2
+      },
+      {
+        "title": "Bolognese Gnocchi",
+        "quantity": 2
+      },
+      {
+        "title": "Salmon Poke Bowl",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "id": "gid://shopify/SubscriptionContract/159427494269",
+    "contractId": "159427494269",
+    "customerName": "Adam SUTTON",
+    "customerEmail": "adamsutton@example.com",
+    "status": "ACTIVE",
+    "productTitle": "Weekly Meal Box - 6 Pack",
+    "price": "£36.00",
+    "shippingAddress": "44 High Street, Manchester, M1 1AA, United Kingdom",
+    "paymentMethod": "Mastercard •••• 4242",
+    "rawBillingDate": "2026-09-11T05:00:00.000Z",
+    "nextBillingDateFormatted": "Fri 11 Sep 2026",
+    "totalMeals": 6,
+    "upcomingSchedule": [
+      {
+        "date": "September 11, 2026",
+        "skipped": false
+      },
+      {
+        "date": "September 18, 2026",
+        "skipped": false
+      }
+    ],
+    "meals": [
+      {
+        "title": "Chicken Gochujang Noodles",
+        "quantity": 3
+      },
+      {
+        "title": "Smoky Chorizo & Tomato Chicken",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "id": "gid://shopify/SubscriptionContract/159319196029",
+    "contractId": "159319196029",
+    "customerName": "Erin Harley",
+    "customerEmail": "erinharley@example.com",
+    "status": "CANCELLED",
+    "productTitle": "Weekly Meal Box - 6 Pack",
+    "price": "£36.00",
+    "shippingAddress": "8 Park View, Leeds, LS1 2AB, United Kingdom",
+    "paymentMethod": "Visa •••• 8812",
+    "rawBillingDate": "2026-09-03T05:00:00.000Z",
+    "nextBillingDateFormatted": "Thu 3 Sep 2026",
+    "totalMeals": 6
+  },
+  {
+    "id": "gid://shopify/SubscriptionContract/159205261693",
+    "contractId": "159205261693",
+    "customerName": "Adam SUTTON",
+    "customerEmail": "adamsutton@example.com",
+    "status": "PAUSED",
+    "productTitle": "Weekly Meal Box - 6 Pack",
+    "price": "£36.00",
+    "shippingAddress": "44 High Street, Manchester, M1 1AA, United Kingdom",
+    "paymentMethod": "Mastercard •••• 4242",
+    "rawBillingDate": "2026-09-09T05:00:00.000Z",
+    "nextBillingDateFormatted": "Wed 9 Sep 2026",
+    "totalMeals": 6
+  },
+  {
+    "id": "gid://shopify/SubscriptionContract/158689231229",
+    "contractId": "158689231229",
+    "customerName": "Mr Declan Haveron",
+    "customerEmail": "declan8570@gmail.com",
+    "status": "CANCELLED",
+    "productTitle": "Weekly Meal Box - 6 Pack",
+    "price": "£36.00",
+    "shippingAddress": "15 Queen Street, Sheffield, S1 2NU, United Kingdom",
+    "paymentMethod": "Visa •••• 3341",
+    "rawBillingDate": "2026-10-02T05:00:00.000Z",
+    "nextBillingDateFormatted": "Fri 2 Oct 2026",
+    "totalMeals": 6
+  },
+  {
+    "id": "gid://shopify/SubscriptionContract/158399791485",
+    "contractId": "158399791485",
+    "customerName": "Mangus Wilson",
+    "customerEmail": "manguswilson@gmail.com",
+    "status": "CANCELLED",
+    "productTitle": "Weekly Meal Box - 6 Pack",
+    "price": "£48.00",
+    "shippingAddress": "22 Castle Gate, Edinburgh, EH1 2TH, United Kingdom",
+    "paymentMethod": "Mastercard •••• 9921",
+    "rawBillingDate": "2026-09-08T05:00:00.000Z",
+    "nextBillingDateFormatted": "Tue 8 Sep 2026",
+    "totalMeals": 6
+  },
+  {
+    "id": "gid://shopify/SubscriptionContract/157857350013",
+    "contractId": "157857350013",
+    "customerName": "MR CALLUM M NEWTON",
+    "customerEmail": "oasycal@gmail.com",
+    "status": "PAUSED",
+    "productTitle": "Weekly Meal Box - 6 Pack",
+    "price": "£48.00",
+    "shippingAddress": "7 Albert Road, Birmingham, B1 1BB, United Kingdom",
+    "paymentMethod": "Visa •••• 7714",
+    "rawBillingDate": "2026-09-03T05:00:00.000Z",
+    "nextBillingDateFormatted": "Thu 3 Sep 2026",
+    "totalMeals": 6
+  },
+  {
+    "id": "gid://shopify/SubscriptionContract/157818519933",
+    "contractId": "157818519933",
+    "customerName": "Olivia Hampson",
+    "customerEmail": "livrhampson@gmail.com",
+    "status": "PAUSED",
+    "productTitle": "Weekly Meal Box - 6 Pack",
+    "price": "£48.00",
+    "shippingAddress": "31 Mill Lane, Cheshire, SK9 1AA, United Kingdom",
+    "paymentMethod": "Apple Pay Visa •••• 2109",
+    "rawBillingDate": "2026-09-10T05:00:00.000Z",
+    "nextBillingDateFormatted": "Thu 10 Sep 2026",
+    "totalMeals": 6
+  },
+  {
+    "id": "gid://shopify/SubscriptionContract/157810426237",
+    "contractId": "157810426237",
+    "customerName": "HANNAH CONWAY",
+    "customerEmail": "hannahconway248@gmail.com",
+    "status": "CANCELLED",
+    "productTitle": "Weekly Meal Box - 10 Pack",
+    "price": "£68.00",
+    "shippingAddress": "19 Oxford Grove, Bolton, BL1 3ST, United Kingdom",
+    "paymentMethod": "Mastercard •••• 4490",
+    "rawBillingDate": "2026-09-10T05:00:00.000Z",
+    "nextBillingDateFormatted": "Thu 10 Sep 2026",
+    "totalMeals": 10
+  },
+  {
+    "id": "gid://shopify/SubscriptionContract/157807903101",
+    "contractId": "157807903101",
+    "customerName": "HANNAH CONWAY",
+    "customerEmail": "hannahconway248@gmail.com",
+    "status": "CANCELLED",
+    "productTitle": "Weekly Meal Box - 6 Pack",
+    "price": "£40.80",
+    "shippingAddress": "19 Oxford Grove, Bolton, BL1 3ST, United Kingdom",
+    "paymentMethod": "Mastercard •••• 4490",
+    "rawBillingDate": "2026-09-10T05:00:00.000Z",
+    "nextBillingDateFormatted": "Thu 10 Sep 2026",
+    "totalMeals": 6
+  },
+  {
+    "id": "gid://shopify/SubscriptionContract/157643276669",
+    "contractId": "157643276669",
+    "customerName": "Hannah Conway",
+    "customerEmail": "hannahconway@hotmail.co.uk",
+    "status": "ACTIVE",
+    "productTitle": "Weekly Meal Box - 6 Pack",
+    "price": "£48.00",
+    "shippingAddress": "19 Oxford Grove, Bolton, BL1 3ST, United Kingdom",
+    "paymentMethod": "Mastercard •••• 4490",
+    "rawBillingDate": "2026-09-11T05:00:00.000Z",
+    "nextBillingDateFormatted": "Fri 11 Sep 2026",
+    "totalMeals": 6
+  },
+  {
+    "id": "gid://shopify/SubscriptionContract/157639475581",
+    "contractId": "157639475581",
+    "customerName": "HANNAH CONWAY",
+    "customerEmail": "hannahconway248@gmail.com",
+    "status": "CANCELLED",
+    "productTitle": "Weekly Meal Box - 6 Pack",
+    "price": "£48.00",
+    "shippingAddress": "19 Oxford Grove, Bolton, BL1 3ST, United Kingdom",
+    "paymentMethod": "Mastercard •••• 4490",
+    "rawBillingDate": "2026-09-08T05:00:00.000Z",
+    "nextBillingDateFormatted": "Tue 8 Sep 2026",
+    "totalMeals": 6
+  }
+]

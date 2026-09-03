@@ -530,6 +530,26 @@ app.post('/api/webhooks/subscription-contract-created', async (req, res) => {
     res.status(200).send('Processed with notice');
   }
 });
+
+/**
+ * Webhook: Real-time Contract Status Update (Pause, Resume, Cancel)
+ * Triggered when customer pauses/resumes from their customer account portal
+ */
+app.post(['/webhooks/subscription-contracts/update', '/api/webhooks/subscription-contract-updated'], async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const contractId = payload.id || payload.admin_graphql_api_id;
+    const status = payload.status;
+    const nextBillingDate = payload.next_billing_date;
+    if (contractId) {
+      console.log(`⚡ [Webhook Triggered] Contract ${contractId} updated status to ${status}`);
+      await subscriptionService.updateContractState(contractId, { status, nextBillingDate });
+    }
+    res.status(200).send('Webhook processed');
+  } catch (e) {
+    res.status(200).send('Processed with notice');
+  }
+});
 /**
  * Webhook: Automated Payment Failure Webhook
  * Triggered by Shopify when any subscription billing attempt fails
