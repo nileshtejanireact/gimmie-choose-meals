@@ -445,19 +445,10 @@
                 </p>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div>
-                  <label style="display: block; font-weight: 700; font-size: 0.84rem; margin-bottom: 6px; color: #444746;">
-                    Plan Price (Display):
-                  </label>
-                  <input type="text" id="plan-price-input" class="search-input" value="{{ planSettings.planPrice | default: '£36.00 / week' }}">
-                </div>
-                <div>
-                  <label style="display: block; font-weight: 700; font-size: 0.84rem; margin-bottom: 6px; color: #444746;">
-                    Delivery Day:
-                  </label>
-                  <input type="text" id="plan-delivery-day" class="search-input" value="{{ planSettings.deliveryDay | default: 'Tuesday Delivery' }}">
-                </div>
+              <div>
+                <button type="button" class="btn-secondary" style="font-size: 0.84rem; padding: 6px 12px;">
+                  ⊕ Add Option
+                </button>
               </div>
 
             </div>
@@ -1095,10 +1086,8 @@
       const payload = {
         planTitle: document.getElementById('plan-title-input')?.value || 'Subscribe weekly & save',
         internalDesc: document.getElementById('plan-internal-desc-input')?.value || 'Weekly Gimmie meal box subscription',
-        planPrice: document.getElementById('plan-price-input')?.value || '£36.00 / week',
         billingAnchorDay: document.getElementById('plan-bill-day')?.value || 'Friday',
-        cutoffBufferDays: parseInt(document.getElementById('plan-buffer-days')?.value || '5', 10),
-        deliveryDay: document.getElementById('plan-delivery-day')?.value || 'Tuesday Delivery'
+        cutoffBufferDays: parseInt(document.getElementById('plan-buffer-days')?.value || '5', 10)
       };
 
       try {
