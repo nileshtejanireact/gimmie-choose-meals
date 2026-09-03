@@ -188,14 +188,16 @@ async function renderAdminDashboard(req, res) {
       console.warn('Selling plans fetch notice:', e.message);
     }
 
-    const nextFridayBilling = billingScheduleService.formatUKBillingDate(billingScheduleService.getNextFridayMorning());
-    const nextThursdayCutoff = billingScheduleService.formatUKBillingDate(billingScheduleService.getNextThursday1159PM());
+    const planSettings = storageService.getSettings();
+    const nextFridayBilling = billingScheduleService.formatUKBillingDate(billingScheduleService.getNextFridayMorning(new Date(), planSettings.cutoffBufferDays || 5));
+    const nextThursdayCutoff = billingScheduleService.formatUKBillingDate(billingScheduleService.getNextThursday1159PM(new Date(), planSettings.cutoffBufferDays || 5));
 
     return res.render('admin-selections', {
       shopDomain,
       submissions,
       contracts,
       sellingPlans,
+      planSettings,
       nextFridayBilling,
       nextThursdayCutoff
     });
@@ -206,6 +208,7 @@ async function renderAdminDashboard(req, res) {
       submissions: storageService.getSubmissions(),
       contracts: [],
       sellingPlans: { productTitle: 'Weekly Meal Box', groups: [] },
+      planSettings: storageService.getSettings(),
       nextFridayBilling: 'Friday 06:00 AM UK Time',
       nextThursdayCutoff: 'Thursday 11:59 PM UK Time'
     });
@@ -429,6 +432,18 @@ app.post('/api/admin/reschedule-contract', async (req, res) => {
     }
     const result = await subscriptionService.rescheduleContract(contractId, newDate);
     res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+/**
+ * Admin Action: Save Subscription Plan & Cutoff Settings
+ */
+app.post('/api/admin/save-plan-settings', (req, res) => {
+  try {
+    const updated = storageService.saveSettings(req.body);
+    res.json({ success: true, settings: updated });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

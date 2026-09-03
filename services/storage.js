@@ -3,6 +3,27 @@ const path = require('path');
 
 const dataDir = path.resolve(__dirname, '../data');
 const dataFile = path.resolve(dataDir, 'submissions.json');
+const settingsFile = path.resolve(dataDir, 'settings.json');
+
+const defaultSettings = {
+  planTitle: "Subscribe weekly & save",
+  internalDesc: "Weekly Gimmie meal box subscription",
+  planPrice: "£36.00 / week",
+  billingAnchorDay: "Friday",
+  billingAnchorTime: "06:00 AM UK",
+  cutoffDay: "Thursday",
+  cutoffTime: "11:59 PM UK",
+  cutoffBufferDays: 5,
+  deliveryDay: "Tuesday Delivery",
+  deliveryNote: "Prepared over the weekend",
+  retryAttemptsPayment: 3,
+  retryDaysPayment: 7,
+  failureActionPayment: "Cancel subscription and send notification",
+  retryAttemptsInventory: 5,
+  retryDaysInventory: 1,
+  failureActionInventory: "Skip order and send notification",
+  staffNotificationFreq: "Weekly summary of billing failures"
+};
 
 // Ensure data directory exists
 if (!fs.existsSync(dataDir)) {
@@ -165,6 +186,33 @@ class StorageService {
    */
   getSubmissions() {
     return this.submissions;
+  }
+
+  /**
+   * Get subscription plan settings
+   */
+  getSettings() {
+    try {
+      if (fs.existsSync(settingsFile)) {
+        const raw = fs.readFileSync(settingsFile, 'utf8');
+        return { ...defaultSettings, ...JSON.parse(raw) };
+      }
+    } catch (e) {}
+    return { ...defaultSettings };
+  }
+
+  /**
+   * Save updated subscription plan settings
+   */
+  saveSettings(newSettings) {
+    try {
+      const current = this.getSettings();
+      const updated = { ...current, ...newSettings };
+      fs.writeFileSync(settingsFile, JSON.stringify(updated, null, 2), 'utf8');
+      return updated;
+    } catch (e) {
+      return newSettings;
+    }
   }
 }
 

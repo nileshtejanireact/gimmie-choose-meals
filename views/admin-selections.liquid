@@ -327,127 +327,319 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- TAB 2: PLANS (SELLING PLANS & CUTOFF BUFFER) -->
+    <!-- TAB 2: PLANS (EDIT SELLING PLAN - EXACT MATCH TO SHOPIFY SCREENSHOT) -->
     <!-- ========================================================================= -->
     <div id="tab-plans" class="tab-content">
-      <div class="Polaris-Card">
-        <div style="margin-bottom: 20px;">
-          <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0 0 4px;">Active Subscription Plans</h2>
-          <p style="margin: 0; font-size: 0.85rem; color: #6d7175;">
-            Configure billing recurrence, anchor days, and automated grace buffer rules
-          </p>
-        </div>
-
-        <div style="border: 1px solid #e1e3e5; border-radius: 10px; padding: 20px; background: #fafbfb; margin-bottom: 20px;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;">
-            <div>
-              <span class="badge-status" style="margin-bottom: 8px;">ACTIVE PLAN</span>
-              <h3 style="font-size: 1.15rem; font-weight: 800; margin: 0 0 6px; color: #102b10;">
-                Weekly Gimmie Meal Box Subscription
-              </h3>
-              <p style="margin: 0 0 12px; color: #6d7175; font-size: 0.9rem;">
-                Applied to product: <strong>Weekly Meal Box</strong>
-              </p>
-            </div>
-            <div style="text-align: right;">
-              <span style="font-weight: 800; font-size: 1.1rem; color: #108043;">£36.00 / week</span>
-              <div style="font-size: 0.8rem; color: #6d7175;">Delivery Every Week</div>
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; background: #ffffff; border: 1px solid #e1e3e5; padding: 16px; border-radius: 8px; margin-top: 10px;">
-            <div>
-              <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #6d7175; margin-bottom: 4px;">Billing Anchor</div>
-              <strong style="font-size: 0.95rem; color: #102b10;">Early Friday Morning (06:00 AM UK)</strong>
-              <div style="font-size: 0.78rem; color: #6d7175;">Bills right after Thursday 11:59 PM</div>
-            </div>
-            <div>
-              <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #6d7175; margin-bottom: 4px;">Cut-Off Buffer</div>
-              <strong style="font-size: 0.95rem; color: #108043;">5-Day Minimum Gap Rule</strong>
-              <div style="font-size: 0.78rem; color: #6d7175;">Wed/Thu orders skip to next week</div>
-            </div>
-            <div>
-              <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #6d7175; margin-bottom: 4px;">Delivery Day</div>
-              <strong style="font-size: 0.95rem; color: #102b10;">Tuesday Delivery</strong>
-              <div style="font-size: 0.78rem; color: #6d7175;">Prepared over the weekend</div>
-            </div>
-            <div>
-              <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #6d7175; margin-bottom: 4px;">Next Scheduled Cycle</div>
-              <strong style="font-size: 0.95rem; color: #102b10;">{{ nextFridayBilling }}</strong>
-              <div style="font-size: 0.78rem; color: #6d7175;">Automated batch processing</div>
-            </div>
-          </div>
-        </div>
-
-        <div style="background: #eef2ee; border-left: 4px solid #108043; padding: 14px 18px; border-radius: 0 8px 8px 0; font-size: 0.9rem; color: #102b10;">
-          <strong>💡 How the 5-Day Buffer Protects Your Customers:</strong><br>
-          When a customer orders on Wednesday or Thursday (inside the 5-day window of Friday), Shopify automatically bypasses the immediate Friday charge. Their first recurring charge is cleanly scheduled for the following Friday (8–9 days later). No double billing!
+      
+      <!-- Blue Info Banner (Matches Screenshot) -->
+      <div style="background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display: flex; gap: 12px; align-items: flex-start;">
+        <span style="color: #0284c7; font-size: 1.25rem; line-height: 1;">ℹ️</span>
+        <div>
+          <strong style="color: #0369a1; display: block; font-size: 0.94rem; margin-bottom: 3px;">Changes apply to new subscribers only</strong>
+          <span style="color: #0c4a6e; font-size: 0.86rem; line-height: 1.4; display: block;">
+            Existing subscribers won't be affected. To change an active subscription contract, edit it directly in the <strong>Contracts</strong> tab.
+          </span>
         </div>
       </div>
-    </div>
 
-    <!-- ========================================================================= -->
-    <!-- TAB 3: SETTINGS & 1-CLICK HOLIDAY MODE -->
-    <!-- ========================================================================= -->
-    <div id="tab-settings" class="tab-content">
-      
-      <!-- 1-Click Holiday Mode Card -->
-      <div class="Polaris-Card" style="border: 2px solid #d82c0d; background: #fffcfb;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
-          <div style="flex: 1; min-width: 280px;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-              <span style="font-size: 1.4rem;">🏖️</span>
-              <h2 style="font-size: 1.25rem; font-weight: 900; margin: 0; color: #d82c0d;">
-                Kitchen Holiday Mode (1-Click Global Skip)
-              </h2>
-            </div>
-            <p style="margin: 0 0 10px; color: #444746; font-size: 0.95rem; line-height: 1.4;">
-              Taking a week off or closing the kitchen for the holidays? 
-              Click below to <strong>automatically shift ALL active subscribers' billing and delivery dates forward by 1 week</strong> in a single click.
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: flex-start;">
+        
+        <!-- Left Main Column: Form Cards -->
+        <div style="display: grid; gap: 20px;">
+          
+          <!-- Card 1: Title & Internal Description -->
+          <div class="Polaris-Card" style="margin: 0;">
+            <label style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; color: #202223;">
+              Title
+            </label>
+            <input type="text" id="plan-title-input" class="search-input" value="{{ planSettings.planTitle | default: 'Subscribe weekly & save' }}" oninput="updatePlanSummary()">
+            <p style="margin: 6px 0 16px; font-size: 0.82rem; color: #6d7175;">
+              Customers will see this on <span style="color: #008060; text-decoration: underline; cursor: pointer;">storefront product pages</span> that have subscriptions.
             </p>
-            <p style="margin: 0; font-size: 0.85rem; color: #6d7175;">
-              • You don't have to manually skip each customer one-by-one.<br>
-              • All recurring payments will safely push to next Friday morning.<br>
-              • Customers will not be charged during your closed week.
+
+            <label style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; color: #202223;">
+              Internal description
+            </label>
+            <input type="text" id="plan-internal-desc-input" class="search-input" value="{{ planSettings.internalDesc | default: 'Weekly Gimmie meal box subscription' }}" oninput="updatePlanSummary()">
+            <p style="margin: 6px 0 0; font-size: 0.82rem; color: #6d7175;">
+              For your reference only
             </p>
           </div>
-          <div>
-            <button type="button" class="btn-holiday" onclick="openHolidayModal()">
-              🌴 Skip Next Delivery Week for All Customers
+
+          <!-- Card 2: Products -->
+          <div class="Polaris-Card" style="margin: 0;">
+            <label style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 10px; color: #202223;">
+              Products
+            </label>
+            <div style="display: flex; gap: 10px; margin-bottom: 14px;">
+              <input type="text" class="search-input" placeholder="🔍 Search products" value="Weekly Meal Box" readonly style="flex: 1; background: #fafbfb;">
+              <button type="button" class="btn-secondary" style="white-space: nowrap;">Browse</button>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: #fafbfb; border: 1px solid #e1e3e5; border-radius: 8px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; background: #e3f1df; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">🍱</div>
+                <div>
+                  <strong style="font-size: 0.95rem; color: #102b10; display: block;">Weekly Meal Box</strong>
+                  <span style="font-size: 0.8rem; color: #444746; background: #e4e5e7; padding: 2px 8px; border-radius: 4px; font-weight: 600;">3 of 3 variants selected</span>
+                </div>
+              </div>
+              <span class="badge-status">Active</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Discount and frequency options -->
+          <div class="Polaris-Card" style="margin: 0;">
+            <h3 style="margin: 0 0 16px; font-size: 1rem; font-weight: 800; color: #202223;">
+              Discount and frequency options
+            </h3>
+
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px; color: #444746;">
+                Discount type
+              </label>
+              <select id="plan-discount-type" class="search-input" style="background: #fff;">
+                <option value="none" selected>No discount</option>
+                <option value="percentage">Percentage off</option>
+                <option value="amount">Amount off</option>
+              </select>
+            </div>
+
+            <div style="border: 1px solid #e1e3e5; border-radius: 8px; padding: 18px; background: #fafbfb; display: grid; gap: 16px;">
+              <div>
+                <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px; color: #444746;">
+                  Delivery frequency
+                </label>
+                <div style="display: flex; gap: 10px;">
+                  <input type="number" id="plan-freq-count" class="search-input" value="1" min="1" max="52" style="width: 110px;">
+                  <select id="plan-freq-unit" class="search-input" style="flex: 1; background: #fff;">
+                    <option value="Weeks" selected>Weeks</option>
+                    <option value="Months">Months</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="plan-specific-day" checked style="width: 18px; height: 18px; accent-color: #008060;">
+                <label for="plan-specific-day" style="font-weight: 600; font-size: 0.92rem; color: #202223; cursor: pointer;">
+                  Set a specific billing day
+                </label>
+              </div>
+
+              <div>
+                <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px; color: #444746;">
+                  Bill on
+                </label>
+                <select id="plan-bill-day" class="search-input" style="background: #fff;" onchange="updatePlanSummary()">
+                  <option value="Friday" {% if planSettings.billingAnchorDay == 'Friday' or planSettings.billingAnchorDay == blank %}selected{% endif %}>Friday (Early Morning 06:00 AM UK)</option>
+                  <option value="Thursday" {% if planSettings.billingAnchorDay == 'Thursday' %}selected{% endif %}>Thursday (07:00 PM UK)</option>
+                  <option value="Wednesday" {% if planSettings.billingAnchorDay == 'Wednesday' %}selected{% endif %}>Wednesday</option>
+                  <option value="Monday" {% if planSettings.billingAnchorDay == 'Monday' %}selected{% endif %}>Monday</option>
+                </select>
+              </div>
+
+              <!-- Cut-off Buffer (Custom Grace Period Feature) -->
+              <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                  <label style="font-weight: 700; font-size: 0.85rem; color: #444746;">
+                    Cut-off Buffer (Grace Period)
+                  </label>
+                  <span style="font-size: 0.76rem; background: #e3f1df; color: #108043; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Built-in Double Billing Fix</span>
+                </div>
+                <select id="plan-buffer-days" class="search-input" style="background: #fff;" onchange="updatePlanSummary()">
+                  <option value="5" {% if planSettings.cutoffBufferDays == 5 or planSettings.cutoffBufferDays == blank %}selected{% endif %}>5 Days (Recommended - skips mid-week signups)</option>
+                  <option value="4" {% if planSettings.cutoffBufferDays == 4 %}selected{% endif %}>4 Days</option>
+                  <option value="3" {% if planSettings.cutoffBufferDays == 3 %}selected{% endif %}>3 Days</option>
+                  <option value="2" {% if planSettings.cutoffBufferDays == 2 %}selected{% endif %}>2 Days</option>
+                </select>
+                <p style="margin: 6px 0 0; font-size: 0.8rem; color: #6d7175;">
+                  💡 Orders placed on Wednesday or Thursday will cleanly skip that Friday's charge, renewing the following Friday (8–9 days later).
+                </p>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label style="display: block; font-weight: 700; font-size: 0.84rem; margin-bottom: 6px; color: #444746;">
+                    Plan Price (Display):
+                  </label>
+                  <input type="text" id="plan-price-input" class="search-input" value="{{ planSettings.planPrice | default: '£36.00 / week' }}">
+                </div>
+                <div>
+                  <label style="display: block; font-weight: 700; font-size: 0.84rem; margin-bottom: 6px; color: #444746;">
+                    Delivery Day:
+                  </label>
+                  <input type="text" id="plan-delivery-day" class="search-input" value="{{ planSettings.deliveryDay | default: 'Tuesday Delivery' }}">
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Summary Card (Matches Screenshot) -->
+        <div>
+          <div class="Polaris-Card" style="position: sticky; top: 20px;">
+            <h3 style="margin: 0 0 14px; font-size: 1rem; font-weight: 800; color: #202223;">Summary</h3>
+            <strong style="display: block; font-size: 0.95rem; color: #102b10; margin-bottom: 10px;" id="summary-title">
+              {{ planSettings.internalDesc | default: 'Weekly Gimmie meal box subscription' }}
+            </strong>
+            <ul style="margin: 0 0 20px; padding-left: 20px; font-size: 0.88rem; color: #444746; line-height: 1.8;" id="summary-bullets">
+              <li>Deliver every week</li>
+              <li id="summary-bill-day">Bill on {{ planSettings.billingAnchorDay | default: 'Friday' }}</li>
+              <li id="summary-buffer">Cut-off buffer: {{ planSettings.cutoffBufferDays | default: 5 }} days</li>
+              <li>Weekly Meal Box</li>
+            </ul>
+            <button type="button" class="btn-action" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem;" id="save-plan-btn" onclick="savePlanSettings()">
+              💾 Save Plan Changes
             </button>
           </div>
         </div>
+
       </div>
 
-      <!-- Cut-Off Rules Card -->
-      <div class="Polaris-Card">
-        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0 0 14px;">Cut-Off & Billing Timers</h2>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 18px;">
-          <div style="padding: 16px; border: 1px solid #e1e3e5; border-radius: 8px; background: #fafbfb;">
-            <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #6d7175;">Cut-Off Deadline</span>
-            <div style="font-size: 1.1rem; font-weight: 800; color: #102b10; margin-top: 4px;">Thursday @ 11:59 PM UK</div>
-            <p style="margin: 4px 0 0; font-size: 0.82rem; color: #6d7175;">Upcoming: {{ nextThursdayCutoff }}</p>
-          </div>
-          <div style="padding: 16px; border: 1px solid #e1e3e5; border-radius: 8px; background: #fafbfb;">
-            <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #6d7175;">Automated Billing Run</span>
-            <div style="font-size: 1.1rem; font-weight: 800; color: #108043; margin-top: 4px;">Friday @ 06:00 AM UK</div>
-            <p style="margin: 4px 0 0; font-size: 0.82rem; color: #6d7175;">Upcoming: {{ nextFridayBilling }}</p>
-          </div>
-          <div style="padding: 16px; border: 1px solid #e1e3e5; border-radius: 8px; background: #fafbfb;">
-            <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #6d7175;">Delivery Day</span>
-            <div style="font-size: 1.1rem; font-weight: 800; color: #102b10; margin-top: 4px;">Tuesday Delivery</div>
-            <p style="margin: 4px 0 0; font-size: 0.82rem; color: #6d7175;">Dispatched via DPD Fresh Express</p>
-          </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: SETTINGS (EXACT MATCH TO SHOPIFY SETTINGS SCREENSHOT) -->
+    <!-- ========================================================================= -->
+    <div id="tab-settings" class="tab-content">
+      
+      <!-- Section 1: Billing Attempts (Matches Screenshot) -->
+      <div style="display: grid; grid-template-columns: 240px 1fr; gap: 24px; margin-bottom: 28px; align-items: flex-start;">
+        <div>
+          <h3 style="margin: 0 0 6px; font-size: 1.05rem; font-weight: 700; color: #202223;">Billing attempts</h3>
+          <p style="margin: 0; font-size: 0.85rem; color: #6d7175; line-height: 1.4;">
+            Control when billing attempts are made again after a failed attempt
+          </p>
         </div>
 
-        <div style="border-top: 1px solid #e1e3e5; padding-top: 16px;">
-          <button type="button" class="btn-action" onclick="alignAllToFriday()">
-            🔄 Force Re-Align All to Friday Morning (06:00 AM UK)
-          </button>
-          <span style="font-size: 0.84rem; color: #6d7175; margin-left: 10px;">
-            Synchronizes any unaligned subscribers to the Friday morning cycle.
-          </span>
+        <div class="Polaris-Card" style="margin: 0;">
+          
+          <!-- Payment Method Failure -->
+          <div style="margin-bottom: 24px;">
+            <h4 style="margin: 0 0 14px; font-size: 0.95rem; font-weight: 700; color: #202223;">Payment method failure</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px;">
+              <div>
+                <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #444746; margin-bottom: 4px;">Number of retry attempts</label>
+                <input type="number" id="setting-retry-payment" class="search-input" value="{{ planSettings.retryAttemptsPayment | default: 3 }}" min="0" max="10">
+                <span style="font-size: 0.76rem; color: #6d7175;">Min 0, max 10 retries</span>
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #444746; margin-bottom: 4px;">Days between payment retry attempts</label>
+                <input type="number" id="setting-days-payment" class="search-input" value="{{ planSettings.retryDaysPayment | default: 7 }}" min="1" max="14">
+                <span style="font-size: 0.76rem; color: #6d7175;">Min 1, max 14 days</span>
+              </div>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #444746; margin-bottom: 4px;">Action when all retry attempts have failed</label>
+              <select id="setting-action-payment" class="search-input" style="background: #fff;">
+                <option value="Cancel subscription and send notification" {% if planSettings.failureActionPayment == 'Cancel subscription and send notification' or planSettings.failureActionPayment == blank %}selected{% endif %}>Cancel subscription and send notification</option>
+                <option value="Pause subscription and send notification" {% if planSettings.failureActionPayment == 'Pause subscription and send notification' %}selected{% endif %}>Pause subscription and send notification</option>
+                <option value="Skip order and send notification" {% if planSettings.failureActionPayment == 'Skip order and send notification' %}selected{% endif %}>Skip order and send notification</option>
+              </select>
+            </div>
+          </div>
+
+          <hr style="border: 0; border-top: 1px solid #e1e3e5; margin: 20px 0;">
+
+          <!-- Not Enough Inventory -->
+          <div>
+            <h4 style="margin: 0 0 14px; font-size: 0.95rem; font-weight: 700; color: #202223;">Not enough inventory</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px;">
+              <div>
+                <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #444746; margin-bottom: 4px;">Number of retry attempts</label>
+                <input type="number" id="setting-retry-inventory" class="search-input" value="{{ planSettings.retryAttemptsInventory | default: 5 }}" min="0" max="10">
+                <span style="font-size: 0.76rem; color: #6d7175;">Min 0, max 10 retries</span>
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #444746; margin-bottom: 4px;">Days between payment retry attempts</label>
+                <input type="number" id="setting-days-inventory" class="search-input" value="{{ planSettings.retryDaysInventory | default: 1 }}" min="1" max="14">
+                <span style="font-size: 0.76rem; color: #6d7175;">Min 1, max 14 days</span>
+              </div>
+            </div>
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #444746; margin-bottom: 4px;">Action when all retry attempts have failed</label>
+              <select id="setting-action-inventory" class="search-input" style="background: #fff;">
+                <option value="Skip order and send notification" {% if planSettings.failureActionInventory == 'Skip order and send notification' or planSettings.failureActionInventory == blank %}selected{% endif %}>Skip order and send notification</option>
+                <option value="Pause subscription and send notification" {% if planSettings.failureActionInventory == 'Pause subscription and send notification' %}selected{% endif %}>Pause subscription and send notification</option>
+                <option value="Cancel subscription and send notification" {% if planSettings.failureActionInventory == 'Cancel subscription and send notification' %}selected{% endif %}>Cancel subscription and send notification</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #444746; margin-bottom: 4px;">Frequency of notifications to staff</label>
+              <select id="setting-staff-freq" class="search-input" style="background: #fff;">
+                <option value="Weekly summary of billing failures" {% if planSettings.staffNotificationFreq == 'Weekly summary of billing failures' or planSettings.staffNotificationFreq == blank %}selected{% endif %}>Weekly summary of billing failures</option>
+                <option value="Immediate notification for each failure" {% if planSettings.staffNotificationFreq == 'Immediate notification for each failure' %}selected{% endif %}>Immediate notification for each failure</option>
+                <option value="Never" {% if planSettings.staffNotificationFreq == 'Never' %}selected{% endif %}>Never</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 20px; border-top: 1px solid #e1e3e5; padding-top: 16px;">
+            <button type="button" class="btn-action" onclick="saveBillingRetrySettings()">
+              💾 Save Retry Settings
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Section 2: Kitchen Holiday Mode (Custom 1-Click Global Skip) -->
+      <div style="display: grid; grid-template-columns: 240px 1fr; gap: 24px; margin-bottom: 28px; align-items: flex-start;">
+        <div>
+          <h3 style="margin: 0 0 6px; font-size: 1.05rem; font-weight: 700; color: #d82c0d;">Kitchen Holiday</h3>
+          <p style="margin: 0; font-size: 0.85rem; color: #6d7175; line-height: 1.4;">
+            1-Click global skip across all active subscribers when closing for holidays
+          </p>
+        </div>
+
+        <div class="Polaris-Card" style="margin: 0; border: 2px solid #d82c0d; background: #fffcfb;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div style="flex: 1; min-width: 260px;">
+              <h4 style="margin: 0 0 6px; font-size: 1.1rem; font-weight: 800; color: #d82c0d;">
+                🏖️ Skip Next Delivery Week for Everyone
+              </h4>
+              <p style="margin: 0; font-size: 0.88rem; color: #444746; line-height: 1.4;">
+                Taking a week off? Push <strong>all active customers' upcoming billing and deliveries forward by 1 week (+7 days)</strong> in one single click.
+              </p>
+            </div>
+            <div>
+              <button type="button" class="btn-holiday" onclick="openHolidayModal()">
+                🌴 Skip Next Week for All Customers
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Cut-Off & Billing Schedule -->
+      <div style="display: grid; grid-template-columns: 240px 1fr; gap: 24px; margin-bottom: 20px; align-items: flex-start;">
+        <div>
+          <h3 style="margin: 0 0 6px; font-size: 1.05rem; font-weight: 700; color: #202223;">Cut-off & Schedules</h3>
+          <p style="margin: 0; font-size: 0.85rem; color: #6d7175; line-height: 1.4;">
+            Weekly cut-off deadline and automated billing timer synchronization
+          </p>
+        </div>
+
+        <div class="Polaris-Card" style="margin: 0;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 16px;">
+            <div style="padding: 14px; border: 1px solid #e1e3e5; border-radius: 8px; background: #fafbfb;">
+              <span style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #6d7175;">Cut-Off Deadline</span>
+              <div style="font-size: 1.05rem; font-weight: 800; color: #102b10; margin-top: 4px;">Thursday @ 11:59 PM UK</div>
+              <p style="margin: 4px 0 0; font-size: 0.8rem; color: #6d7175;">Upcoming: {{ nextThursdayCutoff }}</p>
+            </div>
+            <div style="padding: 14px; border: 1px solid #e1e3e5; border-radius: 8px; background: #fafbfb;">
+              <span style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #6d7175;">Automated Billing Run</span>
+              <div style="font-size: 1.05rem; font-weight: 800; color: #108043; margin-top: 4px;">Friday @ 06:00 AM UK</div>
+              <p style="margin: 4px 0 0; font-size: 0.8rem; color: #6d7175;">Upcoming: {{ nextFridayBilling }}</p>
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid #e1e3e5; padding-top: 14px;">
+            <button type="button" class="btn-secondary" onclick="alignAllToFriday()">
+              🔄 Force Re-Align All Contracts to Friday 06:00 AM
+            </button>
+          </div>
         </div>
       </div>
 
@@ -885,6 +1077,91 @@
       a.href = url;
       a.download = `gimmie-meal-selections-${new Date().toISOString().slice(0, 10)}.csv`;
       a.click();
+    }
+
+    // Update Plan Summary in Right Sidebar live as user types/changes inputs
+    function updatePlanSummary() {
+      const desc = document.getElementById('plan-internal-desc-input')?.value || 'Weekly Gimmie meal box subscription';
+      const billDay = document.getElementById('plan-bill-day')?.value || 'Friday';
+      const bufferDays = document.getElementById('plan-buffer-days')?.value || '5';
+
+      const titleEl = document.getElementById('summary-title');
+      if (titleEl) titleEl.textContent = desc;
+
+      const billDayEl = document.getElementById('summary-bill-day');
+      if (billDayEl) billDayEl.textContent = `Bill on ${billDay}`;
+
+      const bufferEl = document.getElementById('summary-buffer');
+      if (bufferEl) bufferEl.textContent = `Cut-off buffer: ${bufferDays} days`;
+    }
+
+    // Save Plan Changes (Tab 2)
+    async function savePlanSettings() {
+      const btn = document.getElementById('save-plan-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+      }
+
+      const payload = {
+        planTitle: document.getElementById('plan-title-input')?.value || 'Subscribe weekly & save',
+        internalDesc: document.getElementById('plan-internal-desc-input')?.value || 'Weekly Gimmie meal box subscription',
+        planPrice: document.getElementById('plan-price-input')?.value || '£36.00 / week',
+        billingAnchorDay: document.getElementById('plan-bill-day')?.value || 'Friday',
+        cutoffBufferDays: parseInt(document.getElementById('plan-buffer-days')?.value || '5', 10),
+        deliveryDay: document.getElementById('plan-delivery-day')?.value || 'Tuesday Delivery'
+      };
+
+      try {
+        const res = await fetch('/api/admin/save-plan-settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert('✓ Plan changes saved successfully! Next cycle calculations updated.', 'success');
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          showAlert(`Failed to save plan: ${data.message}`, 'error');
+        }
+      } catch (err) {
+        showAlert(`Error saving plan: ${err.message}`, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '💾 Save Plan Changes';
+        }
+      }
+    }
+
+    // Save Billing Retry Settings (Tab 3)
+    async function saveBillingRetrySettings() {
+      const payload = {
+        retryAttemptsPayment: parseInt(document.getElementById('setting-retry-payment')?.value || '3', 10),
+        retryDaysPayment: parseInt(document.getElementById('setting-days-payment')?.value || '7', 10),
+        failureActionPayment: document.getElementById('setting-action-payment')?.value,
+        retryAttemptsInventory: parseInt(document.getElementById('setting-retry-inventory')?.value || '5', 10),
+        retryDaysInventory: parseInt(document.getElementById('setting-days-inventory')?.value || '1', 10),
+        failureActionInventory: document.getElementById('setting-action-inventory')?.value,
+        staffNotificationFreq: document.getElementById('setting-staff-freq')?.value
+      };
+
+      try {
+        const res = await fetch('/api/admin/save-plan-settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert('✓ Billing retry and notification settings saved successfully!', 'success');
+        } else {
+          showAlert(`Failed to save settings: ${data.message}`, 'error');
+        }
+      } catch (err) {
+        showAlert(`Error saving settings: ${err.message}`, 'error');
+      }
     }
   </script>
 </body>
