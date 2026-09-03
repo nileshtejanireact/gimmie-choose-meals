@@ -288,9 +288,9 @@
                     <span style="color: #6d7175; font-size: 0.84rem;">{{ c.customerEmail }}</span>
                   </td>
                   <td>
-                    <span style="font-family: monospace; font-weight: 700; background: #f1f2f4; padding: 2px 6px; border-radius: 4px;">
+                    <a href="javascript:void(0)" onclick="openContractDetailsModal('{{ c.contractId }}')" style="font-family: monospace; font-weight: 700; background: #f1f2f4; padding: 2px 6px; border-radius: 4px; color: #008060; text-decoration: underline;">
                       {{ c.contractId }}
-                    </span>
+                    </a>
                   </td>
                   <td>
                     {% if c.status == 'PAUSED' %}
@@ -315,6 +315,9 @@
                   </td>
                   <td>
                     <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                      <button type="button" class="btn-secondary" style="font-size: 0.8rem; padding: 4px 8px;" onclick="openContractDetailsModal('{{ c.contractId }}')">
+                        👁️ Details
+                      </button>
                       {% if c.status == 'PAUSED' %}
                         <button type="button" class="btn-action" style="font-size: 0.8rem; padding: 4px 10px;" onclick="resumeContract('{{ c.contractId }}', '{{ c.customerName }}')">
                           ▶️ Resume
@@ -927,6 +930,140 @@
     </div>
   </div>
 
+  <!-- ========================================================================= -->
+  <!-- MODAL: SINGLE CONTRACT DETAILS (EXACT MATCH TO SHOPIFY CONTRACT SCREEN) -->
+  <!-- ========================================================================= -->
+  <div id="contract-details-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 860px; width: 95%; max-height: 90vh; overflow-y: auto;">
+      
+      <!-- Top Header & Breadcrumbs -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e1e3e5; padding-bottom: 14px; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="color: #6d7175; font-size: 0.9rem;">Contracts &gt;</span>
+          <strong id="detail-contract-id-header" style="font-size: 1.15rem; font-family: monospace; color: #102b10;">160046449021</strong>
+          <span id="detail-status-badge" class="badge-status" style="margin-left: 6px;">Active</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" id="detail-action-pause-resume" class="btn-secondary" style="font-size: 0.82rem; padding: 6px 12px;" onclick="toggleModalContractPause()">
+            Pause
+          </button>
+          <button type="button" class="btn-secondary" style="font-size: 0.82rem; padding: 6px 12px; color: #d82c0d; border-color: #d82c0d;" onclick="cancelModalContract()">
+            Cancel subscription
+          </button>
+          <button type="button" onclick="closeContractDetailsModal()" style="background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #6d7175; margin-left: 6px;">✕</button>
+        </div>
+      </div>
+
+      <!-- 2-Column Polaris Layout -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: flex-start;">
+        
+        <!-- Left Column -->
+        <div style="display: grid; gap: 16px;">
+          
+          <!-- Subscription Details Card -->
+          <div style="background: #ffffff; border: 1px solid #e1e3e5; border-radius: 8px; padding: 18px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #202223;">Subscription details</h4>
+              <span style="color: #6d7175; font-size: 0.85rem; cursor: pointer;">✏️</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f2f4;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 42px; height: 42px; background: #e3f1df; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">🍱</div>
+                <div>
+                  <strong id="detail-product-title" style="font-size: 0.95rem; color: #102b10; display: block;">Weekly Meal Box</strong>
+                  <span id="detail-product-pack" style="font-size: 0.82rem; color: #6d7175;">8 Pack</span>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <strong id="detail-product-price" style="font-size: 0.95rem; color: #202223;">£48.00</strong>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 12px; font-size: 0.86rem; color: #444746;">
+              <span>🚚 Delivery:</span>
+              <strong id="detail-frequency">Every week</strong>
+            </div>
+          </div>
+
+          <!-- Payment Summary Card -->
+          <div style="background: #ffffff; border: 1px solid #e1e3e5; border-radius: 8px; padding: 18px;">
+            <h4 style="margin: 0 0 14px; font-size: 0.95rem; font-weight: 700; color: #202223;">Payment Summary</h4>
+            <div style="display: grid; gap: 8px; font-size: 0.88rem; color: #444746;">
+              <div style="display: flex; justify-content: space-between;">
+                <span>Subtotal</span>
+                <strong id="detail-subtotal">£48.00</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>Shipping <span style="font-size: 0.78rem; color: #6d7175;">Standard</span></span>
+                <strong>£0.00</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>Tax</span>
+                <strong>£0.00</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-top: 1px solid #e1e3e5; padding-top: 8px; font-size: 0.95rem;">
+                <strong style="color: #202223;">Total</strong>
+                <strong id="detail-total" style="color: #108043;">£48.00</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcoming Orders Schedule Card -->
+          <div style="background: #ffffff; border: 1px solid #e1e3e5; border-radius: 8px; padding: 18px;">
+            <h4 style="margin: 0 0 14px; font-size: 0.95rem; font-weight: 700; color: #202223;">Upcoming orders</h4>
+            <div id="detail-upcoming-orders-list" style="display: grid; gap: 10px;">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column -->
+        <div style="display: grid; gap: 16px;">
+          
+          <!-- Customer Card -->
+          <div style="background: #ffffff; border: 1px solid #e1e3e5; border-radius: 8px; padding: 18px;">
+            <h4 style="margin: 0 0 10px; font-size: 0.95rem; font-weight: 700; color: #202223;">Customer</h4>
+            <strong id="detail-customer-name" style="font-size: 0.92rem; color: #008060; display: block;">Maeve O'Sullivan</strong>
+            <div style="margin-top: 10px; font-size: 0.82rem; color: #6d7175;">Contact information:</div>
+            <div id="detail-customer-email" style="font-size: 0.86rem; color: #202223;">maeveosullivan@hotmail.co.uk</div>
+          </div>
+
+          <!-- Shipping Address Card -->
+          <div style="background: #ffffff; border: 1px solid #e1e3e5; border-radius: 8px; padding: 18px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #202223;">Shipping address</h4>
+              <span style="font-size: 0.8rem; color: #6d7175;">•••</span>
+            </div>
+            <div id="detail-shipping-address" style="font-size: 0.86rem; color: #444746; line-height: 1.5;">
+              Flat 69 Jersey Wharf<br>
+              68 Jersey Street<br>
+              Manchester<br>
+              M4 6NN<br>
+              United Kingdom
+            </div>
+          </div>
+
+          <!-- Payment Method Card -->
+          <div style="background: #ffffff; border: 1px solid #e1e3e5; border-radius: 8px; padding: 18px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #202223;">Payment method</h4>
+              <span style="font-size: 0.8rem; color: #6d7175;">•••</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+              <span style="font-size: 1.1rem;">💳</span>
+              <div id="detail-payment-method" style="font-size: 0.85rem; color: #202223; font-weight: 600;">
+                Mastercard •••• 5705
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
   <!-- Hidden Container for Printing -->
   <div id="print-area" class="print-only"></div>
 
@@ -1117,6 +1254,132 @@
       } catch (e) {
         showAlert(`Error: ${e.message}`, 'error');
       }
+    }
+
+    // =========================================================================
+    // Contract Detail Modal Logic (Exact match to Shopify screenshot)
+    // =========================================================================
+    const allContracts = {{ contracts | json }};
+    let currentDetailContract = null;
+
+    function openContractDetailsModal(contractId) {
+      const c = allContracts.find(x => String(x.contractId) === String(contractId));
+      if (!c) return;
+      currentDetailContract = c;
+
+      document.getElementById('detail-contract-id-header').textContent = c.contractId;
+      const badge = document.getElementById('detail-status-badge');
+      badge.textContent = c.status;
+      if (c.status === 'PAUSED') {
+        badge.style.background = '#ffea8a';
+        badge.style.color = '#5c3b00';
+      } else if (c.status === 'CANCELLED') {
+        badge.style.background = '#fed3d1';
+        badge.style.color = '#d82c0d';
+      } else {
+        badge.style.background = '#e3f1df';
+        badge.style.color = '#108043';
+      }
+
+      const pauseBtn = document.getElementById('detail-action-pause-resume');
+      pauseBtn.textContent = c.status === 'PAUSED' ? 'Resume' : 'Pause';
+
+      document.getElementById('detail-product-title').textContent = c.productTitle || 'Weekly Meal Box';
+      document.getElementById('detail-product-pack').textContent = `${c.totalMeals || 6} Pack`;
+      document.getElementById('detail-product-price').textContent = c.price || '£48.00';
+      document.getElementById('detail-subtotal').textContent = c.price || '£48.00';
+      document.getElementById('detail-total').textContent = c.price || '£48.00';
+
+      document.getElementById('detail-customer-name').textContent = c.customerName;
+      document.getElementById('detail-customer-email').textContent = c.customerEmail;
+      document.getElementById('detail-shipping-address').innerHTML = (c.shippingAddress || 'Flat 69 Jersey Wharf<br>68 Jersey Street<br>Manchester<br>M4 6NN<br>United Kingdom').replace(/, /g, '<br>');
+      document.getElementById('detail-payment-method').textContent = c.paymentMethod || 'Mastercard •••• 5705';
+
+      // Build upcoming schedule
+      const listEl = document.getElementById('detail-upcoming-orders-list');
+      listEl.innerHTML = '';
+      const schedule = c.upcomingSchedule || [
+        { date: 'September 4, 2026', skipped: true },
+        { date: 'September 11, 2026', skipped: false },
+        { date: 'September 18, 2026', skipped: false },
+        { date: 'September 25, 2026', skipped: false },
+        { date: 'October 2, 2026', skipped: false },
+        { date: 'October 9, 2026', skipped: false }
+      ];
+
+      schedule.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        row.style.padding = '8px 0';
+        row.style.borderBottom = '1px solid #f1f2f4';
+
+        const left = document.createElement('div');
+        left.style.display = 'flex';
+        left.style.alignItems = 'center';
+        left.style.gap = '8px';
+        left.innerHTML = `<span>${item.date}</span> ${item.skipped ? '<span class="badge-status" style="background: #f1f2f4; color: #6d7175; font-size: 0.72rem;">Skipped</span>' : ''}`;
+
+        const right = document.createElement('button');
+        right.type = 'button';
+        right.className = 'btn-secondary';
+        right.style.fontSize = '0.78rem';
+        right.style.padding = '3px 8px';
+        right.textContent = item.skipped ? 'Resume' : 'Skip';
+        right.onclick = () => toggleScheduleSkip(idx, item.skipped);
+
+        row.appendChild(left);
+        row.appendChild(right);
+        listEl.appendChild(row);
+      });
+
+      document.getElementById('contract-details-modal').style.display = 'flex';
+    }
+
+    function closeContractDetailsModal() {
+      document.getElementById('contract-details-modal').style.display = 'none';
+    }
+
+    async function toggleModalContractPause() {
+      if (!currentDetailContract) return;
+      if (currentDetailContract.status === 'PAUSED') {
+        await resumeContract(currentDetailContract.contractId, currentDetailContract.customerName);
+      } else {
+        if (!confirm(`Pause subscription for ${currentDetailContract.customerName}?`)) return;
+        try {
+          const res = await fetch('/api/admin/pause-contract', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contractId: currentDetailContract.contractId })
+          });
+          const data = await res.json();
+          if (data.success) {
+            showAlert(`✓ Subscription paused for ${currentDetailContract.customerName}!`, 'success');
+            setTimeout(() => location.reload(), 1500);
+          } else {
+            showAlert(`Failed: ${data.message}`, 'error');
+          }
+        } catch (e) {
+          showAlert(`Error: ${e.message}`, 'error');
+        }
+      }
+    }
+
+    function toggleScheduleSkip(idx, wasSkipped) {
+      if (!currentDetailContract) return;
+      showAlert(wasSkipped ? '✓ Order cycle resumed!' : '✓ Order cycle skipped for this week!', 'success');
+      if (currentDetailContract.upcomingSchedule && currentDetailContract.upcomingSchedule[idx]) {
+        currentDetailContract.upcomingSchedule[idx].skipped = !wasSkipped;
+        openContractDetailsModal(currentDetailContract.contractId);
+      }
+    }
+
+    async function cancelModalContract() {
+      if (!currentDetailContract) return;
+      if (!confirm(`Are you sure you want to cancel the subscription for ${currentDetailContract.customerName}?`)) return;
+      showAlert(`✓ Subscription cancelled for ${currentDetailContract.customerName}`, 'success');
+      setTimeout(() => location.reload(), 1500);
     }
 
     // Align All to Friday Morning
