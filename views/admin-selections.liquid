@@ -1227,25 +1227,33 @@
       variantsText: '{{ planSettings.selectedProductVariants | default: "3 of 3 variants selected" }}'
     };
 
-    function openProductBrowserModal() {
-      // Try Shopify App Bridge ResourcePicker if available in Shopify Admin iframe
-      try {
-        if (window.shopify && typeof window.shopify.resourcePicker === 'function') {
-          window.shopify.resourcePicker({
+    async function openProductBrowserModal() {
+      // 1. Use native Shopify Admin ResourcePicker if inside Shopify Admin
+      if (window.shopify && typeof window.shopify.resourcePicker === 'function') {
+        try {
+          const selection = await window.shopify.resourcePicker({
             type: 'product',
             multiple: false
-          }).then(selection => {
-            if (selection && selection.length > 0) {
-              const p = selection[0];
-              applySelectedProduct(p.id, p.title, p.images?.[0]?.originalSrc || '', `${p.variants?.length || 1} of ${p.variants?.length || 1} variants selected`);
-              return;
-            }
-          }).catch(() => {});
+          });
+          if (selection && selection.length > 0) {
+            const p = selection[0];
+            const title = p.title || 'Weekly Meal Box';
+            const imgUrl = (p.images && p.images[0] && p.images[0].originalSrc) || (p.featuredImage && p.featuredImage.url) || '';
+            const variantCount = p.variants ? p.variants.length : 1;
+            const variantsText = `${variantCount} of ${variantCount} variants selected`;
+            applySelectedProduct(p.id, title, imgUrl, variantsText);
+            showAlert(`✓ Selected: ${title}! Click "Save Plan Changes" to apply.`, 'success');
+          }
+          return; // Handled natively by Shopify - DO NOT OPEN SECOND POPUP!
+        } catch (err) {
+          // Merchant cancelled or closed the Shopify modal - do not open second popup!
+          return;
         }
-      } catch (e) {}
+      }
 
-      // Open in-app Polaris modal
-      document.getElementById('product-picker-modal').style.display = 'flex';
+      // 2. Fallback only if outside Shopify Admin (e.g. direct browser preview)
+      const modal = document.getElementById('product-picker-modal');
+      if (modal) modal.style.display = 'flex';
     }
 
     function closeProductBrowserModal() {
