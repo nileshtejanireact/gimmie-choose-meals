@@ -293,23 +293,40 @@
                     </span>
                   </td>
                   <td>
-                    <span class="badge-status">{{ c.status }}</span>
+                    {% if c.status == 'PAUSED' %}
+                      <span class="badge-status" style="background: #ffea8a; color: #5c3b00;">⏸️ PAUSED</span>
+                    {% elsif c.status == 'CANCELLED' %}
+                      <span class="badge-status" style="background: #fed3d1; color: #d82c0d;">❌ CANCELLED</span>
+                    {% else %}
+                      <span class="badge-status" style="background: #e3f1df; color: #108043;">🟢 ACTIVE</span>
+                    {% endif %}
                   </td>
                   <td>
                     <strong>{{ c.totalMeals }} meals</strong>
                   </td>
                   <td>
-                    <strong style="color: #108043;">📅 {{ c.nextBillingDateFormatted }}</strong>
-                    <div style="font-size: 0.76rem; color: #6d7175;">Early Friday Morning</div>
+                    {% if c.status == 'PAUSED' %}
+                      <span style="color: #6d7175; font-style: italic;">Billing Paused</span>
+                      <div style="font-size: 0.76rem; color: #6d7175;">Pending Customer Resume</div>
+                    {% else %}
+                      <strong style="color: #108043;">📅 {{ c.nextBillingDateFormatted }}</strong>
+                      <div style="font-size: 0.76rem; color: #6d7175;">Early Friday Morning</div>
+                    {% endif %}
                   </td>
                   <td>
                     <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                      <button type="button" class="btn-secondary" onclick="openRescheduleModal('{{ c.contractId }}', '{{ c.customerName }}', '{{ c.rawBillingDate }}')">
-                        🗓️ Reschedule
-                      </button>
-                      <button type="button" class="btn-secondary" onclick="skipSingleContract('{{ c.contractId }}', '{{ c.customerName }}')">
-                        ⏭️ Skip 1 Wk
-                      </button>
+                      {% if c.status == 'PAUSED' %}
+                        <button type="button" class="btn-action" style="font-size: 0.8rem; padding: 4px 10px;" onclick="resumeContract('{{ c.contractId }}', '{{ c.customerName }}')">
+                          ▶️ Resume
+                        </button>
+                      {% else %}
+                        <button type="button" class="btn-secondary" onclick="openRescheduleModal('{{ c.contractId }}', '{{ c.customerName }}', '{{ c.rawBillingDate }}')">
+                          🗓️ Reschedule
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="skipSingleContract('{{ c.contractId }}', '{{ c.customerName }}')">
+                          ⏭️ Skip 1 Wk
+                        </button>
+                      {% endif %}
                     </div>
                   </td>
                 </tr>
@@ -1075,6 +1092,27 @@
           setTimeout(() => location.reload(), 2000);
         } else {
           showAlert(`Failed to skip: ${data.message}`, 'error');
+        }
+      } catch (e) {
+        showAlert(`Error: ${e.message}`, 'error');
+      }
+    }
+
+    // Resume Paused Contract
+    async function resumeContract(contractId, customerName) {
+      if (!confirm(`Resume subscription for ${customerName}?`)) return;
+      try {
+        const res = await fetch('/api/admin/resume-contract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contractId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert(`✓ Subscription resumed for ${customerName}!`, 'success');
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          showAlert(`Failed to resume: ${data.message}`, 'error');
         }
       } catch (e) {
         showAlert(`Error: ${e.message}`, 'error');

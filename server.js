@@ -451,6 +451,34 @@ app.post('/api/admin/reschedule-contract', async (req, res) => {
 });
 
 /**
+ * Admin Action: Resume/Activate a paused subscription contract
+ */
+app.post('/api/admin/resume-contract', async (req, res) => {
+  try {
+    const { contractId } = req.body;
+    if (!contractId) return res.status(400).json({ success: false, message: 'contractId required' });
+    const result = await subscriptionService.resumeContract(contractId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+/**
+ * Admin Action: Pause an active subscription contract
+ */
+app.post('/api/admin/pause-contract', async (req, res) => {
+  try {
+    const { contractId } = req.body;
+    if (!contractId) return res.status(400).json({ success: false, message: 'contractId required' });
+    const result = await subscriptionService.pauseContract(contractId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+/**
  * Admin Action: Save Subscription Plan & Cutoff Settings
  */
 app.post('/api/admin/save-plan-settings', (req, res) => {
