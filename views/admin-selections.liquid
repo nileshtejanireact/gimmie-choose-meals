@@ -496,6 +496,22 @@
 
         <div class="Polaris-Card" style="margin: 0;">
           
+          <!-- Engine Live Status Banner -->
+          <div style="display: flex; align-items: center; justify-content: space-between; background: #eef9f5; border: 1px solid #cbeedd; border-radius: 8px; padding: 12px 16px; margin-bottom: 22px; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 1.25rem;">🟢</span>
+              <div>
+                <strong style="color: #008060; font-size: 0.92rem; display: block;">100% Automated Retry Engine Connected</strong>
+                <span style="color: #444746; font-size: 0.8rem;">
+                  Declined cards auto-queue for retry every {{ planSettings.retryDaysPayment | default: 7 }} days (up to {{ planSettings.retryAttemptsPayment | default: 3 }} attempts).
+                </span>
+              </div>
+            </div>
+            <button type="button" class="btn-secondary" style="font-size: 0.82rem; padding: 6px 12px; white-space: nowrap; font-weight: 700;" onclick="runPendingRetriesNow()">
+              ▶️ Check & Run Due Retries Now
+            </button>
+          </div>
+          
           <!-- Payment Method Failure -->
           <div style="margin-bottom: 24px;">
             <h4 style="margin: 0 0 14px; font-size: 0.95rem; font-weight: 700; color: #202223;">Payment method failure</h4>
@@ -554,6 +570,67 @@
                 <option value="Never" {% if planSettings.staffNotificationFreq == 'Never' %}selected{% endif %}>Never</option>
               </select>
             </div>
+          </div>
+
+          <!-- Failed Payments Queue Section -->
+          <div style="margin-top: 24px; border-top: 1px solid #e1e3e5; padding-top: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #202223;">
+                Live Failed Payments Queue ({{ failedAttempts.length | default: 0 }})
+              </h4>
+            </div>
+
+            {% if failedAttempts.length == 0 or failedAttempts == blank %}
+              <div style="background: #fafbfb; border: 1px dashed #d2d5d8; border-radius: 8px; padding: 18px; text-align: center; color: #6d7175; font-size: 0.88rem;">
+                ✓ All subscribers are currently in good standing. No payment declines pending retry!
+              </div>
+            {% else %}
+              <div style="border: 1px solid #e1e3e5; border-radius: 8px; overflow: hidden; background: #fff;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+                  <thead>
+                    <tr style="background: #f7f8f9; text-align: left; border-bottom: 1px solid #e1e3e5;">
+                      <th style="padding: 10px 14px;">Subscriber</th>
+                      <th style="padding: 10px 14px;">Status</th>
+                      <th style="padding: 10px 14px;">Retry Progress</th>
+                      <th style="padding: 10px 14px;">Next Scheduled Retry</th>
+                      <th style="padding: 10px 14px; text-align: right;">Manual Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for fa in failedAttempts %}
+                      <tr style="border-bottom: 1px solid #f1f2f4;">
+                        <td style="padding: 10px 14px;">
+                          <strong>{{ fa.customerName }}</strong>
+                          <div style="font-size: 0.76rem; color: #6d7175; font-family: monospace;">{{ fa.contractId }}</div>
+                        </td>
+                        <td style="padding: 10px 14px;">
+                          {% if fa.status == 'RETRY_PENDING' %}
+                            <span class="badge-status" style="background: #ffea8a; color: #5c3b00;">Pending Retry</span>
+                          {% elsif fa.status == 'RESOLVED' %}
+                            <span class="badge-status" style="background: #e3f1df; color: #108043;">Resolved</span>
+                          {% else %}
+                            <span class="badge-status" style="background: #fed3d1; color: #d82c0d;">Action Enforced</span>
+                          {% endif %}
+                        </td>
+                        <td style="padding: 10px 14px;">
+                          Attempt {{ fa.attemptCount }} of {{ fa.maxRetries }}
+                        </td>
+                        <td style="padding: 10px 14px; font-weight: 600;">
+                          {{ fa.nextRetryDate | slice: 0, 10 }}
+                        </td>
+                        <td style="padding: 10px 14px; text-align: right;">
+                          {% if fa.status == 'RETRY_PENDING' %}
+                            <button type="button" class="btn-action" style="font-size: 0.78rem; padding: 4px 10px;" onclick="retrySingleContractPayment('{{ fa.contractId }}')">
+                              ⚡ Retry Now
+                            </button>
+                          {% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% endif %}
           </div>
 
           <div style="display: flex; justify-content: flex-end; margin-top: 20px; border-top: 1px solid #e1e3e5; padding-top: 16px;">
@@ -1208,6 +1285,53 @@
         }
       } catch (err) {
         showAlert(`Error saving settings: ${err.message}`, 'error');
+      }
+    }
+
+    // Trigger scheduled retries check on demand
+    async function runPendingRetriesNow() {
+      showAlert('⏳ Checking for due billing retries...', 'success');
+      try {
+        const res = await fetch('/api/admin/process-retries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (data.processedCount === 0) {
+            showAlert('✓ Automated check complete: No payments are due for retry at this moment.', 'success');
+          } else {
+            showAlert(`✓ Processed ${data.processedCount} due billing retry attempt(s)!`, 'success');
+            setTimeout(() => location.reload(), 2000);
+          }
+        } else {
+          showAlert(`Notice: ${data.message}`, 'error');
+        }
+      } catch (e) {
+        showAlert(`Error: ${e.message}`, 'error');
+      }
+    }
+
+    // Manually retry a single contract's payment immediately
+    async function retrySingleContractPayment(contractId) {
+      if (!confirm(`Attempt immediate payment retry for ${contractId}?`)) return;
+      showAlert(`⏳ Retrying payment for ${contractId}...`, 'success');
+      try {
+        const res = await fetch('/api/admin/retry-single-contract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contractId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert('✓ Payment retry succeeded! Contract is back in good standing.', 'success');
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          showAlert(`Payment retry failed: ${data.message || 'Card still declined.'}`, 'error');
+          setTimeout(() => location.reload(), 2000);
+        }
+      } catch (e) {
+        showAlert(`Error: ${e.message}`, 'error');
       }
     }
 

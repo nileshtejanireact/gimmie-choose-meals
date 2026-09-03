@@ -9,6 +9,7 @@ const subscriptionService = require('./services/subscription');
 const menuService = require('./services/menu');
 const storageService = require('./services/storage');
 const billingScheduleService = require('./services/billingSchedule');
+const billingRetryService = require('./services/billingRetryService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -196,6 +197,7 @@ async function renderAdminDashboard(req, res) {
     }
 
     const planSettings = storageService.getSettings();
+    const failedAttempts = billingRetryService.getAttempts();
     const nextFridayBilling = billingScheduleService.formatUKBillingDate(billingScheduleService.getNextFridayMorning(new Date(), planSettings.cutoffBufferDays || 5));
     const nextThursdayCutoff = billingScheduleService.formatUKBillingDate(billingScheduleService.getNextThursday1159PM(new Date(), planSettings.cutoffBufferDays || 5));
 
@@ -206,6 +208,7 @@ async function renderAdminDashboard(req, res) {
       sellingPlans,
       planSettings,
       storeProducts,
+      failedAttempts,
       nextFridayBilling,
       nextThursdayCutoff
     });
@@ -218,6 +221,7 @@ async function renderAdminDashboard(req, res) {
       sellingPlans: { productTitle: 'Weekly Meal Box', groups: [] },
       planSettings: storageService.getSettings(),
       storeProducts: [],
+      failedAttempts: [],
       nextFridayBilling: 'Friday 06:00 AM UK Time',
       nextThursdayCutoff: 'Thursday 11:59 PM UK Time'
     });
@@ -496,6 +500,81 @@ app.post('/api/webhooks/subscription-contract-created', async (req, res) => {
     res.status(200).send('Webhook processed');
   } catch (e) {
     res.status(200).send('Processed with notice');
+  }
+});
+/**
+ * Webhook: Automated Payment Failure Webhook
+ * Triggered by Shopify when any subscription billing attempt fails
+ */
+app.post(['/webhooks/subscription-billing-attempts/failure', '/api/webhooks/billing-attempt-failure'], async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const contractId = payload.subscription_contract_id || payload.admin_graphql_api_id;
+    const errorCode = payload.error_code || 'PAYMENT_FAILURE';
+    const errorMessage = payload.error_message || 'Payment method was declined';
+
+    if (contractId) {
+      const fullContractId = String(contractId).startsWith('gid://') 
+        ? contractId 
+        : `gid://shopify/SubscriptionContract/${contractId}`;
+      console.log(`⚠️ [Webhook] Payment failure recorded for ${fullContractId}`);
+      await billingRetryService.recordFailure({
+        contractId: fullContractId,
+        errorCode,
+        errorMessage
+      });
+    }
+    res.status(200).send('Recorded');
+  } catch (err) {
+    console.error('Webhook failure handler notice:', err.message);
+    res.status(200).send('Acknowledged');
+  }
+});
+
+/**
+ * Webhook: Automated Payment Success Webhook
+ * Triggered by Shopify when a subscription billing attempt succeeds
+ */
+app.post(['/webhooks/subscription-billing-attempts/success', '/api/webhooks/billing-attempt-success'], async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const contractId = payload.subscription_contract_id || payload.admin_graphql_api_id;
+    if (contractId) {
+      const fullContractId = String(contractId).startsWith('gid://') 
+        ? contractId 
+        : `gid://shopify/SubscriptionContract/${contractId}`;
+      console.log(`✅ [Webhook] Payment success recorded for ${fullContractId}`);
+      billingRetryService.recordSuccess(fullContractId);
+    }
+    res.status(200).send('Resolved');
+  } catch (err) {
+    res.status(200).send('Acknowledged');
+  }
+});
+
+/**
+ * Admin Action: Trigger Scheduled Retries On-Demand
+ */
+app.post('/api/admin/process-retries', async (req, res) => {
+  try {
+    const result = await billingRetryService.processPendingRetries();
+    res.json({ success: true, ...result });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * Admin Action: Manually Retry Single Contract Payment Now
+ */
+app.post('/api/admin/retry-single-contract', async (req, res) => {
+  try {
+    const { contractId } = req.body;
+    if (!contractId) return res.status(400).json({ success: false, message: 'contractId is required' });
+    const result = await billingRetryService.retryBillingAttempt(contractId);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
