@@ -3,11 +3,53 @@
  */
 class BillingScheduleService {
   /**
-   * Get the next upcoming Thursday at 23:59 (11:59 PM) UK time.
-   * Ensures new subscribers are NEVER charged in the same billing week.
+   * Get the next upcoming Friday at 06:00 AM UK time (immediately after Thursday 11:59 PM cutoff).
+   * Enforces the 5-day minimum buffer rule so late signups (Wed/Thu) are pushed to the following week.
    * 
    * @param {Date} [fromDate=new Date()]
-   * @param {number} [minBufferDays=5] - Minimum buffer days after initial checkout (default 5 days = 120 hours)
+   * @param {number} [minBufferDays=5] - Minimum buffer days (default 5 days = 120 hours)
+   * @returns {Date} Target Date object in UTC corresponding to Friday 06:00 London time
+   */
+  getNextFridayMorning(fromDate = new Date(), minBufferDays = 5) {
+    const now = new Date(fromDate);
+    const isBST = this.isBritishSummerTime(now);
+    const ukUtcOffsetHours = isBST ? 1 : 0;
+
+    // Target 06:00 AM London time
+    const targetUtcHour = 6 - ukUtcOffsetHours;
+
+    // Friday is day 5 in JS (0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat)
+    const currentDay = now.getUTCDay();
+    let daysUntilFriday = (5 - currentDay + 7) % 7;
+
+    // Create candidate Friday date in UTC at 06:00 AM London time
+    const candidate = new Date(Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate() + daysUntilFriday,
+      targetUtcHour,
+      0,
+      0,
+      0
+    ));
+
+    // Minimum buffer hours (5 days = 120 hours)
+    const minBufferHours = minBufferDays * 24;
+    const hoursDifference = (candidate.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    // If candidate Friday is within 5 days of signup, push to following week's Friday (+7 days)
+    if (hoursDifference < minBufferHours) {
+      candidate.setUTCDate(candidate.getUTCDate() + 7);
+    }
+
+    return candidate;
+  }
+
+  /**
+   * Get the next upcoming Thursday at 23:59 (11:59 PM) UK time (Cut-Off deadline).
+   * 
+   * @param {Date} [fromDate=new Date()]
+   * @param {number} [minBufferDays=5] - Minimum buffer days
    * @returns {Date} Target Date object in UTC corresponding to Thursday 23:59 London time
    */
   getNextThursday1159PM(fromDate = new Date(), minBufferDays = 5) {
@@ -21,7 +63,7 @@ class BillingScheduleService {
     // Target hour in UTC: 23:59 UK time = (23 - ukUtcOffsetHours) in UTC
     const targetUtcHour = 23 - ukUtcOffsetHours;
 
-    // Calculate days until next Thursday (Thursday = day 4 in JS: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat)
+    // Calculate days until next Thursday (Thursday = day 4 in JS)
     const currentDay = now.getUTCDay();
     let daysUntilThursday = (4 - currentDay + 7) % 7;
 
@@ -40,7 +82,7 @@ class BillingScheduleService {
     const minBufferHours = minBufferDays * 24;
     const hoursDifference = (candidate.getTime() - now.getTime()) / (1000 * 60 * 60);
 
-    // If candidate Thursday is within the same week / too close to signup, push to following week's Thursday
+    // If candidate Thursday is within buffer, push to following week's Thursday
     if (hoursDifference < minBufferHours) {
       candidate.setUTCDate(candidate.getUTCDate() + 7);
     }
@@ -48,9 +90,14 @@ class BillingScheduleService {
     return candidate;
   }
 
-  // Alias for backward compatibility
+  // Alias for Friday early morning billing
+  getNextBillingDate(fromDate = new Date(), minBufferDays = 5) {
+    return this.getNextFridayMorning(fromDate, minBufferDays);
+  }
+
+  // Backward compatibility alias
   getNextThursday7PM(fromDate = new Date(), minBufferDays = 5) {
-    return this.getNextThursday1159PM(fromDate, minBufferDays);
+    return this.getNextFridayMorning(fromDate, minBufferDays);
   }
 
   /**

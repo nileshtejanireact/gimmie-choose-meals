@@ -8,6 +8,7 @@ const { verifyAppProxyHmac } = require('./services/hmac');
 const subscriptionService = require('./services/subscription');
 const menuService = require('./services/menu');
 const storageService = require('./services/storage');
+const billingScheduleService = require('./services/billingSchedule');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -173,15 +174,40 @@ async function renderAdminDashboard(req, res) {
       console.warn('Live API fallback:', e.message);
     }
 
+    let contracts = [];
+    try {
+      contracts = await subscriptionService.getAllContractsLive();
+    } catch (e) {
+      console.warn('Contracts fetch notice:', e.message);
+    }
+
+    let sellingPlans = { productTitle: 'Weekly Meal Box', groups: [] };
+    try {
+      sellingPlans = await subscriptionService.getSellingPlansLive();
+    } catch (e) {
+      console.warn('Selling plans fetch notice:', e.message);
+    }
+
+    const nextFridayBilling = billingScheduleService.formatUKBillingDate(billingScheduleService.getNextFridayMorning());
+    const nextThursdayCutoff = billingScheduleService.formatUKBillingDate(billingScheduleService.getNextThursday1159PM());
+
     return res.render('admin-selections', {
       shopDomain,
-      submissions
+      submissions,
+      contracts,
+      sellingPlans,
+      nextFridayBilling,
+      nextThursdayCutoff
     });
   } catch (error) {
     console.error('Error rendering admin dashboard:', error);
     return res.render('admin-selections', {
       shopDomain: 'iknacn-wq.myshopify.com',
-      submissions: storageService.getSubmissions()
+      submissions: storageService.getSubmissions(),
+      contracts: [],
+      sellingPlans: { productTitle: 'Weekly Meal Box', groups: [] },
+      nextFridayBilling: 'Friday 06:00 AM UK Time',
+      nextThursdayCutoff: 'Thursday 11:59 PM UK Time'
     });
   }
 }
@@ -373,6 +399,35 @@ app.post('/api/save-selections', handleSaveSelections);
 app.post('/api/admin/align-billing-thursday', async (req, res) => {
   try {
     const result = await subscriptionService.alignAllSubscribersToThursday7PM();
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+/**
+ * Admin Action: 1-Click Holiday Mode (Skip next delivery week for all customers)
+ */
+app.post('/api/admin/skip-all-holiday', async (req, res) => {
+  try {
+    const weeks = parseInt(req.body.weeks || 1, 10);
+    const result = await subscriptionService.skipNextBillingCycleAll(weeks);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+/**
+ * Admin Action: Reschedule individual customer contract
+ */
+app.post('/api/admin/reschedule-contract', async (req, res) => {
+  try {
+    const { contractId, newDate } = req.body;
+    if (!contractId || !newDate) {
+      return res.status(400).json({ success: false, message: 'contractId and newDate are required.' });
+    }
+    const result = await subscriptionService.rescheduleContract(contractId, newDate);
     res.json(result);
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

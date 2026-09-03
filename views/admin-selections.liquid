@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="shopify-api-key" content="31bce292c2aff18a8158b7d853389698" />
   <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
-  <title>Meal Selections - Gimmie Admin</title>
+  <title>Gimmie Subscriptions & Kitchen Admin</title>
   <link rel="stylesheet" href="https://unpkg.com/@shopify/polaris@12.0.0/build/esm/styles.css"/>
   <style>
     body {
@@ -16,7 +16,7 @@
       padding: 24px;
     }
     .Polaris-Page {
-      max-width: 1050px;
+      max-width: 1100px;
       margin: 0 auto;
     }
     .Polaris-Card {
@@ -24,19 +24,45 @@
       border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       border: 1px solid #e1e3e5;
-      padding: 20px;
+      padding: 24px;
       margin-bottom: 20px;
     }
-    .submission-item {
-      padding: 18px;
-      border: 1px solid #e1e3e5;
-      border-radius: 10px;
-      background: #fafbfb;
-      margin-bottom: 18px;
-      transition: border-color 150ms ease;
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid #e1e3e5;
+      margin-bottom: 24px;
+      background: #ffffff;
+      padding: 6px 14px 0;
+      border-radius: 12px 12px 0 0;
     }
-    .submission-item:hover {
-      border-color: #babfc3;
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #6d7175;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 150ms ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tab-btn:hover {
+      color: #202223;
+    }
+    .tab-btn.active {
+      color: #008060;
+      border-bottom-color: #008060;
+      font-weight: 700;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
     }
     .badge-status {
       display: inline-block;
@@ -60,6 +86,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      transition: background 150ms ease;
     }
     .btn-action:hover {
       background: #006e52;
@@ -80,6 +107,23 @@
     .btn-secondary:hover {
       background: #f6f6f7;
     }
+    .btn-holiday {
+      background: #d82c0d;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 2px 6px rgba(216, 44, 13, 0.25);
+    }
+    .btn-holiday:hover {
+      background: #bc2200;
+    }
     .search-input {
       width: 100%;
       box-sizing: border-box;
@@ -93,27 +137,62 @@
       border-color: #008060;
       box-shadow: 0 0 0 1px #008060;
     }
-
-    /* Print Slip Styles */
-    .print-only {
-      display: none;
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
     }
-
+    .data-table th {
+      text-align: left;
+      padding: 12px 14px;
+      background: #f7f8f9;
+      color: #444746;
+      font-weight: 700;
+      border-bottom: 2px solid #e1e3e5;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+    }
+    .data-table td {
+      padding: 14px;
+      border-bottom: 1px solid #e1e3e5;
+      vertical-align: middle;
+    }
+    .data-table tr:hover {
+      background: #fafbfb;
+    }
+    .submission-item {
+      padding: 18px;
+      border: 1px solid #e1e3e5;
+      border-radius: 10px;
+      background: #fafbfb;
+      margin-bottom: 18px;
+    }
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 26px;
+      max-width: 480px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    /* Print Slip Styles */
+    .print-only { display: none; }
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      #print-area, #print-area * {
-        visibility: visible;
-      }
+      body * { visibility: hidden; }
+      #print-area, #print-area * { visibility: visible; }
       #print-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 20px;
-        background: #fff;
+        position: absolute; left: 0; top: 0; width: 100%;
+        margin: 0; padding: 20px; background: #fff;
       }
       .kitchen-slip {
         page-break-after: always;
@@ -122,122 +201,450 @@
         padding: 24px;
         margin-bottom: 30px;
       }
-      .kitchen-slip:last-child {
-        page-break-after: avoid;
-      }
+      .kitchen-slip:last-child { page-break-after: avoid; }
     }
   </style>
 </head>
 <body>
   <div class="Polaris-Page">
     
-    <!-- Top Header Card -->
-    <div class="Polaris-Card">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;">
+    <!-- Top Brand Header Card -->
+    <div class="Polaris-Card" style="margin-bottom: 12px; padding: 18px 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <div>
-          <h1 style="font-size: 1.35rem; font-weight: 700; margin: 0 0 6px;">Weekly meal selections</h1>
-          <p style="margin: 0 0 4px; color: #6d7175; font-size: 0.92rem;">Store: <strong>{{ shopDomain }}</strong></p>
-          <p style="margin: 0; color: #6d7175; font-size: 0.92rem;">Showing all active subscriber meal choices for upcoming weekly deliveries.</p>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+            <h1 style="font-size: 1.4rem; font-weight: 900; margin: 0; letter-spacing: -0.5px; text-transform: uppercase; color: #102b10;">
+              GIMMIE SUBSCRIPTIONS
+            </h1>
+            <span style="background: #e3f1df; color: #108043; font-weight: 700; font-size: 0.78rem; padding: 2px 8px; border-radius: 999px;">
+              ● 100% NATIVE SHOPIFY API
+            </span>
+          </div>
+          <p style="margin: 0; color: #6d7175; font-size: 0.9rem;">
+            Store: <strong>{{ shopDomain }}</strong> | Complete Subscription, Cut-Off & Kitchen Control
+          </p>
         </div>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <button class="btn-secondary" onclick="exportSubmissionsCSV()">📥 Export CSV (Excel)</button>
-          <button class="btn-action" onclick="printAllSlips()">🖨️ Print All Packing Slips</button>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <span style="font-size: 0.85rem; color: #444746; background: #f1f2f4; padding: 6px 12px; border-radius: 6px;">
+            🕒 Cut-off: <strong>Thu 11:59 PM</strong> | Billing: <strong>Fri 06:00 AM</strong>
+          </span>
         </div>
       </div>
     </div>
 
-    <!-- Latest Submissions Card -->
-    <div class="Polaris-Card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-        <div>
-          <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0;">
-            Current Month Submissions (<span id="submissions-count">{{ submissions.length }}</span>)
-          </h2>
-          <p style="margin: 2px 0 0; font-size: 0.84rem; color: #6d7175;">
-            All live customer customized orders for upcoming delivery cycles
+    <!-- Alert / Toast Banner -->
+    <div id="alert-banner" style="display: none; padding: 14px 18px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; font-size: 0.92rem;"></div>
+
+    <!-- 4 Main Navigation Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('contracts')">
+        📑 Contracts (<span id="tab-contracts-count">{{ contracts.length }}</span>)
+      </button>
+      <button class="tab-btn" onclick="switchTab('plans')">
+        📋 Plans & Cutoff
+      </button>
+      <button class="tab-btn" onclick="switchTab('settings')">
+        ⚙️ Settings & Holiday Mode
+      </button>
+      <button class="tab-btn" onclick="switchTab('kitchen')">
+        🍽️ Kitchen Slips (<span id="tab-submissions-count">{{ submissions.length }}</span>)
+      </button>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 1: CONTRACTS (ALL SUBSCRIBERS) -->
+    <!-- ========================================================================= -->
+    <div id="tab-contracts" class="tab-content active">
+      <div class="Polaris-Card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Active Subscription Contracts</h2>
+            <p style="margin: 2px 0 0; font-size: 0.84rem; color: #6d7175;">
+              Live subscribers managed directly via Shopify API with Friday billing cycle
+            </p>
+          </div>
+          <div>
+            <input type="text" id="contracts-search" class="search-input" style="width: 280px;" placeholder="🔍 Search subscribers..." oninput="filterContracts()">
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="data-table" id="contracts-table">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Contract ID</th>
+                <th>Status</th>
+                <th>Box Size</th>
+                <th>Next Billing Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in contracts %}
+                <tr class="contract-row" data-search="{{ c.customerName }} {{ c.customerEmail }} {{ c.contractId }}">
+                  <td>
+                    <strong style="color: #102b10; display: block; font-size: 0.95rem;">{{ c.customerName }}</strong>
+                    <span style="color: #6d7175; font-size: 0.84rem;">{{ c.customerEmail }}</span>
+                  </td>
+                  <td>
+                    <span style="font-family: monospace; font-weight: 700; background: #f1f2f4; padding: 2px 6px; border-radius: 4px;">
+                      {{ c.contractId }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge-status">{{ c.status }}</span>
+                  </td>
+                  <td>
+                    <strong>{{ c.totalMeals }} meals</strong>
+                  </td>
+                  <td>
+                    <strong style="color: #108043;">📅 {{ c.nextBillingDateFormatted }}</strong>
+                    <div style="font-size: 0.76rem; color: #6d7175;">Early Friday Morning</div>
+                  </td>
+                  <td>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                      <button type="button" class="btn-secondary" onclick="openRescheduleModal('{{ c.contractId }}', '{{ c.customerName }}', '{{ c.rawBillingDate }}')">
+                        🗓️ Reschedule
+                      </button>
+                      <button type="button" class="btn-secondary" onclick="skipSingleContract('{{ c.contractId }}', '{{ c.customerName }}')">
+                        ⏭️ Skip 1 Wk
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="6" style="text-align: center; color: #6d7175; padding: 24px;">
+                    No active contracts found.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 2: PLANS (SELLING PLANS & CUTOFF BUFFER) -->
+    <!-- ========================================================================= -->
+    <div id="tab-plans" class="tab-content">
+      <div class="Polaris-Card">
+        <div style="margin-bottom: 20px;">
+          <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0 0 4px;">Active Subscription Plans</h2>
+          <p style="margin: 0; font-size: 0.85rem; color: #6d7175;">
+            Configure billing recurrence, anchor days, and automated grace buffer rules
           </p>
         </div>
-        <span style="font-size: 0.85rem; color: #108043; font-weight: 600;">● Live Real-Time Feed</span>
-      </div>
 
-      <!-- Quick Search Bar -->
-      <div style="margin-bottom: 18px;">
-        <input type="text" id="search-input" class="search-input" placeholder="🔍 Search by customer name, email, contract ID, or dish..." oninput="filterSubmissions()">
-      </div>
-
-      <div class="submissions-list" id="submissions-container">
-        {% for sub in submissions %}
-          <div class="submission-item" id="order-card-{{ sub.id }}" data-search="{{ sub.customer }} {{ sub.customerName }} {{ sub.orderNumber }} {{ sub.contractId }} {{ sub.deliveryDate }}">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; flex: 1; font-size: 0.92rem;">
-                <div>
-                  <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Customer</strong>
-                  <strong style="font-size: 0.98rem; color: #102b10;">{{ sub.customerName }}</strong>
-                  <div style="color: #444746; font-size: 0.88rem;">{{ sub.customer }}</div>
-                </div>
-                <div>
-                  <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Shopify Order #</strong>
-                  <span style="font-weight: 800; font-size: 1rem; color: #108043; background: #e3f1df; padding: 3px 8px; border-radius: 4px; display: inline-block; font-family: monospace;">
-                    {{ sub.orderNumber | default: '#1011' }}
-                  </span>
-                </div>
-                <div>
-                  <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Contract ID</strong>
-                  <span style="font-weight: 700; font-size: 0.95rem; color: #102b10; font-family: monospace;">
-                    {{ sub.contractId }}
-                  </span>
-                </div>
-                <div>
-                  <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Box Size</strong>
-                  <span style="font-weight: 700;">{{ sub.boxSize }}</span>
-                </div>
-                <div>
-                  <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Delivery Date</strong>
-                  <span style="font-weight: 700; color: #102b10;">📅 {{ sub.deliveryDate }}</span>
-                </div>
-                <div>
-                  <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Status</strong>
-                  <span class="badge-status">{{ sub.status }}</span>
-                  <div style="font-size: 0.76rem; color: #6d7175; margin-top: 2px;">{{ sub.formattedDate }}</div>
-                </div>
-              </div>
-              <button type="button" class="btn-secondary" onclick="printSingleSlip('{{ sub.id }}')">
-                🖨️ Print Kitchen Packing Slip
-              </button>
+        <div style="border: 1px solid #e1e3e5; border-radius: 10px; padding: 20px; background: #fafbfb; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;">
+            <div>
+              <span class="badge-status" style="margin-bottom: 8px;">ACTIVE PLAN</span>
+              <h3 style="font-size: 1.15rem; font-weight: 800; margin: 0 0 6px; color: #102b10;">
+                Weekly Gimmie Meal Box Subscription
+              </h3>
+              <p style="margin: 0 0 12px; color: #6d7175; font-size: 0.9rem;">
+                Applied to product: <strong>Weekly Meal Box</strong>
+              </p>
             </div>
-
-            <!-- Meals List -->
-            <div style="border-top: 1px solid #e1e3e5; padding-top: 12px; margin-top: 10px;">
-              <strong style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #6d7175; text-transform: uppercase;">Selected Meals</strong>
-              <div style="display: grid; gap: 6px; font-size: 0.95rem; color: #303030;">
-                {% for meal in sub.meals %}
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-weight: 700; background: #e4e5e7; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem;">{{ meal.quantity }}x</span>
-                    <span>{{ meal.title }}</span>
-                  </div>
-                {% endfor %}
-              </div>
+            <div style="text-align: right;">
+              <span style="font-weight: 800; font-size: 1.1rem; color: #108043;">£36.00 / week</span>
+              <div style="font-size: 0.8rem; color: #6d7175;">Delivery Every Week</div>
             </div>
           </div>
-        {% else %}
-          <p style="color: #6d7175; text-align: center; padding: 20px;">No meal submissions recorded yet.</p>
-        {% endfor %}
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; background: #ffffff; border: 1px solid #e1e3e5; padding: 16px; border-radius: 8px; margin-top: 10px;">
+            <div>
+              <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #6d7175; margin-bottom: 4px;">Billing Anchor</div>
+              <strong style="font-size: 0.95rem; color: #102b10;">Early Friday Morning (06:00 AM UK)</strong>
+              <div style="font-size: 0.78rem; color: #6d7175;">Bills right after Thursday 11:59 PM</div>
+            </div>
+            <div>
+              <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #6d7175; margin-bottom: 4px;">Cut-Off Buffer</div>
+              <strong style="font-size: 0.95rem; color: #108043;">5-Day Minimum Gap Rule</strong>
+              <div style="font-size: 0.78rem; color: #6d7175;">Wed/Thu orders skip to next week</div>
+            </div>
+            <div>
+              <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #6d7175; margin-bottom: 4px;">Delivery Day</div>
+              <strong style="font-size: 0.95rem; color: #102b10;">Tuesday Delivery</strong>
+              <div style="font-size: 0.78rem; color: #6d7175;">Prepared over the weekend</div>
+            </div>
+            <div>
+              <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #6d7175; margin-bottom: 4px;">Next Scheduled Cycle</div>
+              <strong style="font-size: 0.95rem; color: #102b10;">{{ nextFridayBilling }}</strong>
+              <div style="font-size: 0.78rem; color: #6d7175;">Automated batch processing</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: #eef2ee; border-left: 4px solid #108043; padding: 14px 18px; border-radius: 0 8px 8px 0; font-size: 0.9rem; color: #102b10;">
+          <strong>💡 How the 5-Day Buffer Protects Your Customers:</strong><br>
+          When a customer orders on Wednesday or Thursday (inside the 5-day window of Friday), Shopify automatically bypasses the immediate Friday charge. Their first recurring charge is cleanly scheduled for the following Friday (8–9 days later). No double billing!
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: SETTINGS & 1-CLICK HOLIDAY MODE -->
+    <!-- ========================================================================= -->
+    <div id="tab-settings" class="tab-content">
+      
+      <!-- 1-Click Holiday Mode Card -->
+      <div class="Polaris-Card" style="border: 2px solid #d82c0d; background: #fffcfb;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+          <div style="flex: 1; min-width: 280px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <span style="font-size: 1.4rem;">🏖️</span>
+              <h2 style="font-size: 1.25rem; font-weight: 900; margin: 0; color: #d82c0d;">
+                Kitchen Holiday Mode (1-Click Global Skip)
+              </h2>
+            </div>
+            <p style="margin: 0 0 10px; color: #444746; font-size: 0.95rem; line-height: 1.4;">
+              Taking a week off or closing the kitchen for the holidays? 
+              Click below to <strong>automatically shift ALL active subscribers' billing and delivery dates forward by 1 week</strong> in a single click.
+            </p>
+            <p style="margin: 0; font-size: 0.85rem; color: #6d7175;">
+              • You don't have to manually skip each customer one-by-one.<br>
+              • All recurring payments will safely push to next Friday morning.<br>
+              • Customers will not be charged during your closed week.
+            </p>
+          </div>
+          <div>
+            <button type="button" class="btn-holiday" onclick="openHolidayModal()">
+              🌴 Skip Next Delivery Week for All Customers
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cut-Off Rules Card -->
+      <div class="Polaris-Card">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0 0 14px;">Cut-Off & Billing Timers</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 18px;">
+          <div style="padding: 16px; border: 1px solid #e1e3e5; border-radius: 8px; background: #fafbfb;">
+            <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #6d7175;">Cut-Off Deadline</span>
+            <div style="font-size: 1.1rem; font-weight: 800; color: #102b10; margin-top: 4px;">Thursday @ 11:59 PM UK</div>
+            <p style="margin: 4px 0 0; font-size: 0.82rem; color: #6d7175;">Upcoming: {{ nextThursdayCutoff }}</p>
+          </div>
+          <div style="padding: 16px; border: 1px solid #e1e3e5; border-radius: 8px; background: #fafbfb;">
+            <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #6d7175;">Automated Billing Run</span>
+            <div style="font-size: 1.1rem; font-weight: 800; color: #108043; margin-top: 4px;">Friday @ 06:00 AM UK</div>
+            <p style="margin: 4px 0 0; font-size: 0.82rem; color: #6d7175;">Upcoming: {{ nextFridayBilling }}</p>
+          </div>
+          <div style="padding: 16px; border: 1px solid #e1e3e5; border-radius: 8px; background: #fafbfb;">
+            <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #6d7175;">Delivery Day</span>
+            <div style="font-size: 1.1rem; font-weight: 800; color: #102b10; margin-top: 4px;">Tuesday Delivery</div>
+            <p style="margin: 4px 0 0; font-size: 0.82rem; color: #6d7175;">Dispatched via DPD Fresh Express</p>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid #e1e3e5; padding-top: 16px;">
+          <button type="button" class="btn-action" onclick="alignAllToFriday()">
+            🔄 Force Re-Align All to Friday Morning (06:00 AM UK)
+          </button>
+          <span style="font-size: 0.84rem; color: #6d7175; margin-left: 10px;">
+            Synchronizes any unaligned subscribers to the Friday morning cycle.
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 4: KITCHEN PACKING SLIPS & SUBMISSIONS FEED -->
+    <!-- ========================================================================= -->
+    <div id="tab-kitchen" class="tab-content">
+      <div class="Polaris-Card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0;">
+              Kitchen Submissions (<span id="submissions-count">{{ submissions.length }}</span>)
+            </h2>
+            <p style="margin: 2px 0 0; font-size: 0.84rem; color: #6d7175;">
+              Customer meal choices for upcoming deliveries
+            </p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn-secondary" onclick="exportSubmissionsCSV()">📥 Export CSV (Excel)</button>
+            <button class="btn-action" onclick="printAllSlips()">🖨️ Print All Packing Slips</button>
+          </div>
+        </div>
+
+        <!-- Quick Search Bar -->
+        <div style="margin-bottom: 18px;">
+          <input type="text" id="search-input" class="search-input" placeholder="🔍 Search by customer name, email, contract ID, or dish..." oninput="filterSubmissions()">
+        </div>
+
+        <div class="submissions-list" id="submissions-container">
+          {% for sub in submissions %}
+            <div class="submission-item" id="order-card-{{ sub.id }}" data-search="{{ sub.customer }} {{ sub.customerName }} {{ sub.orderNumber }} {{ sub.contractId }} {{ sub.deliveryDate }}">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; flex: 1; font-size: 0.92rem;">
+                  <div>
+                    <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Customer</strong>
+                    <strong style="font-size: 0.98rem; color: #102b10;">{{ sub.customerName }}</strong>
+                    <div style="color: #444746; font-size: 0.88rem;">{{ sub.customer }}</div>
+                  </div>
+                  <div>
+                    <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Shopify Order #</strong>
+                    <span style="font-weight: 800; font-size: 1rem; color: #108043; background: #e3f1df; padding: 3px 8px; border-radius: 4px; display: inline-block; font-family: monospace;">
+                      {{ sub.orderNumber | default: '#1011' }}
+                    </span>
+                  </div>
+                  <div>
+                    <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Contract ID</strong>
+                    <span style="font-weight: 700; font-size: 0.95rem; color: #102b10; font-family: monospace;">
+                      {{ sub.contractId }}
+                    </span>
+                  </div>
+                  <div>
+                    <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Box Size</strong>
+                    <span style="font-weight: 700;">{{ sub.boxSize }}</span>
+                  </div>
+                  <div>
+                    <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Delivery Date</strong>
+                    <span style="font-weight: 700; color: #102b10;">📅 {{ sub.deliveryDate }}</span>
+                  </div>
+                  <div>
+                    <strong style="color: #6d7175; font-size: 0.8rem; display: block; text-transform: uppercase;">Status</strong>
+                    <span class="badge-status">{{ sub.status }}</span>
+                    <div style="font-size: 0.76rem; color: #6d7175; margin-top: 2px;">{{ sub.formattedDate }}</div>
+                  </div>
+                </div>
+                <button type="button" class="btn-secondary" onclick="printSingleSlip('{{ sub.id }}')">
+                  🖨️ Print Slip
+                </button>
+              </div>
+
+              <!-- Meals List -->
+              <div style="border-top: 1px solid #e1e3e5; padding-top: 12px; margin-top: 10px;">
+                <strong style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #6d7175; text-transform: uppercase;">Selected Meals</strong>
+                <div style="display: grid; gap: 6px; font-size: 0.95rem; color: #303030;">
+                  {% for meal in sub.meals %}
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-weight: 700; background: #e4e5e7; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem;">{{ meal.quantity }}x</span>
+                      <span>{{ meal.title }}</span>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          {% else %}
+            <p style="color: #6d7175; text-align: center; padding: 20px;">No meal submissions recorded yet.</p>
+          {% endfor %}
+        </div>
       </div>
     </div>
 
   </div>
 
-  <!-- Hidden Container dynamically populated for printing -->
+  <!-- ========================================================================= -->
+  <!-- MODAL: 1-CLICK HOLIDAY CONFIRMATION -->
+  <!-- ========================================================================= -->
+  <div id="holiday-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+        <span style="font-size: 1.8rem;">🏖️</span>
+        <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #d82c0d;">Confirm Kitchen Holiday Skip</h3>
+      </div>
+      <p style="color: #444746; font-size: 0.95rem; line-height: 1.4; margin-bottom: 18px;">
+        Are you sure you want to skip next week's billing for <strong>ALL active subscribers</strong>?
+        <br><br>
+        This will automatically push everyone's next billing date forward by <strong>+7 days</strong> to the following Friday.
+      </p>
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn-secondary" onclick="closeHolidayModal()">Cancel</button>
+        <button type="button" class="btn-holiday" id="confirm-holiday-btn" onclick="executeHolidaySkip()">
+          Yes, Skip Next Week (Holiday)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: RESCHEDULE SINGLE CONTRACT -->
+  <!-- ========================================================================= -->
+  <div id="reschedule-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h3 style="margin: 0 0 8px; font-size: 1.2rem; font-weight: 800; color: #102b10;">Reschedule Billing Date</h3>
+      <p style="margin: 0 0 16px; color: #6d7175; font-size: 0.88rem;">
+        Subscriber: <strong id="reschedule-customer-name" style="color: #202223;"></strong>
+      </p>
+      
+      <input type="hidden" id="reschedule-contract-id">
+      
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px; color: #444746;">
+          Select New Billing Date:
+        </label>
+        <input type="date" id="reschedule-date-input" class="search-input" style="font-size: 1rem;">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn-secondary" onclick="closeRescheduleModal()">Cancel</button>
+        <button type="button" class="btn-action" id="save-reschedule-btn" onclick="saveRescheduleDate()">
+          Save New Date
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Container for Printing -->
   <div id="print-area" class="print-only"></div>
 
   <script>
     const submissionsData = {{ submissions | json }};
+    const contractsData = {{ contracts | json }};
 
+    // Tab Navigation
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      const activeBtn = document.querySelector(`.tab-btn[onclick*="${tabId}"]`);
+      const activeContent = document.getElementById(`tab-${tabId}`);
+
+      if (activeBtn) activeBtn.classList.add('active');
+      if (activeContent) activeContent.classList.add('active');
+    }
+
+    function showAlert(message, type = 'success') {
+      const banner = document.getElementById('alert-banner');
+      if (!banner) return;
+      banner.style.display = 'block';
+      banner.textContent = message;
+      if (type === 'success') {
+        banner.style.background = '#e3f1df';
+        banner.style.color = '#108043';
+        banner.style.border = '1px solid #108043';
+      } else {
+        banner.style.background = '#fedcd8';
+        banner.style.color = '#d82c0d';
+        banner.style.border = '1px solid #d82c0d';
+      }
+      setTimeout(() => {
+        banner.style.display = 'none';
+      }, 6000);
+    }
+
+    // Filter Contracts Table
+    function filterContracts() {
+      const q = (document.getElementById('contracts-search')?.value || '').toLowerCase();
+      const rows = document.querySelectorAll('.contract-row');
+      rows.forEach(r => {
+        const text = (r.getAttribute('data-search') || r.textContent || '').toLowerCase();
+        r.style.display = (!q || text.includes(q)) ? '' : 'none';
+      });
+    }
+
+    // Filter Submissions
     function filterSubmissions() {
       const q = (document.getElementById('search-input')?.value || '').toLowerCase();
       const items = document.querySelectorAll('.submission-item');
       let visibleCount = 0;
-
       items.forEach(item => {
         const text = (item.getAttribute('data-search') || item.textContent || '').toLowerCase();
         if (!q || text.includes(q)) {
@@ -247,28 +654,150 @@
           item.style.display = 'none';
         }
       });
-
       const countEl = document.getElementById('submissions-count');
       if (countEl) countEl.textContent = visibleCount;
     }
 
+    // Holiday Modal Functions
+    function openHolidayModal() {
+      document.getElementById('holiday-modal').style.display = 'flex';
+    }
+    function closeHolidayModal() {
+      document.getElementById('holiday-modal').style.display = 'none';
+    }
+
+    async function executeHolidaySkip() {
+      const btn = document.getElementById('confirm-holiday-btn');
+      btn.disabled = true;
+      btn.textContent = 'Shifting All Subscribers...';
+
+      try {
+        const res = await fetch('/api/admin/skip-all-holiday', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ weeks: 1 })
+        });
+        const data = await res.json();
+        closeHolidayModal();
+        if (data.success) {
+          showAlert(`🎉 Holiday Mode Activated! All ${data.totalShifted || 'active'} subscribers have been shifted by 1 week to: ${data.formattedUKTime || data.nextBillingDate}`, 'success');
+          setTimeout(() => location.reload(), 2500);
+        } else {
+          showAlert(`Failed to activate holiday skip: ${data.message}`, 'error');
+        }
+      } catch (err) {
+        closeHolidayModal();
+        showAlert(`Error: ${err.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Yes, Skip Next Week (Holiday)';
+      }
+    }
+
+    // Reschedule Modal Functions
+    function openRescheduleModal(contractId, customerName, currentRawDate) {
+      document.getElementById('reschedule-contract-id').value = contractId;
+      document.getElementById('reschedule-customer-name').textContent = customerName;
+      if (currentRawDate) {
+        document.getElementById('reschedule-date-input').value = new Date(currentRawDate).toISOString().slice(0, 10);
+      }
+      document.getElementById('reschedule-modal').style.display = 'flex';
+    }
+    function closeRescheduleModal() {
+      document.getElementById('reschedule-modal').style.display = 'none';
+    }
+
+    async function saveRescheduleDate() {
+      const contractId = document.getElementById('reschedule-contract-id').value;
+      const newDate = document.getElementById('reschedule-date-input').value;
+      if (!newDate) {
+        alert('Please select a valid date.');
+        return;
+      }
+      const btn = document.getElementById('save-reschedule-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        const res = await fetch('/api/admin/reschedule-contract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contractId, newDate })
+        });
+        const data = await res.json();
+        closeRescheduleModal();
+        if (data.success) {
+          showAlert(`✓ Successfully rescheduled Contract ${contractId} to ${newDate}!`, 'success');
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          showAlert(`Failed to reschedule: ${data.message}`, 'error');
+        }
+      } catch (e) {
+        closeRescheduleModal();
+        showAlert(`Error: ${e.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save New Date';
+      }
+    }
+
+    // Skip Single Contract
+    async function skipSingleContract(contractId, customerName) {
+      if (!confirm(`Skip 1 week for ${customerName} (Contract: ${contractId})?`)) return;
+
+      try {
+        const res = await fetch('/api/admin/skip-billing-cycle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contractId, weeks: 1 })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert(`✓ Skipped 1 week for ${customerName}!`, 'success');
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          showAlert(`Failed to skip: ${data.message}`, 'error');
+        }
+      } catch (e) {
+        showAlert(`Error: ${e.message}`, 'error');
+      }
+    }
+
+    // Align All to Friday Morning
+    async function alignAllToFriday() {
+      if (!confirm('Re-align all active contracts to early Friday Morning (06:00 AM UK)?')) return;
+      try {
+        const res = await fetch('/api/admin/align-billing-thursday', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert(`✓ Successfully aligned subscribers to Friday 06:00 AM UK Time!`, 'success');
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          showAlert(`Notice: ${data.message}`, 'error');
+        }
+      } catch (e) {
+        showAlert(`Error: ${e.message}`, 'error');
+      }
+    }
+
+    // Packing Slips Functions
     function generatePackingSlipHtml(sub) {
       return `
         <div class="kitchen-slip" style="font-family: Arial, sans-serif; color: #102b10; border: 2px solid #102b10; padding: 24px; border-radius: 8px; margin-bottom: 24px;">
-          <!-- Header -->
           <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #102b10; padding-bottom: 12px; margin-bottom: 16px;">
             <div>
               <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase;">GIMMIE MEAL PREP</h1>
               <p style="margin: 4px 0 0; font-size: 14px; font-weight: 700; color: #555;">KITCHEN PACKING SLIP & QUALITY CHECK</p>
             </div>
             <div style="text-align: right;">
-              <span style="display: inline-block; border: 2px solid #102b10; padding: 4px 10px; border-radius: 999px; font-weight: 800; font-size: 13px;">${sub.boxSize.toUpperCase()}</span>
+              <span style="display: inline-block; border: 2px solid #102b10; padding: 4px 10px; border-radius: 999px; font-weight: 800; font-size: 13px;">${(sub.boxSize || '6 meals').toUpperCase()}</span>
               <p style="margin: 4px 0 0; font-size: 15px; font-weight: 900; color: #108043; font-family: monospace;">Shopify Order: ${sub.orderNumber || '#1011'}</p>
               <p style="margin: 2px 0 0; font-size: 12px; color: #666; font-family: monospace;">Contract: ${sub.contractId || sub.id}</p>
             </div>
           </div>
-
-          <!-- Customer & Delivery Meta -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; background: #f9f8f4; padding: 12px 16px; border: 1px solid #102b10; border-radius: 6px; margin-bottom: 20px; font-size: 14px;">
             <div>
               <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #666; margin-bottom: 2px;">CUSTOMER</div>
@@ -281,8 +810,6 @@
               <div style="color: #444;">Status: <strong>${sub.status}</strong></div>
             </div>
           </div>
-
-          <!-- Itemized Meal Checklist -->
           <div style="margin-bottom: 24px;">
             <h2 style="margin: 0 0 10px; font-size: 16px; font-weight: 900; text-transform: uppercase; border-bottom: 1.5px solid #102b10; padding-bottom: 4px;">
               MEAL PACKING CHECKLIST (${sub.boxSize})
@@ -296,132 +823,62 @@
                 </tr>
               </thead>
               <tbody>
-                ${sub.meals.map(m => `
+                ${(sub.meals || []).map(m => `
                   <tr>
                     <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">
                       <div style="width: 18px; height: 18px; border: 2px solid #102b10; border-radius: 3px; display: inline-block;"></div>
                     </td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd; font-weight: 900; font-size: 16px;">
-                      ${m.quantity}×
-                    </td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd; font-weight: 700;">
-                      ${m.title}
-                    </td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd; font-weight: 900; font-size: 16px;">${m.quantity}×</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd; font-weight: 700;">${m.title}</td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
           </div>
-
-          <!-- Kitchen Signoff Footer -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1.5px dashed #102b10; padding-top: 14px; font-size: 13px;">
-            <div>
-              <strong>Packed By:</strong> ___________________________
-            </div>
-            <div style="text-align: right;">
-              <strong>Quality Inspected:</strong> ___________________________
-            </div>
+            <div><strong>Packed By:</strong> ___________________________</div>
+            <div style="text-align: right;"><strong>Quality Inspected:</strong> ___________________________</div>
           </div>
         </div>
       `;
     }
 
-    // Print a single individual packing slip in a clean standalone print window
     function printSingleSlip(subId) {
       const sub = submissionsData.find(s => String(s.id) === String(subId));
       if (!sub) return;
-
-      const printHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Packing Slip - ${sub.customerName || sub.customer}</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #102b10; background: #fff; }
-            .kitchen-slip { border: 2px solid #102b10; padding: 24px; border-radius: 8px; max-width: 750px; margin: 0 auto; }
-            table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-            th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
-            th { background: #eef2ee; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #102b10; }
-            @media print {
-              body { padding: 0; }
-            }
-          </style>
-        </head>
-        <body>
-          ${generatePackingSlipHtml(sub)}
-        </body>
-        </html>
-      `;
-
       const printWin = window.open('', '_blank', 'width=850,height=950');
       if (printWin) {
         printWin.document.open();
-        printWin.document.write(printHtml);
+        printWin.document.write(`<!DOCTYPE html><html><head><title>Slip - ${sub.customerName}</title></head><body>${generatePackingSlipHtml(sub)}</body></html>`);
         printWin.document.close();
         printWin.focus();
-        setTimeout(() => {
-          printWin.print();
-        }, 350);
+        setTimeout(() => printWin.print(), 350);
       }
     }
 
-    // Print all slips (each on its own separate page)
     function printAllSlips() {
       if (!submissionsData || submissionsData.length === 0) return;
-
-      const allHtml = submissionsData.map(sub => `
-        <div style="page-break-after: always; margin-bottom: 30px;">
-          ${generatePackingSlipHtml(sub)}
-        </div>
-      `).join('');
-
-      const printHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>All Kitchen Packing Slips - Gimmie</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #102b10; background: #fff; }
-            table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-            th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
-            th { background: #eef2ee; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #102b10; }
-            @media print {
-              body { padding: 0; }
-            }
-          </style>
-        </head>
-        <body>
-          ${allHtml}
-        </body>
-        </html>
-      `;
-
+      const allHtml = submissionsData.map(sub => `<div style="page-break-after: always; margin-bottom: 30px;">${generatePackingSlipHtml(sub)}</div>`).join('');
       const printWin = window.open('', '_blank', 'width=850,height=950');
       if (printWin) {
         printWin.document.open();
-        printWin.document.write(printHtml);
+        printWin.document.write(`<!DOCTYPE html><html><head><title>All Slips - Gimmie</title></head><body>${allHtml}</body></html>`);
         printWin.document.close();
         printWin.focus();
-        setTimeout(() => {
-          printWin.print();
-        }, 350);
+        setTimeout(() => printWin.print(), 350);
       }
     }
 
-    // Export all submissions to CSV format
     function exportSubmissionsCSV() {
       if (!submissionsData || submissionsData.length === 0) {
         alert('No submissions to export.');
         return;
       }
-
       let csv = 'Contract ID,Customer Name,Email,Box Size,Delivery Date,Status,Submitted At,Meals Breakdown\n';
-
       submissionsData.forEach(s => {
-        const mealsStr = s.meals.map(m => `${m.quantity}x ${m.title}`).join('; ');
+        const mealsStr = (s.meals || []).map(m => `${m.quantity}x ${m.title}`).join('; ');
         csv += `"${s.contractId || s.id}","${s.customerName}","${s.customer}","${s.boxSize}","${s.deliveryDate}","${s.status}","${s.formattedDate || s.submittedAt}","${mealsStr}"\n`;
       });
-
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
