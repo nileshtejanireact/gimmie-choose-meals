@@ -1069,6 +1069,65 @@ class SubscriptionService {
       };
     }
   }
+
+  /**
+   * Fetch store products for product browser modal
+   */
+  async getStoreProductsLive() {
+    const query = `
+      query getProducts {
+        products(first: 20) {
+          edges {
+            node {
+              id
+              title
+              handle
+              featuredImage {
+                url
+              }
+              variants(first: 10) {
+                edges {
+                  node {
+                    id
+                    title
+                    price
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+    try {
+      const data = await shopifyClient.graphql(query);
+      return data?.products?.edges?.map(e => ({
+        id: e.node.id,
+        title: e.node.title,
+        handle: e.node.handle,
+        imageUrl: e.node.featuredImage?.url || null,
+        variants: e.node.variants?.edges?.map(v => ({
+          id: v.node.id,
+          title: v.node.title,
+          price: v.node.price
+        })) || []
+      })) || [];
+    } catch (e) {
+      return [
+        {
+          id: 'gid://shopify/Product/15923999670653',
+          title: 'Weekly Meal Box',
+          handle: 'weekly-meal-box',
+          imageUrl: 'https://cdn.shopify.com/s/files/1/0947/9461/3117/files/Cardboardboxicon.png?v=1786370344',
+          variants: [
+            { id: '58275009167741', title: '6 Pack', price: '48.00' },
+            { id: '58571946328445', title: '8 Pack', price: '64.00' },
+            { id: '58275009200509', title: '10 Pack', price: '80.00' }
+          ]
+        }
+      ];
+    }
+  }
 }
 
 module.exports = new SubscriptionService();

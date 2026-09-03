@@ -188,6 +188,13 @@ async function renderAdminDashboard(req, res) {
       console.warn('Selling plans fetch notice:', e.message);
     }
 
+    let storeProducts = [];
+    try {
+      storeProducts = await subscriptionService.getStoreProductsLive();
+    } catch (e) {
+      console.warn('Store products fetch notice:', e.message);
+    }
+
     const planSettings = storageService.getSettings();
     const nextFridayBilling = billingScheduleService.formatUKBillingDate(billingScheduleService.getNextFridayMorning(new Date(), planSettings.cutoffBufferDays || 5));
     const nextThursdayCutoff = billingScheduleService.formatUKBillingDate(billingScheduleService.getNextThursday1159PM(new Date(), planSettings.cutoffBufferDays || 5));
@@ -198,6 +205,7 @@ async function renderAdminDashboard(req, res) {
       contracts,
       sellingPlans,
       planSettings,
+      storeProducts,
       nextFridayBilling,
       nextThursdayCutoff
     });
@@ -209,6 +217,7 @@ async function renderAdminDashboard(req, res) {
       contracts: [],
       sellingPlans: { productTitle: 'Weekly Meal Box', groups: [] },
       planSettings: storageService.getSettings(),
+      storeProducts: [],
       nextFridayBilling: 'Friday 06:00 AM UK Time',
       nextThursdayCutoff: 'Thursday 11:59 PM UK Time'
     });
@@ -444,6 +453,18 @@ app.post('/api/admin/save-plan-settings', (req, res) => {
   try {
     const updated = storageService.saveSettings(req.body);
     res.json({ success: true, settings: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+/**
+ * Admin Action: Query store products for product browser modal
+ */
+app.get('/api/admin/products', async (req, res) => {
+  try {
+    const products = await subscriptionService.getStoreProductsLive();
+    res.json({ success: true, products });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
