@@ -83,16 +83,44 @@
         {% assign meta_menus = shop.metaobjects.menu.values %}
       {% endif %}
 
-      {% comment %} 2. Find September 7th menu for recurring subscribers {% endcomment %}
+      {% comment %} 2. Dynamically find the next UPCOMING menu (auto-skip any date that has already passed) {% endcomment %}
+      {% assign now_ts = 'now' | date: '%s' | plus: 0 %}
       {% assign next_week_menu = nil %}
+      {% assign min_future_diff = 9999999999 %}
+      {% assign fallback_recent_menu = nil %}
+      {% assign min_past_diff = 9999999999 %}
+
       {% for menu_item in meta_menus %}
-        {% assign date_val = menu_item.delivery_date.value | default: menu_item.delivery_date | default: menu_item.date | default: menu_item.title | default: menu_item.name | downcase %}
-        {% if date_val contains '7' or date_val contains 'sep 7' or date_val contains 'sept 7' or date_val contains 'september 7' %}
-          {% assign next_week_menu = menu_item %}
+        {% assign raw_cutoff = menu_item.cutoff_date_time.value | default: menu_item.cutoff_date_time | default: menu_item.cutoff_date %}
+        {% assign raw_deliv = menu_item.delivery_date.value | default: menu_item.delivery_date | default: menu_item.date | default: menu_item.display_name | default: menu_item.title %}
+
+        {% assign cutoff_ts = raw_cutoff | date: '%s' | plus: 0 %}
+        {% assign deliv_ts = raw_deliv | date: '%s' | plus: 0 %}
+
+        {% comment %} Check if cutoff or delivery is upcoming in the future {% endcomment %}
+        {% if cutoff_ts >= now_ts or deliv_ts >= now_ts %}
+          {% assign diff = deliv_ts | minus: now_ts %}
+          {% if diff < 0 %}
+            {% assign diff = cutoff_ts | minus: now_ts %}
+          {% endif %}
+
+          {% if diff >= 0 and diff < min_future_diff %}
+            {% assign min_future_diff = diff %}
+            {% assign next_week_menu = menu_item %}
+          {% endif %}
+        {% else %}
+          {% comment %} Track most recent past menu as fallback {% endcomment %}
+          {% assign past_diff = now_ts | minus: deliv_ts %}
+          {% if past_diff < min_past_diff %}
+            {% assign min_past_diff = past_diff %}
+            {% assign fallback_recent_menu = menu_item %}
+          {% endif %}
         {% endif %}
       {% endfor %}
 
-      {% if next_week_menu == nil and meta_menus.size > 0 %}
+      {% if next_week_menu == nil and fallback_recent_menu %}
+        {% assign next_week_menu = fallback_recent_menu %}
+      {% elsif next_week_menu == nil and meta_menus.size > 0 %}
         {% assign next_week_menu = meta_menus.first %}
       {% endif %}
 
@@ -102,15 +130,9 @@
       {% if next_week_menu %}
         {% assign raw_deliv = next_week_menu.delivery_date.value | default: next_week_menu.delivery_date | default: next_week_menu.date | default: next_week_menu.display_name | default: next_week_menu.title %}
         {% assign active_delivery_date = raw_deliv | date: "%a %d %b" %}
-        {% if active_delivery_date == blank or active_delivery_date contains '2026' or active_delivery_date == '' %}
-          {% assign active_delivery_date = 'Mon 7 Sept' %}
-        {% endif %}
 
         {% assign raw_cutoff = next_week_menu.cutoff_date_time.value | default: next_week_menu.cutoff_date_time | default: next_week_menu.cutoff_date %}
         {% assign active_cutoff_date = raw_cutoff | date: "%a %d %b @ 11:59 PM UK" %}
-        {% if active_cutoff_date == blank or active_cutoff_date contains '2026-09-03' or active_cutoff_date == '' %}
-          {% assign active_cutoff_date = 'Thu 3 Sept @ 11:59 PM UK' %}
-        {% endif %}
 
         {% assign active_meta_meals = next_week_menu.meals.value | default: next_week_menu.meals | default: next_week_menu.products.value | default: next_week_menu.products | default: next_week_menu.dishes.value %}
       {% endif %}
@@ -127,7 +149,7 @@
         </p>
         <h1 class="gimmie-build-box__heading">Choose Your Meals</h1>
         <p class="gimmie-build-box__intro">
-          Select your <strong>{{ mealQuota }} meals</strong> for your upcoming delivery on <strong>{% raw %}{{ active_delivery_date | default: 'Mon 7 Sept' }}{% endraw %}</strong>.
+          Select your <strong>{{ mealQuota }} meals</strong> for your upcoming delivery on <strong>{% raw %}{{ active_delivery_date | default: 'Upcoming Monday' }}{% endraw %}</strong>.
         </p>
       </header>
 
@@ -157,7 +179,7 @@
                 </div>
                 <div class="gimmie-build-box__detail">
                   <strong>Delivery Date</strong>
-                  <span style="color: var(--gimmie-text);">📅 {% raw %}{{ active_delivery_date | default: 'Mon 7 Sept' }}{% endraw %}</span>
+                  <span style="color: var(--gimmie-text);">📅 {% raw %}{{ active_delivery_date | default: 'Upcoming Monday' }}{% endraw %}</span>
                 </div>
                 <div class="gimmie-build-box__detail">
                   <strong>Your Box Size</strong>
@@ -165,7 +187,7 @@
                 </div>
                 <div class="gimmie-build-box__detail">
                   <strong>Cut-Off Time</strong>
-                  <span>⏰ {% raw %}{{ active_cutoff_date | default: 'Thu 3 Sept @ 11:59 PM UK' }}{% endraw %}</span>
+                  <span>⏰ {% raw %}{{ active_cutoff_date | default: 'Thursday @ 11:59 PM UK' }}{% endraw %}</span>
                 </div>
               </div>
 
@@ -699,7 +721,7 @@
       "customerName": "{% raw %}{{ customer.first_name | default: customer.name | default: 'Subscriber' }} {{ customer.last_name }}{% endraw %}",
       "mealQuota": {{ mealQuota | json }},
       "contractId": {{ contractId | json }},
-      "formattedDeliveryDate": "{% raw %}{{ active_delivery_date | default: 'Mon 7 Sept' }}{% endraw %}",
+      "formattedDeliveryDate": "{% raw %}{{ active_delivery_date | default: 'Upcoming Monday' }}{% endraw %}",
       "currentLines": {{ currentLines | json }},
       "meals": {{ meals | json }}
     }
@@ -797,7 +819,9 @@
       validMealMap.set(m.title.toLowerCase().trim(), m);
     });
 
-    const savedLocal = localStorage.getItem('gimmie_saved_meals_' + (customerEmail || 'hannahconway@hotmail.co.uk'));
+    const deliveryKey = (config.formattedDeliveryDate || '').replace(/[^a-zA-Z0-9]/g, '');
+    const storageKey = 'gimmie_saved_meals_' + (customerEmail || 'hannahconway@hotmail.co.uk') + '_' + deliveryKey;
+    const savedLocal = localStorage.getItem(storageKey);
     let loadedFromSaved = false;
 
     if (savedLocal) {
@@ -1160,7 +1184,9 @@
         }
 
         try {
-          localStorage.setItem('gimmie_saved_meals_' + (customerEmail || 'hannahconway@hotmail.co.uk'), JSON.stringify(state.selections));
+          const deliveryKey = (config.formattedDeliveryDate || '').replace(/[^a-zA-Z0-9]/g, '');
+          const storageKey = 'gimmie_saved_meals_' + (customerEmail || 'hannahconway@hotmail.co.uk') + '_' + deliveryKey;
+          localStorage.setItem(storageKey, JSON.stringify(state.selections));
         } catch (e) {}
 
         updateSavedBanner();

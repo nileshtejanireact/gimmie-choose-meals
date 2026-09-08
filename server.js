@@ -241,9 +241,17 @@ async function handleAppProxy(req, res) {
     let subscription = await subscriptionService.getActiveSubscription(customerId);
 
     if (!subscription) {
-      console.log(`⚡ Activating meal selection session for customer ID ${customerId}`);
       const custDetails = await subscriptionService.getCustomerDetails(customerId);
-      const formattedDeliveryDate = 'Mon 7 Sept';
+      // Calculate upcoming Monday delivery date dynamically
+      const now = new Date();
+      const daysUntilNextMonday = (1 - now.getDay() + 7) % 7 || 7;
+      const nextMonday = new Date(now);
+      nextMonday.setDate(now.getDate() + daysUntilNextMonday);
+      const formattedDeliveryDate = nextMonday.toLocaleDateString('en-GB', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short'
+      });
 
       subscription = {
         id: `gid://shopify/SubscriptionContract/cust_${customerId}`,
