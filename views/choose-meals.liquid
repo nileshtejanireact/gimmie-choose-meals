@@ -95,7 +95,8 @@
         {% assign raw_deliv = menu_item.delivery_date.value | default: menu_item.delivery_date | default: menu_item.date | default: menu_item.display_name | default: menu_item.title %}
 
         {% assign cutoff_ts = raw_cutoff | date: '%s' | plus: 0 %}
-        {% assign deliv_ts = raw_deliv | date: '%s' | plus: 0 %}
+        {% comment %} Set delivery expiration to Monday 11:59:59 PM UK time (end of delivery day) {% endcomment %}
+        {% assign deliv_ts = raw_deliv | date: '%s' | plus: 86399 %}
 
         {% comment %} Check if cutoff or delivery is upcoming in the future {% endcomment %}
         {% if cutoff_ts >= now_ts or deliv_ts >= now_ts %}
