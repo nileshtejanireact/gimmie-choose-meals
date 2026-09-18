@@ -127,12 +127,19 @@
       {% assign active_delivery_date = nil %}
       {% assign active_cutoff_date = nil %}
       {% assign active_meta_meals = nil %}
+      {% assign is_cutoff_passed = false %}
+      {% assign cutoff_ts = 0 %}
       {% if next_week_menu %}
         {% assign raw_deliv = next_week_menu.delivery_date.value | default: next_week_menu.delivery_date | default: next_week_menu.date | default: next_week_menu.display_name | default: next_week_menu.title %}
         {% assign active_delivery_date = raw_deliv | date: "%a %d %b" %}
 
         {% assign raw_cutoff = next_week_menu.cutoff_date_time.value | default: next_week_menu.cutoff_date_time | default: next_week_menu.cutoff_date %}
         {% assign active_cutoff_date = raw_cutoff | date: "%a %d %b @ 11:59 PM UK" %}
+
+        {% assign cutoff_ts = raw_cutoff | date: '%s' | plus: 0 %}
+        {% if cutoff_ts > 0 and now_ts > cutoff_ts %}
+          {% assign is_cutoff_passed = true %}
+        {% endif %}
 
         {% assign active_meta_meals = next_week_menu.meals.value | default: next_week_menu.meals | default: next_week_menu.products.value | default: next_week_menu.products | default: next_week_menu.dishes.value %}
       {% endif %}
@@ -187,22 +194,43 @@
                 </div>
                 <div class="gimmie-build-box__detail">
                   <strong>Cut-Off Time</strong>
-                  <span>⏰ {% raw %}{{ active_cutoff_date | default: 'Thursday @ 11:59 PM UK' }}{% endraw %}</span>
+                  <span>⏰ {% raw %}{{ active_cutoff_date | default: 'Thursday @ 11:59 PM UK' }}{% endraw %}
+                    {% raw %}{% if is_cutoff_passed %}{% endraw %}
+                      <span style="display:inline-block; font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; background: #fee2e2; color: #991b1b; font-weight: 700; margin-left: 4px;">PASSED</span>
+                    {% raw %}{% endif %}{% endraw %}
+                  </span>
                 </div>
               </div>
 
               <!-- Currently Saved Meal Selections Banner -->
-              <div id="gimmie-saved-banner" style="margin-top: 16px; padding: 14px 18px; border: 2px solid var(--gimmie-success); border-radius: 16px; background: #e8f5e8;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-                  <strong style="color: var(--gimmie-success); font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.04em;">
-                    ✓ Your current meal selection
-                  </strong>
-                  <span style="font-size: 0.8rem; font-weight: 700; color: var(--gimmie-muted);">Editable until Thursday 11:59 PM</span>
+              {% raw %}{% if is_cutoff_passed %}{% endraw %}
+                <div id="gimmie-saved-banner" style="margin-top: 16px; padding: 16px 20px; border: 2px solid #d97706; border-radius: 16px; background: #fffbeb;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
+                    <strong style="color: #b45309; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.04em; display: flex; align-items: center; gap: 6px;">
+                      🔒 Confirmed Meal Selection (Locked)
+                    </strong>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #92400e; background: #fef3c7; border: 1px solid #fde68a; padding: 3px 8px; border-radius: 6px;">🔒 Cut-off Passed (Locked for Kitchen Prep)</span>
+                  </div>
+                  <p id="gimmie-saved-summary-text" style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--gimmie-text);">
+                    Loading your confirmed selections...
+                  </p>
+                  <p style="margin: 8px 0 0; font-size: 0.84rem; color: #92400e; font-weight: 600; line-height: 1.4;">
+                    Your meals for delivery on <strong>{% raw %}{{ active_delivery_date | default: 'Upcoming Monday' }}{% endraw %}</strong> were locked on {% raw %}{{ active_cutoff_date }}{% endraw %}. Kitchen cooking and packing is underway, so this order can no longer be edited.
+                  </p>
                 </div>
-                <p id="gimmie-saved-summary-text" style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--gimmie-text);">
-                  Loading your saved selections...
-                </p>
-              </div>
+              {% raw %}{% else %}{% endraw %}
+                <div id="gimmie-saved-banner" style="margin-top: 16px; padding: 14px 18px; border: 2px solid var(--gimmie-success); border-radius: 16px; background: #e8f5e8;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <strong style="color: var(--gimmie-success); font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.04em;">
+                      ✓ Your current meal selection
+                    </strong>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--gimmie-muted);">Editable until Thursday 11:59 PM</span>
+                  </div>
+                  <p id="gimmie-saved-summary-text" style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--gimmie-text);">
+                    Loading your saved selections...
+                  </p>
+                </div>
+              {% raw %}{% endif %}{% endraw %}
 
             </div>
           </div>
@@ -214,11 +242,28 @@
                 <div style="display: flex; align-items: center; gap: 14px;">
                   <span class="gimmie-build-box__step">2</span>
                   <h2 class="gimmie-build-box__panel-title" style="margin: 0;">Pick your meals</h2>
+                  {% raw %}{% if is_cutoff_passed %}{% endraw %}
+                    <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; background: #fef3c7; border: 1px solid #fde68a; color: #92400e; font-size: 0.8rem; font-weight: 700;">🔒 Locked for Delivery</span>
+                  {% raw %}{% endif %}{% endraw %}
                 </div>
                 <div id="gimmie-counter-badge" class="gimmie-build-box__counter" style="font-size: 0.9rem; font-weight: 700; color: var(--gimmie-muted);">
                   <span id="gimmie-step2-count">0</span> of <span id="gimmie-step2-quota">{{ mealQuota }}</span> Selected
                 </div>
               </div>
+
+              {% raw %}{% if is_cutoff_passed %}{% endraw %}
+                <div style="margin-bottom: 20px; padding: 14px 18px; background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 12px; display: flex; align-items: center; gap: 12px;">
+                  <span style="font-size: 1.6rem; line-height: 1;">🔒</span>
+                  <div>
+                    <strong style="color: #92400e; font-size: 0.95rem; display: block; margin-bottom: 2px;">
+                      Order Locked for Delivery ({% raw %}{{ active_delivery_date | default: 'Upcoming Monday' }}{% endraw %})
+                    </strong>
+                    <span style="color: #b45309; font-size: 0.86rem; line-height: 1.4; display: block;">
+                      The weekly cut-off time ({% raw %}{{ active_cutoff_date | default: 'Thu 11:59 PM UK' }}{% endraw %}) has passed. Your meal choices are locked while our chefs prepare and pack your order.
+                    </span>
+                  </div>
+                </div>
+              {% raw %}{% endif %}{% endraw %}
 
               <!-- Meals Grid - Responsive 2 in row desktop, 1 in row mobile -->
               <div class="gimmie-build-box__meals-grid">
@@ -599,9 +644,15 @@
                             <span class="gimmie-macro-bubble">{{ m_prot_display | strip_html | upcase }}</span>
                           </div>
                           <div class="gimmie-build-box__qty">
-                            <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ m_variant_id }}" aria-label="Decrease quantity" disabled>−</button>
-                            <span class="gimmie-build-box__qty-value" data-meal-qty="{{ m_variant_id }}">0</span>
-                            <button type="button" class="gimmie-build-box__qty-button" data-action="plus" data-variant-id="{{ m_variant_id }}" aria-label="Increase quantity">+</button>
+                            {% if is_cutoff_passed %}
+                              <button type="button" class="gimmie-build-box__qty-button is-locked" data-action="minus" data-variant-id="{{ m_variant_id }}" aria-label="Decrease quantity" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">−</button>
+                              <span class="gimmie-build-box__qty-value" data-meal-qty="{{ m_variant_id }}">0</span>
+                              <button type="button" class="gimmie-build-box__qty-button is-locked" data-action="plus" data-variant-id="{{ m_variant_id }}" aria-label="Increase quantity" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">+</button>
+                            {% else %}
+                              <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ m_variant_id }}" aria-label="Decrease quantity" disabled>−</button>
+                              <span class="gimmie-build-box__qty-value" data-meal-qty="{{ m_variant_id }}">0</span>
+                              <button type="button" class="gimmie-build-box__qty-button" data-action="plus" data-variant-id="{{ m_variant_id }}" aria-label="Increase quantity">+</button>
+                            {% endif %}
                           </div>
                         </div>
                       </article>
@@ -661,14 +712,22 @@
             </div>
 
             <!-- Save CTA -->
-            <button id="gimmie-save-btn" class="gimmie-build-box__button" disabled>
-              Select {{ mealQuota }} Meals
-            </button>
-
-            <!-- Cutoff notice in sidebar -->
-            <p style="margin: 12px 0 0; text-align: center; font-size: 0.78rem; color: var(--gimmie-muted);">
-              🔒 Selections lock Thursday at 11:59 PM UK Time
-            </p>
+            {% if is_cutoff_passed %}
+              <button id="gimmie-save-btn" class="gimmie-build-box__button is-locked" disabled style="background: #6b7280 !important; cursor: not-allowed !important;">
+                🔒 Order Locked for Kitchen Prep
+              </button>
+              <p style="margin: 12px 0 0; text-align: center; font-size: 0.8rem; color: #b45309; font-weight: 700;">
+                ⚠️ Cut-off passed on {{ active_cutoff_date | default: 'Thu 11:59 PM UK' }}. Kitchen preparation is underway.
+              </p>
+            {% else %}
+              <button id="gimmie-save-btn" class="gimmie-build-box__button" disabled>
+                Select {{ mealQuota }} Meals
+              </button>
+              <!-- Cutoff notice in sidebar -->
+              <p style="margin: 12px 0 0; text-align: center; font-size: 0.78rem; color: var(--gimmie-muted);">
+                🔒 Selections lock Thursday at 11:59 PM UK Time
+              </p>
+            {% endif %}
 
             <!-- Status Alerts -->
             <div id="gimmie-status-message" class="gimmie-build-box__status"></div>
@@ -722,6 +781,10 @@
       "mealQuota": {{ mealQuota | json }},
       "contractId": {{ contractId | json }},
       "formattedDeliveryDate": "{% raw %}{{ active_delivery_date | default: 'Upcoming Monday' }}{% endraw %}",
+      "activeCutoffDate": "{% raw %}{{ active_cutoff_date | default: 'Thursday @ 11:59 PM UK' }}{% endraw %}",
+      "isCutoffPassed": {% raw %}{{ is_cutoff_passed | json }}{% endraw %},
+      "cutoffTimestamp": {% raw %}{{ cutoff_ts | default: 0 | json }}{% endraw %},
+      "nowTimestamp": {% raw %}{{ now_ts | json }}{% endraw %},
       "currentLines": {{ currentLines | json }},
       "meals": {{ meals | json }}
     }
@@ -737,6 +800,9 @@
     const config = JSON.parse(configEl.textContent || '{}');
     const mealQuota = parseInt(config.mealQuota || 6, 10);
     const contractId = config.contractId || '';
+    const isCutoffPassed = config.isCutoffPassed === true || 
+                           config.isCutoffPassed === 'true' || 
+                           (config.cutoffTimestamp && config.cutoffTimestamp > 0 && Math.floor(Date.now() / 1000) > config.cutoffTimestamp);
     
     // Scan DOM for all rendered meal articles (supports both metaobjects and fallback)
     const renderedMealCards = document.querySelectorAll('.gimmie-build-box__meal');
@@ -923,15 +989,39 @@
         const currentQty = state.selections[meal.variantId]?.quantity || 0;
 
         if (qtyEl) qtyEl.textContent = currentQty;
-        if (minusBtn) minusBtn.disabled = currentQty <= 0;
-        if (plusBtn) plusBtn.disabled = total >= mealQuota;
+
+        if (isCutoffPassed) {
+          if (minusBtn) {
+            minusBtn.disabled = true;
+            minusBtn.setAttribute('disabled', 'disabled');
+            minusBtn.style.opacity = '0.35';
+            minusBtn.style.cursor = 'not-allowed';
+            minusBtn.style.pointerEvents = 'none';
+          }
+          if (plusBtn) {
+            plusBtn.disabled = true;
+            plusBtn.setAttribute('disabled', 'disabled');
+            plusBtn.style.opacity = '0.35';
+            plusBtn.style.cursor = 'not-allowed';
+            plusBtn.style.pointerEvents = 'none';
+          }
+        } else {
+          if (minusBtn) minusBtn.disabled = currentQty <= 0;
+          if (plusBtn) plusBtn.disabled = total >= mealQuota;
+        }
       });
 
       renderSummaryList();
       updateSavedBanner();
 
       if (saveButton) {
-        if (total === mealQuota) {
+        if (isCutoffPassed) {
+          saveButton.disabled = true;
+          saveButton.setAttribute('disabled', 'disabled');
+          saveButton.textContent = '🔒 Order Locked for Kitchen Prep';
+          saveButton.style.background = '#6b7280';
+          saveButton.style.cursor = 'not-allowed';
+        } else if (total === mealQuota) {
           saveButton.disabled = false;
           saveButton.removeAttribute('disabled');
           saveButton.textContent = 'Save My Meal Selection';
@@ -952,7 +1042,7 @@
       if (!bannerEl) return;
       const items = Object.values(state.selections).filter(item => item.quantity > 0);
       if (items.length === 0) {
-        bannerEl.textContent = 'No meals selected yet. Pick your meals below.';
+        bannerEl.textContent = isCutoffPassed ? 'No custom selections were saved. Box will be packed with chef selections.' : 'No meals selected yet. Pick your meals below.';
       } else {
         bannerEl.textContent = items.map(i => `${i.quantity}× ${i.title}`).join('  •  ');
       }
@@ -964,7 +1054,7 @@
       const items = Object.entries(state.selections).filter(([_, item]) => item.quantity > 0);
 
       if (clearButton) {
-        clearButton.style.display = items.length > 0 ? 'inline-block' : 'none';
+        clearButton.style.display = (!isCutoffPassed && items.length > 0) ? 'inline-block' : 'none';
       }
 
       if (items.length === 0) {
@@ -974,28 +1064,35 @@
 
       let html = '';
       items.forEach(([variantId, item]) => {
+        const removeHtml = isCutoffPassed ? '' : `<span style="cursor: pointer; opacity: 0.7; font-size: 1.1rem;" data-remove-variant="${variantId}">&times;</span>`;
         html += `
           <div class="gimmie-build-box__selected-item">
             <span>${item.quantity} × ${item.title}</span>
-            <span style="cursor: pointer; opacity: 0.7; font-size: 1.1rem;" data-remove-variant="${variantId}">&times;</span>
+            ${removeHtml}
           </div>
         `;
       });
 
       selectedListEl.innerHTML = html;
 
-      selectedListEl.querySelectorAll('[data-remove-variant]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const vId = btn.getAttribute('data-remove-variant');
-          if (state.selections[vId]) {
-            delete state.selections[vId];
-            updateUI();
-          }
+      if (!isCutoffPassed) {
+        selectedListEl.querySelectorAll('[data-remove-variant]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const vId = btn.getAttribute('data-remove-variant');
+            if (state.selections[vId]) {
+              delete state.selections[vId];
+              updateUI();
+            }
+          });
         });
-      });
+      }
     }
 
     function handleQuantityChange(variantId, change) {
+      if (isCutoffPassed) {
+        showStatus(`🔒 Cut-off passed on ${config.activeCutoffDate || 'Thu 11:59 PM UK'}. Your meals for delivery on ${config.formattedDeliveryDate} are locked for kitchen prep and cannot be changed.`, true);
+        return;
+      }
       const meal = meals.find(m => String(m.variantId) === String(variantId));
       if (!meal) return;
 
@@ -1122,6 +1219,11 @@
     }
 
     async function saveSelections() {
+      if (isCutoffPassed) {
+        showStatus(`🔒 Cut-off has passed for delivery on ${config.formattedDeliveryDate}. Your order is locked for kitchen prep and cannot be edited.`, true);
+        return;
+      }
+
       if (state.totalSelected !== mealQuota) {
         showStatus(`Please select exactly ${mealQuota} meals before saving.`, true);
         return;
@@ -1142,7 +1244,8 @@
         contractId: activeContractId || '157643276669',
         customerEmail: customerEmail || config.customerEmail || 'hannahconway@hotmail.co.uk',
         customerName: customerName || config.customerName || 'Hannah Conway',
-        deliveryDate: config.formattedDeliveryDate || 'Tue 1 Sept',
+        deliveryDate: config.formattedDeliveryDate || 'Upcoming Monday',
+        isCutoffPassed: isCutoffPassed,
         selectedMeals: Object.values(state.selections).filter(item => item.quantity > 0)
       };
 

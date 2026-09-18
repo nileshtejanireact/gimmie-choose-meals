@@ -319,6 +319,16 @@ async function handleSaveSelections(req, res) {
       else contractId = '157643276669';
     }
 
+    // 🔒 Strict Cut-Off Validation:
+    // If cutoff has passed for this delivery (Thu 11:59 PM UK), reject modifications
+    if (req.body.isCutoffPassed === true || req.body.isCutoffPassed === 'true') {
+      console.warn(`🔒 [Locked Order Save Blocked]: Customer ${customerEmail} attempted to modify meals after cut-off for ${deliveryDate}.`);
+      return res.status(403).json({
+        success: false,
+        message: `Cut-off time has passed for delivery on ${deliveryDate}. Your order is locked for kitchen preparation and cannot be edited.`
+      });
+    }
+
     if (!selectedMeals || !Array.isArray(selectedMeals) || selectedMeals.length === 0) {
       return res.status(400).json({ success: false, message: 'No meals were selected.' });
     }
