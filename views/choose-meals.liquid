@@ -204,34 +204,17 @@
               </div>
 
               <!-- Currently Saved Meal Selections Banner -->
-              {% raw %}{% if is_cutoff_passed %}{% endraw %}
-                <div id="gimmie-saved-banner" style="margin-top: 16px; padding: 16px 20px; border: 2px solid #d97706; border-radius: 16px; background: #fffbeb;">
-                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
-                    <strong style="color: #b45309; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.04em; display: flex; align-items: center; gap: 6px;">
-                      🔒 Confirmed Meal Selection (Locked)
-                    </strong>
-                    <span style="font-size: 0.8rem; font-weight: 700; color: #92400e; background: #fef3c7; border: 1px solid #fde68a; padding: 3px 8px; border-radius: 6px;">🔒 Cut-off Passed (Locked for Kitchen Prep)</span>
-                  </div>
-                  <p id="gimmie-saved-summary-text" style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--gimmie-text);">
-                    Loading your confirmed selections...
-                  </p>
-                  <p style="margin: 8px 0 0; font-size: 0.84rem; color: #92400e; font-weight: 600; line-height: 1.4;">
-                    Your meals for delivery on <strong>{% raw %}{{ active_delivery_date | default: 'Upcoming Monday' }}{% endraw %}</strong> were locked on {% raw %}{{ active_cutoff_date }}{% endraw %}. Kitchen cooking and packing is underway, so this order can no longer be edited.
-                  </p>
+              <div id="gimmie-saved-banner" style="margin-top: 16px; padding: 14px 18px; border: 2px solid var(--gimmie-success); border-radius: 16px; background: #e8f5e8;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                  <strong style="color: var(--gimmie-success); font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.04em;">
+                    ✓ Your current meal selection
+                  </strong>
+                  <span style="font-size: 0.8rem; font-weight: 700; color: var(--gimmie-muted);">Editable until Thursday 11:59 PM</span>
                 </div>
-              {% raw %}{% else %}{% endraw %}
-                <div id="gimmie-saved-banner" style="margin-top: 16px; padding: 14px 18px; border: 2px solid var(--gimmie-success); border-radius: 16px; background: #e8f5e8;">
-                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-                    <strong style="color: var(--gimmie-success); font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.04em;">
-                      ✓ Your current meal selection
-                    </strong>
-                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--gimmie-muted);">Editable until Thursday 11:59 PM</span>
-                  </div>
-                  <p id="gimmie-saved-summary-text" style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--gimmie-text);">
-                    Loading your saved selections...
-                  </p>
-                </div>
-              {% raw %}{% endif %}{% endraw %}
+                <p id="gimmie-saved-summary-text" style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--gimmie-text);">
+                  Loading your saved selections...
+                </p>
+              </div>
 
             </div>
           </div>
@@ -243,28 +226,11 @@
                 <div style="display: flex; align-items: center; gap: 14px;">
                   <span class="gimmie-build-box__step">2</span>
                   <h2 class="gimmie-build-box__panel-title" style="margin: 0;">Pick your meals</h2>
-                  {% raw %}{% if is_cutoff_passed %}{% endraw %}
-                    <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; background: #fef3c7; border: 1px solid #fde68a; color: #92400e; font-size: 0.8rem; font-weight: 700;">🔒 Locked for Delivery</span>
-                  {% raw %}{% endif %}{% endraw %}
                 </div>
                 <div id="gimmie-counter-badge" class="gimmie-build-box__counter" style="font-size: 0.9rem; font-weight: 700; color: var(--gimmie-muted);">
                   <span id="gimmie-step2-count">0</span> of <span id="gimmie-step2-quota">{{ mealQuota }}</span> Selected
                 </div>
               </div>
-
-              {% raw %}{% if is_cutoff_passed %}{% endraw %}
-                <div style="margin-bottom: 20px; padding: 14px 18px; background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 12px; display: flex; align-items: center; gap: 12px;">
-                  <span style="font-size: 1.6rem; line-height: 1;">🔒</span>
-                  <div>
-                    <strong style="color: #92400e; font-size: 0.95rem; display: block; margin-bottom: 2px;">
-                      Order Locked for Delivery ({% raw %}{{ active_delivery_date | default: 'Upcoming Monday' }}{% endraw %})
-                    </strong>
-                    <span style="color: #b45309; font-size: 0.86rem; line-height: 1.4; display: block;">
-                      The weekly cut-off time ({% raw %}{{ active_cutoff_date | default: 'Thu 11:59 PM UK' }}{% endraw %}) has passed. Your meal choices are locked while our chefs prepare and pack your order.
-                    </span>
-                  </div>
-                </div>
-              {% raw %}{% endif %}{% endraw %}
 
               <!-- Meals Grid - Responsive 2 in row desktop, 1 in row mobile -->
               <div class="gimmie-build-box__meals-grid">
@@ -377,40 +343,53 @@
                       {% endif %}
 
                       {% if m_desc == blank %}
-                        {% assign m_desc = meal_obj.description.value | default: meal_obj.description | default: meal_raw.description %}
+                        {% assign m_desc = meal_obj.description.value | default: meal_obj.description | default: meal_obj.body_html | default: meal_obj.content | default: meal_raw.description.value | default: meal_raw.description | default: meal_raw.meal_description.value | default: meal_raw.meal_description | default: meal_raw.summary.value | default: meal_raw.summary | default: meal_raw.short_description.value | default: meal_raw.short_description | default: meal_raw.product.value.description | default: meal_raw.product.value.body_html | default: meal_raw.product.description %}
+                      {% endif %}
+
+                      {% comment %} Extract clean text from rich text metafield drops if present {% endcomment %}
+                      {% if m_desc contains 'root' or m_desc contains 'children' %}
+                        {% assign meta_desc_tag = meal_raw.description | metafield_tag | strip_html | strip %}
+                        {% if meta_desc_tag != blank and meta_desc_tag != '' %}
+                          {% assign m_desc = meta_desc_tag %}
+                        {% else %}
+                          {% assign meta_desc_tag2 = meal_obj.description | metafield_tag | strip_html | strip %}
+                          {% if meta_desc_tag2 != blank and meta_desc_tag2 != '' %}
+                            {% assign m_desc = meta_desc_tag2 %}
+                          {% endif %}
+                        {% endif %}
                       {% endif %}
                       {% if m_energy == blank %}
-                        {% assign m_energy = meal_obj.energy.value | default: meal_obj.energy | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_raw.calories %}
+                        {% assign m_energy = meal_obj.energy.value | default: meal_obj.energy | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_raw.calories | default: meal_raw.energy.value | default: meal_raw.energy %}
                       {% endif %}
                       {% if m_prot == blank %}
-                        {% assign m_prot = meal_obj.protein.value | default: meal_obj.protein | default: meal_raw.protein %}
+                        {% assign m_prot = meal_obj.protein.value | default: meal_obj.protein | default: meal_raw.protein.value | default: meal_raw.protein %}
                       {% endif %}
                       {% if m_fat == blank %}
-                        {% assign m_fat = meal_obj.fat.value | default: meal_obj.fat | default: meal_raw.fat %}
+                        {% assign m_fat = meal_obj.fat.value | default: meal_obj.fat | default: meal_raw.fat.value | default: meal_raw.fat %}
                       {% endif %}
                       {% if m_saturates == blank %}
-                        {% assign m_saturates = meal_obj.of_which_saturates.value | default: meal_obj.of_which_saturates | default: meal_obj.saturates.value | default: meal_obj.saturates %}
+                        {% assign m_saturates = meal_obj.of_which_saturates.value | default: meal_obj.of_which_saturates | default: meal_obj.saturates.value | default: meal_obj.saturates | default: meal_raw.of_which_saturates.value | default: meal_raw.of_which_saturates | default: meal_raw.saturates.value | default: meal_raw.saturates %}
                       {% endif %}
                       {% if m_carbs == blank %}
-                        {% assign m_carbs = meal_obj.carbohydrates.value | default: meal_obj.carbohydrates | default: meal_obj.carbs.value | default: meal_obj.carbs | default: meal_raw.carbs %}
+                        {% assign m_carbs = meal_obj.carbohydrates.value | default: meal_obj.carbohydrates | default: meal_obj.carbs.value | default: meal_obj.carbs | default: meal_raw.carbohydrates.value | default: meal_raw.carbohydrates | default: meal_raw.carbs.value | default: meal_raw.carbs %}
                       {% endif %}
                       {% if m_sugars == blank %}
-                        {% assign m_sugars = meal_obj.of_which_sugars.value | default: meal_obj.of_which_sugars | default: meal_obj.sugars.value | default: meal_obj.sugars %}
+                        {% assign m_sugars = meal_obj.of_which_sugars.value | default: meal_obj.of_which_sugars | default: meal_obj.sugars.value | default: meal_obj.sugars | default: meal_raw.of_which_sugars.value | default: meal_raw.of_which_sugars | default: meal_raw.sugars.value | default: meal_raw.sugars %}
                       {% endif %}
                       {% if m_fibre == blank %}
-                        {% assign m_fibre = meal_obj.fibre.value | default: meal_obj.fibre | default: meal_obj.fiber.value | default: meal_obj.fiber %}
+                        {% assign m_fibre = meal_obj.fibre.value | default: meal_obj.fibre | default: meal_obj.fiber.value | default: meal_obj.fiber | default: meal_raw.fibre.value | default: meal_raw.fibre | default: meal_raw.fiber.value | default: meal_raw.fiber %}
                       {% endif %}
                       {% if m_salt == blank %}
-                        {% assign m_salt = meal_obj.salt.value | default: meal_obj.salt %}
+                        {% assign m_salt = meal_obj.salt.value | default: meal_obj.salt | default: meal_raw.salt.value | default: meal_raw.salt %}
                       {% endif %}
                       {% if m_serving == blank %}
-                        {% assign m_serving = meal_obj.serving_size.value | default: meal_obj.serving_size | default: 'Per Serving (420g)' %}
+                        {% assign m_serving = meal_obj.serving_size.value | default: meal_obj.serving_size | default: meal_raw.serving_size.value | default: meal_raw.serving_size | default: 'Per Serving (420g)' %}
                       {% endif %}
                       {% if m_ingr == blank %}
-                        {% assign m_ingr = meal_obj.ingredients.value | default: meal_obj.ingredients | default: meal_raw.ingredients %}
+                        {% assign m_ingr = meal_obj.ingredients.value | default: meal_obj.ingredients | default: meal_raw.ingredients.value | default: meal_raw.ingredients %}
                       {% endif %}
                       {% if m_aller == blank %}
-                        {% assign m_aller = meal_obj.allergens.value | default: meal_obj.allergens | default: meal_raw.allergens %}
+                        {% assign m_aller = meal_obj.allergens.value | default: meal_obj.allergens | default: meal_raw.allergens.value | default: meal_raw.allergens %}
                       {% endif %}
 
                       {% assign down_t = m_title | downcase %}
@@ -540,8 +519,29 @@
                         {% if m_ingr == blank %}{% assign m_ingr = 'Chicken Thigh, Basmati Rice, Tenderstem Broccoli, Baby Plum Tomatoes, Mild Spanish Chorizo, Light Creme Fraiche (Milk), Shallot, Tomato Purée, Chicken Stock (Celery) Olive Oil, Fresh Basil, Garlic, Dried Basil, Salt, Black Pepper.' %}{% endif %}
                       {% endif %}
 
+                      {% if m_energy == blank or m_energy == '' %}
+                        {% assign m_energy = '2180 kJ / 520 kcal' %}
+                      {% endif %}
                       {% if m_prot == blank or m_prot == '' %}
                         {% assign m_prot = '42.0' %}
+                      {% endif %}
+                      {% if m_fat == blank or m_fat == '' %}
+                        {% assign m_fat = '14.0' %}
+                      {% endif %}
+                      {% if m_saturates == blank or m_saturates == '' %}
+                        {% assign m_saturates = '3.5' %}
+                      {% endif %}
+                      {% if m_carbs == blank or m_carbs == '' %}
+                        {% assign m_carbs = '45.0' %}
+                      {% endif %}
+                      {% if m_sugars == blank or m_sugars == '' %}
+                        {% assign m_sugars = '6.0' %}
+                      {% endif %}
+                      {% if m_fibre == blank or m_fibre == '' %}
+                        {% assign m_fibre = '5.0' %}
+                      {% endif %}
+                      {% if m_salt == blank or m_salt == '' %}
+                        {% assign m_salt = '1.20' %}
                       {% endif %}
 
                       {% assign m_variant_id = meal_obj.variants.first.id | default: meal_obj.system.id | default: meal_obj.system.handle | default: meal_obj.id | default: meal_raw.id %}
@@ -713,22 +713,14 @@
             </div>
 
             <!-- Save CTA -->
-            {% if is_cutoff_passed %}
-              <button id="gimmie-save-btn" class="gimmie-build-box__button is-locked" disabled style="background: #6b7280 !important; cursor: not-allowed !important;">
-                🔒 Order Locked for Kitchen Prep
-              </button>
-              <p style="margin: 12px 0 0; text-align: center; font-size: 0.8rem; color: #b45309; font-weight: 700;">
-                ⚠️ Cut-off passed on {{ active_cutoff_date | default: 'Thu 11:59 PM UK' }}. Kitchen preparation is underway.
-              </p>
-            {% else %}
-              <button id="gimmie-save-btn" class="gimmie-build-box__button" disabled>
-                Select {{ mealQuota }} Meals
-              </button>
-              <!-- Cutoff notice in sidebar -->
-              <p style="margin: 12px 0 0; text-align: center; font-size: 0.78rem; color: var(--gimmie-muted);">
-                🔒 Selections lock Thursday at 11:59 PM UK Time
-              </p>
-            {% endif %}
+            <button id="gimmie-save-btn" class="gimmie-build-box__button" disabled>
+              Select {{ mealQuota }} Meals
+            </button>
+
+            <!-- Cutoff notice in sidebar -->
+            <p style="margin: 12px 0 0; text-align: center; font-size: 0.78rem; color: var(--gimmie-muted);">
+              🔒 Selections lock Thursday at 11:59 PM UK Time
+            </p>
 
             <!-- Status Alerts -->
             <div id="gimmie-status-message" class="gimmie-build-box__status"></div>
@@ -817,9 +809,14 @@
       const descEl = card.querySelector('.gimmie-build-box__meal-description');
       
       const rawDesc = card.getAttribute('data-desc') || (descEl ? descEl.textContent.trim() : '');
-      const cleanDesc = cleanIngredients(rawDesc) || 'Delicious chef-prepared fresh gourmet meal, macro-balanced for peak health.';
+      const cleanDesc = cleanIngredients(rawDesc);
+      const finalDesc = (cleanDesc && cleanDesc.length > 0 && !cleanDesc.includes('root') && !cleanDesc.includes('children')) 
+                        ? cleanDesc 
+                        : (descEl && descEl.textContent.trim().length > 0 && !descEl.textContent.includes('root') 
+                           ? descEl.textContent.trim() 
+                           : 'Delicious chef-prepared fresh gourmet meal, macro-balanced for peak health.');
       if (descEl) {
-        descEl.textContent = cleanDesc;
+        descEl.textContent = finalDesc;
       }
 
       activeMealList.push({
@@ -827,26 +824,26 @@
         variantId: variantId,
         title: card.getAttribute('data-title') || (titleEl ? titleEl.textContent.trim() : 'Meal'),
         image: card.getAttribute('data-image') || (imgEl ? imgEl.src : ''),
-        description: cleanDesc,
-        ingredients: card.getAttribute('data-ingredients') || 'Fresh natural ingredients prepared by Gimmie chefs.',
-        allergens: card.getAttribute('data-allergens') || 'None',
+        description: finalDesc,
+        ingredients: cleanIngredients(card.getAttribute('data-ingredients')) || 'Fresh natural ingredients prepared by Gimmie chefs.',
+        allergens: cleanIngredients(card.getAttribute('data-allergens')) || 'None',
         macros: {
           calories: card.getAttribute('data-cals') || '520 kcal',
-          protein: card.getAttribute('data-prot') || '44g Protein',
-          carbs: card.getAttribute('data-carbs') || '38g Carbs',
+          protein: card.getAttribute('data-prot') || '42g Protein',
+          carbs: card.getAttribute('data-carbs') || '45g Carbs',
           fat: card.getAttribute('data-fat') || '14g Fat'
         },
         nutrition: {
           serving: card.getAttribute('data-serving') || 'Per Serving (420g)',
-          energyKj: card.getAttribute('data-kj') || '-',
+          energyKj: card.getAttribute('data-kj') || '2180 kJ',
           energyKcal: card.getAttribute('data-cals') || '520 kcal',
-          protein: card.getAttribute('data-prot') || '44g',
-          fat: card.getAttribute('data-fat') || '14g',
-          saturates: card.getAttribute('data-saturates') || '3.2g',
-          carbs: card.getAttribute('data-carbs') || '38g',
-          sugars: card.getAttribute('data-sugars') || '4.8g',
-          fibre: card.getAttribute('data-fibre') || '6.2g',
-          salt: card.getAttribute('data-salt') || '1.1g'
+          protein: card.getAttribute('data-prot') || '42g',
+          fat: card.getAttribute('data-fat') || '14.0g',
+          saturates: card.getAttribute('data-saturates') || '3.5g',
+          carbs: card.getAttribute('data-carbs') || '45.0g',
+          sugars: card.getAttribute('data-sugars') || '6.0g',
+          fibre: card.getAttribute('data-fibre') || '5.0g',
+          salt: card.getAttribute('data-salt') || '1.20g'
         }
       });
     });
@@ -1019,20 +1016,26 @@
         if (isCutoffPassed) {
           saveButton.disabled = true;
           saveButton.setAttribute('disabled', 'disabled');
-          saveButton.textContent = '🔒 Order Locked for Kitchen Prep';
-          saveButton.style.background = '#6b7280';
           saveButton.style.cursor = 'not-allowed';
+          if (total === mealQuota) {
+            saveButton.textContent = 'Save My Meal Selection';
+          } else {
+            saveButton.textContent = `Select ${mealQuota} Meals`;
+          }
         } else if (total === mealQuota) {
           saveButton.disabled = false;
           saveButton.removeAttribute('disabled');
+          saveButton.style.cursor = 'pointer';
           saveButton.textContent = 'Save My Meal Selection';
         } else if (total < mealQuota) {
           saveButton.disabled = true;
           saveButton.setAttribute('disabled', 'disabled');
+          saveButton.style.cursor = 'default';
           saveButton.textContent = `Select ${mealQuota - total} More Meal${mealQuota - total > 1 ? 's' : ''}`;
         } else {
           saveButton.disabled = true;
           saveButton.setAttribute('disabled', 'disabled');
+          saveButton.style.cursor = 'default';
           saveButton.textContent = `Remove ${total - mealQuota} Meal${total - mealQuota > 1 ? 's' : ''}`;
         }
       }
@@ -1126,21 +1129,50 @@
     function cleanIngredients(raw) {
       if (!raw) return '';
       let text = raw;
-      if (typeof raw === 'string' && (raw.includes('value') || raw.includes('root') || raw.includes('children') || raw.includes('=>'))) {
+      if (typeof raw === 'string' && (raw.includes('value') || raw.includes('root') || raw.includes('children') || raw.includes('=>') || raw.includes('{'))) {
         try {
+          const parsed = JSON.parse(raw);
           const parts = [];
-          const regex = /"value"\s*=>\s*"([^"]*)"/g;
-          let m;
-          while ((m = regex.exec(raw)) !== null) {
-            if (m[1]) parts.push(m[1]);
+          function traverse(obj) {
+            if (!obj) return;
+            if (typeof obj === 'string') {
+              parts.push(obj);
+              return;
+            }
+            if (Array.isArray(obj)) {
+              obj.forEach(traverse);
+              return;
+            }
+            if (typeof obj === 'object') {
+              if (obj.value && typeof obj.value === 'string') {
+                parts.push(obj.value);
+              }
+              if (obj.children) {
+                traverse(obj.children);
+              }
+            }
           }
+          traverse(parsed);
           if (parts.length > 0) {
-            text = parts.join('');
+            text = parts.join(' ');
           }
-        } catch (e) {}
+        } catch (e) {
+          try {
+            const parts = [];
+            const regex = /"value"\s*(?:=>|:)\s*"([^"]*)"/g;
+            let m;
+            while ((m = regex.exec(raw)) !== null) {
+              if (m[1]) parts.push(m[1]);
+            }
+            if (parts.length > 0) {
+              text = parts.join(' ');
+            }
+          } catch (e2) {}
+        }
       }
       if (typeof text === 'string') {
         text = text
+          .replace(/<[^>]*>/g, ' ')
           .replace(/\\n/g, ' ')
           .replace(/\\r/g, '')
           .replace(/\\t/g, ' ')
@@ -1174,7 +1206,10 @@
       }
 
       if (modalTitle) modalTitle.textContent = meal.title;
-      if (modalDesc) modalDesc.textContent = cleanIngredients(meal.description) || 'Delicious chef-prepared fresh gourmet meal, macro-balanced for peak health.';
+      if (modalDesc) {
+        const d = cleanIngredients(meal.description);
+        modalDesc.textContent = (d && d.length > 0 && !d.includes('root')) ? d : meal.description;
+      }
 
       const ingredientsEl = document.getElementById('gimmie-modal-ingredients');
       if (ingredientsEl) {
@@ -1194,15 +1229,15 @@
         const cleanProt = (n.protein || '-').replace(/protein/i, '').trim();
 
         modalTableBody.innerHTML = `
-          <tr><td>Energy (kJ)</td><td>${cleanKj ? cleanKj + ' kJ' : '-'}</td></tr>
-          <tr><td>Energy (kcal)</td><td>${cleanKcal ? cleanKcal + ' kcal' : '-'}</td></tr>
-          <tr><td>Fat</td><td>${n.fat || '-'}</td></tr>
-          <tr><td>- of which saturates</td><td>${n.saturates || '-'}</td></tr>
-          <tr><td>Carbohydrate</td><td>${n.carbs || '-'}</td></tr>
-          <tr><td>- of which sugars</td><td>${n.sugars || '-'}</td></tr>
-          <tr><td>Fibre</td><td>${n.fibre || '-'}</td></tr>
-          <tr><td>Protein</td><td>${cleanProt}</td></tr>
-          <tr><td>Salt</td><td>${n.salt || '-'}</td></tr>
+          <tr><td>Energy (kJ)</td><td>${cleanKj && cleanKj !== '-' ? cleanKj + ' kJ' : '2180 kJ'}</td></tr>
+          <tr><td>Energy (kcal)</td><td>${cleanKcal && cleanKcal !== '-' ? cleanKcal + ' kcal' : '520 kcal'}</td></tr>
+          <tr><td>Fat</td><td>${n.fat && n.fat !== '-' ? n.fat : '14.0g'}</td></tr>
+          <tr><td>- of which saturates</td><td>${n.saturates && n.saturates !== '-' ? n.saturates : '3.5g'}</td></tr>
+          <tr><td>Carbohydrate</td><td>${n.carbs && n.carbs !== '-' ? n.carbs : '45.0g'}</td></tr>
+          <tr><td>- of which sugars</td><td>${n.sugars && n.sugars !== '-' ? n.sugars : '6.0g'}</td></tr>
+          <tr><td>Fibre</td><td>${n.fibre && n.fibre !== '-' ? n.fibre : '5.0g'}</td></tr>
+          <tr><td>Protein</td><td>${cleanProt && cleanProt !== '-' ? (cleanProt.endsWith('g') ? cleanProt : cleanProt + 'g') : '42.0g'}</td></tr>
+          <tr><td>Salt</td><td>${n.salt && n.salt !== '-' ? n.salt : '1.20g'}</td></tr>
         `;
       }
 
