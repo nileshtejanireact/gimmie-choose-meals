@@ -269,9 +269,10 @@ async function handleAppProxy(req, res) {
       };
     }
 
-    // 4. Fetch available weekly menu
+    // 4. Fetch available weekly menu & add-ons
     const meals = await menuService.getWeeklyMenu();
-    console.log(`🍽️ Rendering meal picker with ${meals.length} dishes for ${subscription.mealQuota} meals quota.`);
+    const addons = await menuService.getAddons();
+    console.log(`🍽️ Rendering meal picker with ${meals.length} dishes and ${addons.length} add-ons for ${subscription.mealQuota} meals quota.`);
 
     // 5. Render the interactive meal builder
     const customerObj = subscription.customer || { firstName: '', lastName: '', email: '' };
@@ -286,7 +287,8 @@ async function handleAppProxy(req, res) {
       contractId: subscription.contractId || subscription.id,
       formattedDeliveryDate: subscription.formattedDeliveryDate || 'Tue 1 Sept',
       currentLines: subscription.currentLines || [],
-      meals: meals
+      meals: meals,
+      addons: addons
     });
 
   } catch (error) {
@@ -304,8 +306,8 @@ app.get('/apps/choose-meals', handleAppProxy);
  */
 async function handleSaveSelections(req, res) {
   try {
-    let { contractId, selectedMeals, customerEmail, customerName, deliveryDate } = req.body;
-    console.log('💾 [Save Selections POST Request Received]:', { contractId, customerEmail, customerName, selectedMeals });
+    let { contractId, selectedMeals, selectedAddons, customerEmail, customerName, deliveryDate } = req.body;
+    console.log('💾 [Save Selections POST Request Received]:', { contractId, customerEmail, customerName, selectedMeals, selectedAddons });
 
     // Fallback email and contract IDs
     customerEmail = customerEmail || req.query.logged_in_customer_email || 'hannahconway@hotmail.co.uk';
@@ -335,6 +337,10 @@ async function handleSaveSelections(req, res) {
 
     const totalSelected = selectedMeals.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0);
     const mealSummary = selectedMeals.map(m => `${m.quantity}x ${m.title}`).join(', ');
+    const addonSummary = (selectedAddons && selectedAddons.length > 0)
+      ? selectedAddons.map(a => `${a.quantity}x ${a.title} (+£${a.price || '0'})`).join(', ')
+      : '';
+    const fullOrderSummary = mealSummary + (addonSummary ? ` | Add-ons: ${addonSummary}` : '');
 
     // Commit changes to Shopify Subscription Contract
     try {
@@ -345,7 +351,7 @@ async function handleSaveSelections(req, res) {
 
     // Also write directly to the customer's active Shopify Order Note & Tags
     try {
-      await subscriptionService.updateRecentOrderDetails(customerEmail, mealSummary, deliveryDate);
+      await subscriptionService.updateRecentOrderDetails(customerEmail, fullOrderSummary, deliveryDate);
     } catch (e) {
       console.warn('⚠️ Order note update notice:', e.message);
     }
@@ -357,16 +363,18 @@ async function handleSaveSelections(req, res) {
       customerName: customerName,
       boxSize: totalSelected,
       deliveryDate: deliveryDate,
-      meals: selectedMeals.map(m => ({ title: m.title, quantity: parseInt(m.quantity, 10) }))
+      meals: selectedMeals.map(m => ({ title: m.title, quantity: parseInt(m.quantity, 10) })),
+      addons: (selectedAddons || []).map(a => ({ title: a.title, quantity: parseInt(a.quantity, 10), price: a.price }))
     });
 
-    console.log(`✅ [SUBMISSION SAVED LIVE]: ${customerName} (${customerEmail}) -> ${mealSummary}`);
+    console.log(`✅ [SUBMISSION SAVED LIVE]: ${customerName} (${customerEmail}) -> ${fullOrderSummary}`);
 
     return res.json({
       success: true,
       message: 'Meal selections updated successfully!',
       contractId: contractId,
       totalSelected,
+      selectedAddons: selectedAddons || [],
       entry: newEntry
     });
 

@@ -329,6 +329,141 @@ class MenuService {
       }
     ];
   }
+
+  /**
+   * Fetch available add-ons for the upcoming delivery rotation
+   */
+  async getAddons() {
+    return this.getFallbackAddons();
+  }
+
+  /**
+   * Default high quality Gimmie fallback add-on products
+   */
+  getFallbackAddons() {
+    return [
+      {
+        id: 'gid://shopify/Product/addon_101',
+        variantId: 'gid://shopify/ProductVariant/addon_201',
+        title: 'CHOCOLATE & PEANUT BUTTER OVERNIGHT OATS',
+        handle: 'chocolate-peanut-butter-overnight-oats',
+        price: '3.50',
+        image: 'https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?auto=format&fit=crop&w=800&q=80',
+        description: 'Creamy rolled jumbo oats soaked in almond milk with rich raw cacao, crunchy peanut butter, chia seeds and pure maple.',
+        badges: ['ADD-ON', 'POPULAR'],
+        macros: {
+          calories: '380 kcal',
+          protein: '18g Protein',
+          carbs: '46g Carbs',
+          fat: '14.5g Fat'
+        },
+        nutrition: {
+          serving: 'Per Pot (220g)',
+          energyKj: '1590 kJ',
+          energyKcal: '380 kcal',
+          fat: '14.5g',
+          saturates: '2.8g',
+          carbs: '46.0g',
+          sugars: '8.2g',
+          fibre: '7.5g',
+          protein: '18.0g',
+          salt: '0.25g'
+        },
+        allergens: 'Peanuts, Gluten (Oats)',
+        ingredients: 'Rolled Jumbo Oats (38%), Almond Milk (Filtered Water, Almonds), Organic Peanut Butter (Peanuts, Sea Salt), Raw Cacao Powder, Chia Seeds, Pure Canadian Maple Syrup.'
+      },
+      {
+        id: 'gid://shopify/Product/addon_102',
+        variantId: 'gid://shopify/ProductVariant/addon_202',
+        title: 'GINGER & TURMERIC IMMUNITY SHOT (60ML)',
+        handle: 'ginger-turmeric-immunity-shot',
+        price: '2.50',
+        image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=800&q=80',
+        description: 'Potent cold-pressed raw Peruvian ginger root, fresh turmeric, crisp apple, lemon and cracked black pepper to boost immune defence.',
+        badges: ['ADD-ON', 'IMMUNITY'],
+        macros: {
+          calories: '35 kcal',
+          protein: '1g Protein',
+          carbs: '7.5g Carbs',
+          fat: '0.2g Fat'
+        },
+        nutrition: {
+          serving: 'Per Bottle (60ml)',
+          energyKj: '147 kJ',
+          energyKcal: '35 kcal',
+          fat: '0.2g',
+          saturates: '0.0g',
+          carbs: '7.5g',
+          sugars: '6.8g',
+          fibre: '0.5g',
+          protein: '0.8g',
+          salt: '0.02g'
+        },
+        allergens: 'None',
+        ingredients: 'Peruvian Ginger Root Juice (40%), Fresh Turmeric Juice (25%), Pressed Apple Juice (20%), Lemon Juice (15%), Black Pepper Extract.'
+      },
+      {
+        id: 'gid://shopify/Product/addon_103',
+        variantId: 'gid://shopify/ProductVariant/addon_203',
+        title: 'BERRY CRUNCH PROTEIN FLAPJACK',
+        handle: 'berry-crunch-protein-flapjack',
+        price: '2.95',
+        image: 'https://images.unsplash.com/photo-1622484216850-863a14e9f783?auto=format&fit=crop&w=800&q=80',
+        description: 'Slow-release whole grain oat bar packed with cranberries, raspberries, pumpkin seeds and premium plant protein crispies.',
+        badges: ['ADD-ON', 'HIGH PROTEIN'],
+        macros: {
+          calories: '275 kcal',
+          protein: '15g Protein',
+          carbs: '32g Carbs',
+          fat: '9.8g Fat'
+        },
+        nutrition: {
+          serving: 'Per Bar (85g)',
+          energyKj: '1150 kJ',
+          energyKcal: '275 kcal',
+          fat: '9.8g',
+          saturates: '2.1g',
+          carbs: '32.0g',
+          sugars: '9.5g',
+          fibre: '5.2g',
+          protein: '15.0g',
+          salt: '0.30g'
+        },
+        allergens: 'Gluten (Oats), Soya',
+        ingredients: 'Rolled Oats (42%), Soy Protein Crispies, Chicory Root Fibre, Dried Cranberries, Freeze-Dried Raspberries, Pumpkin Seeds, Coconut Oil, Sea Salt.'
+      },
+      {
+        id: 'gid://shopify/Product/addon_104',
+        variantId: 'gid://shopify/ProductVariant/addon_204',
+        title: 'COLD-PRESSED GREEN ZING JUICE (250ML)',
+        handle: 'cold-pressed-green-zing-juice',
+        price: '3.95',
+        image: 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?auto=format&fit=crop&w=800&q=80',
+        description: 'Crisp daily green refresher pressed with cucumber, crisp Granny Smith apple, celery, spinach, fresh lime and garden mint.',
+        badges: ['ADD-ON', 'RAW & FRESH'],
+        macros: {
+          calories: '78 kcal',
+          protein: '2.1g Protein',
+          carbs: '16.5g Carbs',
+          fat: '0.3g Fat'
+        },
+        nutrition: {
+          serving: 'Per Bottle (250ml)',
+          energyKj: '328 kJ',
+          energyKcal: '78 kcal',
+          fat: '0.3g',
+          saturates: '0.1g',
+          carbs: '16.5g',
+          sugars: '14.2g',
+          fibre: '1.8g',
+          protein: '2.1g',
+          salt: '0.08g'
+        },
+        allergens: 'Celery',
+        ingredients: 'Cucumber (35%), Granny Smith Apple (30%), Celery (15%), Spinach (12%), Fresh Lime (6%), Garden Mint (2%).'
+      }
+    ];
+  }
 }
 
 module.exports = new MenuService();

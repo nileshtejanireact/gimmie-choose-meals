@@ -143,6 +143,10 @@
         {% endif %}
 
         {% assign active_meta_meals = next_week_menu.meals.value | default: next_week_menu.meals | default: next_week_menu.products.value | default: next_week_menu.products | default: next_week_menu.dishes.value %}
+        {% assign active_meta_addons = next_week_menu.addon_products.value | default: next_week_menu.addon_products | default: next_week_menu.addons.value | default: next_week_menu.addons | default: next_week_menu.add_ons.value | default: next_week_menu.add_ons | default: next_week_menu.featured_addons.value | default: next_week_menu.featured_addons | default: next_week_menu.addon_meals.value | default: next_week_menu.addon_meals | default: next_week_menu.addon_product.value | default: next_week_menu.addon_product | default: next_week_menu.extra_products.value | default: next_week_menu.extra_products %}
+        {% if active_meta_addons == blank or active_meta_addons.size == 0 %}
+          {% assign active_meta_addons = shop.metaobjects.addon_product.values | default: shop.metaobjects.addon.values | default: shop.metaobjects.addons.values %}
+        {% endif %}
       {% endif %}
 {% endraw %}
 
@@ -689,6 +693,208 @@
             </div>
           </div>
 
+          <!-- Step 3: FEATURED ADD-ONS Panel (Matching Build Your Box) -->
+          <div class="gimmie-build-box__panel gimmie-build-box__panel--addons" id="gimmie-addons-panel">
+            <div class="gimmie-build-box__surface">
+              <div class="gimmie-build-box__panel-header gimmie-build-box__panel-header--addons" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 0;">
+                <div style="display: flex; align-items: flex-start; gap: 14px;">
+                  <span class="gimmie-build-box__step" style="margin-top: 2px;">3</span>
+                  <div class="gimmie-build-box__title-wrap">
+                    <h2 class="gimmie-build-box__panel-title" style="margin: 0; line-height: 1.1;">FEATURED ADD-ONS</h2>
+                    <p class="gimmie-build-box__step-description" style="margin: 6px 0 0; color: var(--gimmie-muted); font-size: 0.95rem; font-weight: 500;">
+                      Craving more? Check out this week's add-ons.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Toggle Switch from Build Your Box Screenshot -->
+                <div class="gimmie-addon-toggle-wrap" style="flex-shrink: 0; display: flex; align-items: center; gap: 10px; margin-top: 2px;">
+                  <label class="gimmie-switch" for="gimmie-addon-toggle" title="Toggle featured add-ons">
+                    <input type="checkbox" id="gimmie-addon-toggle" class="gimmie-switch__input" aria-label="Toggle featured add-ons" {% if is_cutoff_passed %}disabled{% endif %}>
+                    <span class="gimmie-switch__slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Collapsible Add-on Products Grid (Shown when toggle is checked) -->
+              <div id="gimmie-addons-container" class="gimmie-addons-container" style="display: none; margin-top: 24px; padding-top: 20px; border-top: 1.5px dashed #D5D0C6;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 8px;">
+                  <span style="font-size: 0.9rem; font-weight: 600; color: var(--gimmie-muted);">
+                    Optional one-off additions attached only to your upcoming delivery.
+                  </span>
+                  <span id="gimmie-addon-counter" style="font-size: 0.85rem; font-weight: 800; color: var(--gimmie-text); background: var(--gimmie-accent); padding: 4px 12px; border-radius: 999px; border: 1.5px solid var(--gimmie-border);">
+                    <span id="gimmie-addon-selected-count">0</span> Add-ons Added
+                  </span>
+                </div>
+
+                <!-- Add-on Items Grid -->
+                <div class="gimmie-build-box__meals-grid gimmie-build-box__addons-grid">
+                  {% raw %}
+                    {% if active_meta_addons and active_meta_addons.size > 0 %}
+                      {% for addon_raw in active_meta_addons %}
+                        {% assign addon_obj = addon_raw.product | default: addon_raw %}
+                        {% assign a_title = addon_obj.title.value | default: addon_obj.title | default: addon_raw.title | default: addon_raw.name.value | default: addon_raw.name %}
+                        
+                        {% assign a_img = nil %}
+                        {% if addon_obj.image.value %}
+                          {% assign a_img = addon_obj.image.value | image_url: width: 800 %}
+                        {% elsif addon_obj.image %}
+                          {% assign a_img = addon_obj.image | image_url: width: 800 %}
+                        {% elsif addon_obj.featured_image.value %}
+                          {% assign a_img = addon_obj.featured_image.value | image_url: width: 800 %}
+                        {% elsif addon_obj.featured_image %}
+                          {% assign a_img = addon_obj.featured_image | image_url: width: 800 %}
+                        {% elsif addon_obj.photo.value %}
+                          {% assign a_img = addon_obj.photo.value | image_url: width: 800 %}
+                        {% elsif addon_obj.photo %}
+                          {% assign a_img = addon_obj.photo | image_url: width: 800 %}
+                        {% endif %}
+
+                        {% if a_img == blank or a_img == '' %}
+                          {% assign down_at = a_title | downcase %}
+                          {% if down_at contains 'oat' %}
+                            {% assign a_img = 'https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?auto=format&fit=crop&w=800&q=80' %}
+                          {% elsif down_at contains 'shot' or down_at contains 'immunity' or down_at contains 'ginger' %}
+                            {% assign a_img = 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=800&q=80' %}
+                          {% elsif down_at contains 'bar' or down_at contains 'flapjack' or down_at contains 'snack' %}
+                            {% assign a_img = 'https://images.unsplash.com/photo-1622484216850-863a14e9f783?auto=format&fit=crop&w=800&q=80' %}
+                          {% elsif down_at contains 'juice' or down_at contains 'drink' or down_at contains 'zing' %}
+                            {% assign a_img = 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?auto=format&fit=crop&w=800&q=80' %}
+                          {% else %}
+                            {% assign a_img = 'https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?auto=format&fit=crop&w=800&q=80' %}
+                          {% endif %}
+                        {% endif %}
+
+                        {% assign a_price = addon_obj.price | default: addon_obj.variants.first.price | default: addon_raw.price | default: '3.50' %}
+                        {% assign a_variant_id = addon_obj.variants.first.id | default: addon_obj.system.id | default: addon_obj.id | default: addon_raw.id %}
+                        {% if a_variant_id == blank or a_variant_id == '' %}
+                          {% assign a_variant_id = 'addon_' | append: forloop.index %}
+                        {% endif %}
+
+                        {% assign a_desc = addon_obj.description.value | default: addon_obj.description | default: addon_raw.description.value | default: addon_raw.description | default: addon_raw.summary | default: 'Freshly prepared delicious gourmet add-on to elevate your daily routine.' %}
+                        {% if a_desc contains 'root' or a_desc contains 'children' %}
+                          {% assign meta_desc_tag = addon_raw.description | metafield_tag | strip_html | strip %}
+                          {% if meta_desc_tag != blank %}{% assign a_desc = meta_desc_tag %}{% endif %}
+                        {% endif %}
+
+                        {% assign a_cals = addon_obj.calories.value | default: addon_obj.calories | default: addon_raw.calories | default: '320 kcal' %}
+                        {% assign a_prot = addon_obj.protein.value | default: addon_obj.protein | default: addon_raw.protein | default: '14g' %}
+                        {% assign a_fat = addon_obj.fat.value | default: addon_obj.fat | default: addon_raw.fat | default: '10g' %}
+                        {% assign a_sat = addon_obj.of_which_saturates.value | default: addon_obj.saturates | default: '2.5g' %}
+                        {% assign a_carbs = addon_obj.carbohydrates.value | default: addon_obj.carbs | default: '35g' %}
+                        {% assign a_sug = addon_obj.of_which_sugars.value | default: addon_obj.sugars | default: '8g' %}
+                        {% assign a_fib = addon_obj.fibre.value | default: addon_obj.fiber | default: '5g' %}
+                        {% assign a_salt = addon_obj.salt.value | default: addon_obj.salt | default: '0.2g' %}
+                        {% assign a_serv = addon_obj.serving_size.value | default: 'Per Serving' %}
+                        {% assign a_kj = addon_obj.energy.value | default: '1340 kJ' %}
+                        {% assign a_ingr = addon_obj.ingredients.value | default: addon_raw.ingredients | default: 'Premium wholesome natural ingredients.' %}
+                        {% assign a_aller = addon_obj.allergens.value | default: addon_raw.allergens | default: 'None' %}
+
+                        <article class="gimmie-build-box__meal gimmie-build-box__addon-item"
+                                 data-meal-id="{{ a_variant_id }}"
+                                 data-addon-id="{{ a_variant_id }}"
+                                 data-price="{{ a_price | replace: '£', '' | strip }}"
+                                 data-title="{{ a_title | strip_html | escape }}"
+                                 data-image="{{ a_img | escape }}"
+                                 data-desc="{{ a_desc | strip_html | escape }}"
+                                 data-ingredients="{{ a_ingr | strip_html | escape }}"
+                                 data-allergens="{{ a_aller | strip_html | escape }}"
+                                 data-cals="{{ a_cals | strip_html | escape }}"
+                                 data-prot="{{ a_prot | strip_html | escape }}"
+                                 data-carbs="{{ a_carbs | strip_html | escape }}"
+                                 data-fat="{{ a_fat | strip_html | escape }}"
+                                 data-saturates="{{ a_sat | strip_html | escape }}"
+                                 data-sugars="{{ a_sug | strip_html | escape }}"
+                                 data-fibre="{{ a_fib | strip_html | escape }}"
+                                 data-salt="{{ a_salt | strip_html | escape }}"
+                                 data-serving="{{ a_serv | strip_html | escape }}"
+                                 data-kj="{{ a_kj | strip_html | escape }}"
+                                 style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
+                          <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ a_variant_id }}">
+                            <img src="{{ a_img }}" alt="{{ a_title | strip_html | escape }}" class="gimmie-build-box__meal-image" loading="lazy">
+                            <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ a_variant_id }}">ℹ</button>
+                          </div>
+                          <div class="gimmie-build-box__meal-content">
+                            <span class="gimmie-addon-price-tag">+£{{ a_price | replace: '£', '' | strip }}</span>
+                            <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ a_variant_id }}">{{ a_title | strip_html }}</h3>
+                            <p class="gimmie-build-box__meal-description">{{ a_desc | strip_html }}</p>
+                            <div class="gimmie-build-box__meal-macros">
+                              <span class="gimmie-macro-bubble">{{ a_cals | strip_html | upcase }}</span>
+                              <span class="gimmie-macro-bubble">{{ a_prot | strip_html | upcase }}</span>
+                            </div>
+                            <div class="gimmie-build-box__qty">
+                              {% if is_cutoff_passed %}
+                                <button type="button" class="gimmie-build-box__qty-button is-locked" data-addon-action="minus" data-addon-id="{{ a_variant_id }}" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">−</button>
+                                <span class="gimmie-build-box__qty-value" data-addon-qty="{{ a_variant_id }}">0</span>
+                                <button type="button" class="gimmie-build-box__qty-button is-locked" data-addon-action="plus" data-addon-id="{{ a_variant_id }}" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">+</button>
+                              {% else %}
+                                <button type="button" class="gimmie-build-box__qty-button" data-addon-action="minus" data-addon-id="{{ a_variant_id }}" disabled>−</button>
+                                <span class="gimmie-build-box__qty-value" data-addon-qty="{{ a_variant_id }}">0</span>
+                                <button type="button" class="gimmie-build-box__qty-button" data-addon-action="plus" data-addon-id="{{ a_variant_id }}">+</button>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </article>
+                      {% endfor %}
+                    {% else %}
+                  {% endraw %}
+                    <!-- Fallback Addons passed from Express Server -->
+                    {% for addon in addons %}
+                      <article class="gimmie-build-box__meal gimmie-build-box__addon-item"
+                               data-meal-id="{{ addon.variantId }}"
+                               data-addon-id="{{ addon.variantId }}"
+                               data-price="{{ addon.price }}"
+                               data-title="{{ addon.title | escape }}"
+                               data-image="{{ addon.image | escape }}"
+                               data-desc="{{ addon.description | escape }}"
+                               data-ingredients="{{ addon.ingredients | escape }}"
+                               data-allergens="{{ addon.allergens | escape }}"
+                               data-cals="{{ addon.macros.calories | escape }}"
+                               data-prot="{{ addon.macros.protein | escape }}"
+                               data-carbs="{{ addon.macros.carbs | escape }}"
+                               data-fat="{{ addon.macros.fat | escape }}"
+                               data-saturates="{{ addon.nutrition.saturates | escape }}"
+                               data-sugars="{{ addon.nutrition.sugars | escape }}"
+                               data-fibre="{{ addon.nutrition.fibre | escape }}"
+                               data-salt="{{ addon.nutrition.salt | escape }}"
+                               data-serving="{{ addon.nutrition.serving | escape }}"
+                               data-kj="{{ addon.nutrition.energyKj | escape }}"
+                               style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
+                        <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ addon.variantId }}">
+                          <img src="{{ addon.image }}" alt="{{ addon.title | escape }}" class="gimmie-build-box__meal-image" loading="lazy">
+                          <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ addon.variantId }}">ℹ</button>
+                        </div>
+                        <div class="gimmie-build-box__meal-content">
+                          <span class="gimmie-addon-price-tag">+£{{ addon.price }}</span>
+                          <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ addon.variantId }}">{{ addon.title }}</h3>
+                          <p class="gimmie-build-box__meal-description">{{ addon.description }}</p>
+                          <div class="gimmie-build-box__meal-macros">
+                            <span class="gimmie-macro-bubble">{{ addon.macros.calories | upcase }}</span>
+                            <span class="gimmie-macro-bubble">{{ addon.macros.protein | upcase }}</span>
+                          </div>
+                          <div class="gimmie-build-box__qty">
+                            {% if is_cutoff_passed %}
+                              <button type="button" class="gimmie-build-box__qty-button is-locked" data-addon-action="minus" data-addon-id="{{ addon.variantId }}" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">−</button>
+                              <span class="gimmie-build-box__qty-value" data-addon-qty="{{ addon.variantId }}">0</span>
+                              <button type="button" class="gimmie-build-box__qty-button is-locked" data-addon-action="plus" data-addon-id="{{ addon.variantId }}" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">+</button>
+                            {% else %}
+                              <button type="button" class="gimmie-build-box__qty-button" data-addon-action="minus" data-addon-id="{{ addon.variantId }}" disabled>−</button>
+                              <span class="gimmie-build-box__qty-value" data-addon-qty="{{ addon.variantId }}">0</span>
+                              <button type="button" class="gimmie-build-box__qty-button" data-addon-action="plus" data-addon-id="{{ addon.variantId }}">+</button>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </article>
+                    {% endfor %}
+                  {% raw %}
+                    {% endif %}
+                  {% endraw %}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
         </div>
 
         <!-- Right Column: Sticky Summary & Save Button -->
@@ -710,6 +916,21 @@
             <!-- List of Selected Meals -->
             <div id="gimmie-selected-meals-list" class="gimmie-build-box__selected-meals">
               <p style="color: var(--gimmie-muted); font-size: 0.9rem; margin: 0;">No meals selected yet.</p>
+            </div>
+
+            <!-- Add-ons Summary Breakdown in Sidebar -->
+            <div id="gimmie-summary-addons-section" style="margin-top: 14px; padding-top: 12px; border-top: 1.5px dashed #ECEAE4;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <strong style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--gimmie-muted);">
+                  Featured Add-ons
+                </strong>
+                <span id="gimmie-summary-addons-total" style="font-size: 0.88rem; font-weight: 800; color: var(--gimmie-text);">
+                  £0.00
+                </span>
+              </div>
+              <div id="gimmie-selected-addons-list" style="font-size: 0.88rem; color: var(--gimmie-text);">
+                <p style="color: var(--gimmie-muted); font-size: 0.85rem; margin: 0;">No add-ons added (Optional).</p>
+              </div>
             </div>
 
             <!-- Save CTA -->
@@ -779,7 +1000,8 @@
       "cutoffTimestamp": {% raw %}{{ cutoff_ts | default: 0 | json }}{% endraw %},
       "nowTimestamp": {% raw %}{{ now_ts | json }}{% endraw %},
       "currentLines": {{ currentLines | json }},
-      "meals": {{ meals | json }}
+      "meals": {{ meals | json }},
+      "addons": {{ addons | default: '[]' | json }}
     }
   </script>
 
@@ -797,8 +1019,8 @@
                            config.isCutoffPassed === 'true' || 
                            (config.cutoffTimestamp && config.cutoffTimestamp > 0 && Math.floor(Date.now() / 1000) > config.cutoffTimestamp);
     
-    // Scan DOM for all rendered meal articles (supports both metaobjects and fallback)
-    const renderedMealCards = document.querySelectorAll('.gimmie-build-box__meal');
+    // Scan DOM for rendered meals (excluding add-ons)
+    const renderedMealCards = document.querySelectorAll('.gimmie-build-box__meal:not(.gimmie-build-box__addon-item)');
     const activeMealList = [];
     renderedMealCards.forEach(card => {
       const mealId = card.getAttribute('data-meal-id');
@@ -848,6 +1070,65 @@
       });
     });
     const meals = activeMealList.length > 0 ? activeMealList : (config.meals || []);
+
+    // Scan DOM for rendered add-on cards
+    const renderedAddonCards = document.querySelectorAll('.gimmie-build-box__addon-item');
+    const activeAddonList = [];
+    renderedAddonCards.forEach(card => {
+      const addonId = card.getAttribute('data-addon-id') || card.getAttribute('data-meal-id');
+      const plusBtn = card.querySelector('[data-addon-action="plus"]');
+      const variantId = plusBtn ? plusBtn.getAttribute('data-addon-id') : addonId;
+      const titleEl = card.querySelector('.gimmie-build-box__meal-title');
+      const imgEl = card.querySelector('.gimmie-build-box__meal-image');
+      const descEl = card.querySelector('.gimmie-build-box__meal-description');
+      const rawPrice = card.getAttribute('data-price') || '3.50';
+      const cleanPrice = parseFloat(rawPrice.replace(/[^0-9.]/g, '')) || 3.50;
+
+      const rawDesc = card.getAttribute('data-desc') || (descEl ? descEl.textContent.trim() : '');
+      const cleanDesc = cleanIngredients(rawDesc);
+      const finalDesc = (cleanDesc && cleanDesc.length > 0 && !cleanDesc.includes('root') && !cleanDesc.includes('children')) 
+                        ? cleanDesc 
+                        : (descEl && descEl.textContent.trim().length > 0 && !descEl.textContent.includes('root') 
+                           ? descEl.textContent.trim() 
+                           : 'Delicious healthy add-on prepared with pure natural ingredients.');
+      if (descEl) {
+        descEl.textContent = finalDesc;
+      }
+
+      activeAddonList.push({
+        id: addonId,
+        variantId: variantId,
+        price: cleanPrice,
+        title: card.getAttribute('data-title') || (titleEl ? titleEl.textContent.trim() : 'Add-on'),
+        image: card.getAttribute('data-image') || (imgEl ? imgEl.src : ''),
+        description: finalDesc,
+        ingredients: cleanIngredients(card.getAttribute('data-ingredients')) || 'Fresh, wholesome ingredients.',
+        allergens: cleanIngredients(card.getAttribute('data-allergens')) || 'None',
+        macros: {
+          calories: card.getAttribute('data-cals') || '320 kcal',
+          protein: card.getAttribute('data-prot') || '14g Protein',
+          carbs: card.getAttribute('data-carbs') || '35g Carbs',
+          fat: card.getAttribute('data-fat') || '10g Fat'
+        },
+        nutrition: {
+          serving: card.getAttribute('data-serving') || 'Per Serving',
+          energyKj: card.getAttribute('data-kj') || '1340 kJ',
+          energyKcal: card.getAttribute('data-cals') || '320 kcal',
+          protein: card.getAttribute('data-prot') || '14g',
+          fat: card.getAttribute('data-fat') || '10.0g',
+          saturates: card.getAttribute('data-saturates') || '2.5g',
+          carbs: card.getAttribute('data-carbs') || '35.0g',
+          sugars: card.getAttribute('data-sugars') || '8.0g',
+          fibre: card.getAttribute('data-fibre') || '5.0g',
+          salt: card.getAttribute('data-salt') || '0.20g'
+        }
+      });
+    });
+    const addons = activeAddonList.length > 0 ? activeAddonList : (config.addons || []);
+
+    // Unified lookup list for the nutrition modal (works for both meals & add-ons)
+    const allModalItems = [...meals, ...addons];
+
     let customerEmail = config.customerEmail || '';
     let customerName = config.customerName || 'Subscriber';
 
@@ -872,7 +1153,11 @@
 
     const state = {
       selections: {},
-      totalSelected: 0
+      totalSelected: 0,
+      addonSelections: {},
+      totalAddons: 0,
+      totalAddonsPrice: 0,
+      addonsEnabled: false
     };
 
     // Filter selections to only include dishes present in current rotation
@@ -881,6 +1166,14 @@
       validMealMap.set(String(m.variantId), m);
       validMealMap.set(String(m.id), m);
       validMealMap.set(m.title.toLowerCase().trim(), m);
+    });
+
+    // Valid add-ons lookup map
+    const validAddonMap = new Map();
+    addons.forEach(a => {
+      validAddonMap.set(String(a.variantId), a);
+      validAddonMap.set(String(a.id), a);
+      validAddonMap.set(a.title.toLowerCase().trim(), a);
     });
 
     const deliveryKey = (config.formattedDeliveryDate || '').replace(/[^a-zA-Z0-9]/g, '');
@@ -892,7 +1185,11 @@
       try {
         const parsed = JSON.parse(savedLocal);
         if (parsed && typeof parsed === 'object') {
-          Object.entries(parsed).forEach(([key, item]) => {
+          // Backward-compatible: check if parsed has .meals or is the direct object
+          const savedMeals = parsed.meals || parsed;
+          const savedAddons = parsed.addons || {};
+
+          Object.entries(savedMeals).forEach(([key, item]) => {
             if (item && item.quantity > 0) {
               const matchedMeal = validMealMap.get(String(key)) || validMealMap.get(item.title?.toLowerCase()?.trim());
               if (matchedMeal) {
@@ -906,6 +1203,24 @@
               }
             }
           });
+
+          if (parsed.addonsEnabled || Object.keys(savedAddons).length > 0) {
+            state.addonsEnabled = true;
+            Object.entries(savedAddons).forEach(([key, item]) => {
+              if (item && item.quantity > 0) {
+                const matchedAddon = validAddonMap.get(String(key)) || validAddonMap.get(item.title?.toLowerCase()?.trim());
+                if (matchedAddon) {
+                  state.addonSelections[matchedAddon.variantId] = {
+                    quantity: item.quantity,
+                    title: matchedAddon.title,
+                    id: matchedAddon.id,
+                    variantId: matchedAddon.variantId,
+                    price: parseFloat(matchedAddon.price) || 0
+                  };
+                }
+              }
+            });
+          }
         }
       } catch (e) {}
     }
@@ -933,10 +1248,14 @@
     const summaryQuota = document.getElementById('gimmie-summary-quota');
     const progressBar = document.getElementById('gimmie-progress-fill');
     const selectedListEl = document.getElementById('gimmie-selected-meals-list');
+    const selectedAddonsListEl = document.getElementById('gimmie-selected-addons-list');
+    const summaryAddonsTotalEl = document.getElementById('gimmie-summary-addons-total');
     const saveButton = document.getElementById('gimmie-save-btn');
     const statusMessage = document.getElementById('gimmie-status-message');
     const clearButton = document.getElementById('gimmie-clear-btn');
-    const quotaNotice = document.getElementById('gimmie-quota-notice');
+    const addonToggle = document.getElementById('gimmie-addon-toggle');
+    const addonsContainer = document.getElementById('gimmie-addons-container');
+    const addonSelectedCountEl = document.getElementById('gimmie-addon-selected-count');
 
     const modalEl = document.getElementById('gimmie-nutrition-modal');
     const modalBackdrop = document.getElementById('gimmie-modal-backdrop');
@@ -946,46 +1265,69 @@
     const modalDesc = document.getElementById('gimmie-modal-desc');
     const modalAllergens = document.getElementById('gimmie-modal-allergens');
     const modalTableBody = document.getElementById('gimmie-modal-table-body');
-    const modalBadges = document.getElementById('gimmie-modal-badges');
 
     function updateUI() {
-      let total = 0;
+      // 1. Calculate Meals Total
+      let totalMeals = 0;
       Object.values(state.selections).forEach(item => {
-        total += item.quantity || 0;
+        totalMeals += item.quantity || 0;
       });
+      state.totalSelected = totalMeals;
 
-      state.totalSelected = total;
+      // 2. Calculate Add-ons Total & Price
+      let totalAddonsCount = 0;
+      let totalAddonsPrice = 0;
+      Object.values(state.addonSelections).forEach(item => {
+        const q = item.quantity || 0;
+        totalAddonsCount += q;
+        totalAddonsPrice += q * (parseFloat(item.price) || 0);
+      });
+      state.totalAddons = totalAddonsCount;
+      state.totalAddonsPrice = totalAddonsPrice;
 
+      // Update Step 2 meal counts
       const step2Count = document.getElementById('gimmie-step2-count');
       const step2Quota = document.getElementById('gimmie-step2-quota');
-      if (step2Count) step2Count.textContent = total;
+      if (step2Count) step2Count.textContent = totalMeals;
       if (step2Quota) step2Quota.textContent = mealQuota;
 
       if (counterBadge) {
-        counterBadge.textContent = `${total} of ${mealQuota} Selected`;
-        if (total === mealQuota) {
+        counterBadge.textContent = `${totalMeals} of ${mealQuota} Selected`;
+        if (totalMeals === mealQuota) {
           counterBadge.classList.add('is-complete');
         } else {
           counterBadge.classList.remove('is-complete');
         }
       }
 
-      if (summarySelectedCount) summarySelectedCount.textContent = total;
+      if (summarySelectedCount) summarySelectedCount.textContent = totalMeals;
       if (summaryQuota) summaryQuota.textContent = mealQuota;
 
       if (progressBar) {
-        const percentage = Math.min(100, Math.round((total / mealQuota) * 100));
+        const percentage = Math.min(100, Math.round((totalMeals / mealQuota) * 100));
         progressBar.style.width = `${percentage}%`;
       }
 
-      // Update Meal Card Quantity Inputs & Plus Button States
+      // Update Step 3 Add-on Section UI & Toggle
+      if (addonSelectedCountEl) addonSelectedCountEl.textContent = totalAddonsCount;
+      if (addonToggle) {
+        addonToggle.checked = state.addonsEnabled;
+        if (isCutoffPassed) {
+          addonToggle.disabled = true;
+          addonToggle.style.cursor = 'not-allowed';
+        }
+      }
+      if (addonsContainer) {
+        addonsContainer.style.display = state.addonsEnabled ? 'block' : 'none';
+      }
+
+      // Update Meal Cards Quantity Inputs & Plus/Minus Button States
       meals.forEach(meal => {
         const qtyEl = document.querySelector(`[data-meal-qty="${meal.variantId}"]`);
         const minusBtn = document.querySelector(`[data-action="minus"][data-variant-id="${meal.variantId}"]`);
         const plusBtn = document.querySelector(`[data-action="plus"][data-variant-id="${meal.variantId}"]`);
 
         const currentQty = state.selections[meal.variantId]?.quantity || 0;
-
         if (qtyEl) qtyEl.textContent = currentQty;
 
         if (isCutoffPassed) {
@@ -1005,38 +1347,73 @@
           }
         } else {
           if (minusBtn) minusBtn.disabled = currentQty <= 0;
-          if (plusBtn) plusBtn.disabled = total >= mealQuota;
+          if (plusBtn) plusBtn.disabled = totalMeals >= mealQuota;
+        }
+      });
+
+      // Update Add-on Cards Quantity Inputs & Plus/Minus Button States
+      addons.forEach(addon => {
+        const qtyEl = document.querySelector(`[data-addon-qty="${addon.variantId}"]`);
+        const minusBtn = document.querySelector(`[data-addon-action="minus"][data-addon-id="${addon.variantId}"]`);
+        const plusBtn = document.querySelector(`[data-addon-action="plus"][data-addon-id="${addon.variantId}"]`);
+
+        const currentQty = state.addonSelections[addon.variantId]?.quantity || 0;
+        if (qtyEl) qtyEl.textContent = currentQty;
+
+        if (isCutoffPassed) {
+          if (minusBtn) {
+            minusBtn.disabled = true;
+            minusBtn.setAttribute('disabled', 'disabled');
+            minusBtn.style.opacity = '0.35';
+            minusBtn.style.cursor = 'not-allowed';
+            minusBtn.style.pointerEvents = 'none';
+          }
+          if (plusBtn) {
+            plusBtn.disabled = true;
+            plusBtn.setAttribute('disabled', 'disabled');
+            plusBtn.style.opacity = '0.35';
+            plusBtn.style.cursor = 'not-allowed';
+            plusBtn.style.pointerEvents = 'none';
+          }
+        } else {
+          if (minusBtn) minusBtn.disabled = currentQty <= 0;
+          if (plusBtn) plusBtn.disabled = currentQty >= 10;
         }
       });
 
       renderSummaryList();
       updateSavedBanner();
 
+      // Update Save Button State & Wording
       if (saveButton) {
         if (isCutoffPassed) {
           saveButton.disabled = true;
           saveButton.setAttribute('disabled', 'disabled');
           saveButton.style.cursor = 'not-allowed';
-          if (total === mealQuota) {
+          if (totalMeals === mealQuota) {
             saveButton.textContent = 'Save My Meal Selection';
           } else {
             saveButton.textContent = `Select ${mealQuota} Meals`;
           }
-        } else if (total === mealQuota) {
+        } else if (totalMeals === mealQuota) {
           saveButton.disabled = false;
           saveButton.removeAttribute('disabled');
           saveButton.style.cursor = 'pointer';
-          saveButton.textContent = 'Save My Meal Selection';
-        } else if (total < mealQuota) {
+          if (state.totalAddonsPrice > 0) {
+            saveButton.textContent = `Save Selection (+£${state.totalAddonsPrice.toFixed(2)} Add-ons)`;
+          } else {
+            saveButton.textContent = 'Save My Meal Selection';
+          }
+        } else if (totalMeals < mealQuota) {
           saveButton.disabled = true;
           saveButton.setAttribute('disabled', 'disabled');
           saveButton.style.cursor = 'default';
-          saveButton.textContent = `Select ${mealQuota - total} More Meal${mealQuota - total > 1 ? 's' : ''}`;
+          saveButton.textContent = `Select ${mealQuota - totalMeals} More Meal${mealQuota - totalMeals > 1 ? 's' : ''}`;
         } else {
           saveButton.disabled = true;
           saveButton.setAttribute('disabled', 'disabled');
           saveButton.style.cursor = 'default';
-          saveButton.textContent = `Remove ${total - mealQuota} Meal${total - mealQuota > 1 ? 's' : ''}`;
+          saveButton.textContent = `Remove ${totalMeals - mealQuota} Meal${totalMeals - mealQuota > 1 ? 's' : ''}`;
         }
       }
     }
@@ -1044,51 +1421,99 @@
     function updateSavedBanner() {
       const bannerEl = document.getElementById('gimmie-saved-summary-text');
       if (!bannerEl) return;
-      const items = Object.values(state.selections).filter(item => item.quantity > 0);
-      if (items.length === 0) {
+      const mealItems = Object.values(state.selections).filter(item => item.quantity > 0);
+      const addonItems = Object.values(state.addonSelections).filter(item => item.quantity > 0);
+
+      if (mealItems.length === 0 && addonItems.length === 0) {
         bannerEl.textContent = isCutoffPassed ? 'No custom selections were saved. Box will be packed with chef selections.' : 'No meals selected yet. Pick your meals below.';
-      } else {
-        bannerEl.textContent = items.map(i => `${i.quantity}× ${i.title}`).join('  •  ');
-      }
-    }
-
-    function renderSummaryList() {
-      if (!selectedListEl) return;
-
-      const items = Object.entries(state.selections).filter(([_, item]) => item.quantity > 0);
-
-      if (clearButton) {
-        clearButton.style.display = (!isCutoffPassed && items.length > 0) ? 'inline-block' : 'none';
-      }
-
-      if (items.length === 0) {
-        selectedListEl.innerHTML = '<p style="color: var(--gimmie-muted); font-size: 0.9rem; margin: 0;">No meals selected yet.</p>';
         return;
       }
 
-      let html = '';
-      items.forEach(([variantId, item]) => {
-        const removeHtml = isCutoffPassed ? '' : `<span style="cursor: pointer; opacity: 0.7; font-size: 1.1rem;" data-remove-variant="${variantId}">&times;</span>`;
-        html += `
-          <div class="gimmie-build-box__selected-item">
-            <span>${item.quantity} × ${item.title}</span>
-            ${removeHtml}
-          </div>
-        `;
-      });
+      let summary = mealItems.map(i => `${i.quantity}× ${i.title}`).join('  •  ');
+      if (addonItems.length > 0) {
+        const addonText = addonItems.map(a => `${a.quantity}× ${a.title}`).join('  •  ');
+        summary += `  |  Add-ons: ${addonText}`;
+      }
+      bannerEl.textContent = summary;
+    }
 
-      selectedListEl.innerHTML = html;
+    function renderSummaryList() {
+      // 1. Render Selected Meals in Sidebar
+      if (selectedListEl) {
+        const items = Object.entries(state.selections).filter(([_, item]) => item.quantity > 0);
 
-      if (!isCutoffPassed) {
-        selectedListEl.querySelectorAll('[data-remove-variant]').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const vId = btn.getAttribute('data-remove-variant');
-            if (state.selections[vId]) {
-              delete state.selections[vId];
-              updateUI();
-            }
+        if (clearButton) {
+          clearButton.style.display = (!isCutoffPassed && (items.length > 0 || state.totalAddons > 0)) ? 'inline-block' : 'none';
+        }
+
+        if (items.length === 0) {
+          selectedListEl.innerHTML = '<p style="color: var(--gimmie-muted); font-size: 0.9rem; margin: 0;">No meals selected yet.</p>';
+        } else {
+          let html = '';
+          items.forEach(([variantId, item]) => {
+            const removeHtml = isCutoffPassed ? '' : `<span style="cursor: pointer; opacity: 0.7; font-size: 1.1rem;" data-remove-variant="${variantId}">&times;</span>`;
+            html += `
+              <div class="gimmie-build-box__selected-item">
+                <span>${item.quantity} × ${item.title}</span>
+                ${removeHtml}
+              </div>
+            `;
           });
-        });
+          selectedListEl.innerHTML = html;
+
+          if (!isCutoffPassed) {
+            selectedListEl.querySelectorAll('[data-remove-variant]').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const vId = btn.getAttribute('data-remove-variant');
+                if (state.selections[vId]) {
+                  delete state.selections[vId];
+                  updateUI();
+                }
+              });
+            });
+          }
+        }
+      }
+
+      // 2. Render Selected Add-ons in Sidebar
+      if (summaryAddonsTotalEl) {
+        summaryAddonsTotalEl.textContent = state.totalAddonsPrice > 0 ? `+£${state.totalAddonsPrice.toFixed(2)}` : '£0.00';
+      }
+
+      if (selectedAddonsListEl) {
+        const addonItems = Object.entries(state.addonSelections).filter(([_, item]) => item.quantity > 0);
+
+        if (!state.addonsEnabled || addonItems.length === 0) {
+          selectedAddonsListEl.innerHTML = '<p style="color: var(--gimmie-muted); font-size: 0.85rem; margin: 0;">No add-ons added (Optional).</p>';
+        } else {
+          let html = '';
+          addonItems.forEach(([vId, item]) => {
+            const removeHtml = isCutoffPassed ? '' : `<span style="cursor: pointer; opacity: 0.7; font-size: 1.1rem; margin-left: 6px;" data-remove-addon="${vId}">&times;</span>`;
+            const itemPrice = (item.quantity * item.price).toFixed(2);
+            html += `
+              <div class="gimmie-build-box__selected-addon-row">
+                <span>${item.quantity} × ${item.title}</span>
+                <span style="display: flex; align-items: center; gap: 4px; font-weight: 800;">
+                  +£${itemPrice}
+                  ${removeHtml}
+                </span>
+              </div>
+            `;
+          });
+          selectedAddonsListEl.innerHTML = html;
+
+          if (!isCutoffPassed) {
+            selectedAddonsListEl.querySelectorAll('[data-remove-addon]').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const aId = btn.getAttribute('data-remove-addon');
+                if (state.addonSelections[aId]) {
+                  delete state.addonSelections[aId];
+                  updateUI();
+                }
+              });
+            });
+          }
+        }
       }
     }
 
@@ -1121,6 +1546,36 @@
         delete state.selections[variantId];
       } else {
         state.selections[variantId].quantity = newQty;
+      }
+
+      updateUI();
+    }
+
+    function handleAddonQuantityChange(addonId, change) {
+      if (isCutoffPassed) {
+        showStatus(`🔒 Cut-off passed. Order locked for kitchen prep.`, true);
+        return;
+      }
+      const addon = addons.find(a => String(a.variantId) === String(addonId) || String(a.id) === String(addonId));
+      if (!addon) return;
+
+      if (!state.addonSelections[addonId]) {
+        state.addonSelections[addonId] = {
+          quantity: 0,
+          title: addon.title,
+          id: addon.id,
+          variantId: addon.variantId,
+          price: parseFloat(addon.price) || 0
+        };
+      }
+
+      const currentQty = state.addonSelections[addonId].quantity;
+      const newQty = Math.max(0, Math.min(10, currentQty + change));
+
+      if (newQty === 0) {
+        delete state.addonSelections[addonId];
+      } else {
+        state.addonSelections[addonId].quantity = newQty;
       }
 
       updateUI();
@@ -1159,7 +1614,7 @@
         } catch (e) {
           try {
             const parts = [];
-            const regex = /"value"\s*(?:=>|:)\s*"([^"]*)"/g;
+            const regex = /"value"s*(?:=>|:)s*"([^"]*)"/g;
             let m;
             while ((m = regex.exec(raw)) !== null) {
               if (m[1]) parts.push(m[1]);
@@ -1184,46 +1639,46 @@
       return text;
     }
 
-    function openModal(mealId) {
-      const meal = meals.find(m => 
-        String(m.id) === String(mealId) || 
-        String(m.variantId) === String(mealId) || 
-        (m.title && mealId && m.title.toLowerCase().trim() === String(mealId).toLowerCase().trim())
+    function openModal(itemId) {
+      const item = allModalItems.find(m => 
+        String(m.id) === String(itemId) || 
+        String(m.variantId) === String(itemId) || 
+        (m.title && itemId && m.title.toLowerCase().trim() === String(itemId).toLowerCase().trim())
       );
-      if (!meal || !modalEl) return;
+      if (!item || !modalEl) return;
 
       // Populate Image
       const modalImg = document.getElementById('gimmie-modal-image');
       const modalImgWrap = document.getElementById('gimmie-modal-image-wrap');
       if (modalImg && modalImgWrap) {
-        if (meal.image) {
-          modalImg.src = meal.image;
-          modalImg.alt = meal.title || '';
+        if (item.image) {
+          modalImg.src = item.image;
+          modalImg.alt = item.title || '';
           modalImgWrap.style.display = 'block';
         } else {
           modalImgWrap.style.display = 'none';
         }
       }
 
-      if (modalTitle) modalTitle.textContent = meal.title;
+      if (modalTitle) modalTitle.textContent = item.title;
       if (modalDesc) {
-        const d = cleanIngredients(meal.description);
-        modalDesc.textContent = (d && d.length > 0 && !d.includes('root')) ? d : meal.description;
+        const d = cleanIngredients(item.description);
+        modalDesc.textContent = (d && d.length > 0 && !d.includes('root')) ? d : item.description;
       }
 
       const ingredientsEl = document.getElementById('gimmie-modal-ingredients');
       if (ingredientsEl) {
-        ingredientsEl.textContent = cleanIngredients(meal.ingredients) || 'Fresh, natural ingredients prepared in our kitchen.';
+        ingredientsEl.textContent = cleanIngredients(item.ingredients) || 'Fresh, natural ingredients prepared in our kitchen.';
       }
 
       if (modalAllergens) {
-        const cleanAllergens = cleanIngredients(meal.allergens);
+        const cleanAllergens = cleanIngredients(item.allergens);
         modalAllergens.textContent = cleanAllergens && cleanAllergens !== 'None' ? `⚠️ Allergens: ${cleanAllergens}` : '✓ No common allergens listed.';
         modalAllergens.style.color = cleanAllergens && cleanAllergens !== 'None' ? '#b42318' : '#1E6B24';
       }
 
-      if (modalTableBody && meal.nutrition) {
-        const n = meal.nutrition;
+      if (modalTableBody && item.nutrition) {
+        const n = item.nutrition;
         const cleanKj = (n.energyKj || '-').replace(/kj/i, '').trim();
         const cleanKcal = (n.energyKcal || '-').replace(/kcal/i, '').trim();
         const cleanProt = (n.protein || '-').replace(/protein/i, '').trim();
@@ -1282,7 +1737,10 @@
         customerName: customerName || config.customerName || 'Hannah Conway',
         deliveryDate: config.formattedDeliveryDate || 'Upcoming Monday',
         isCutoffPassed: isCutoffPassed,
-        selectedMeals: Object.values(state.selections).filter(item => item.quantity > 0)
+        selectedMeals: Object.values(state.selections).filter(item => item.quantity > 0),
+        selectedAddons: Object.values(state.addonSelections).filter(item => item.quantity > 0),
+        addonsTotal: state.totalAddonsPrice.toFixed(2),
+        addonsEnabled: state.addonsEnabled
       };
 
       try {
@@ -1325,11 +1783,18 @@
         try {
           const deliveryKey = (config.formattedDeliveryDate || '').replace(/[^a-zA-Z0-9]/g, '');
           const storageKey = 'gimmie_saved_meals_' + (customerEmail || 'hannahconway@hotmail.co.uk') + '_' + deliveryKey;
-          localStorage.setItem(storageKey, JSON.stringify(state.selections));
+          localStorage.setItem(storageKey, JSON.stringify({
+            meals: state.selections,
+            addons: state.addonSelections,
+            addonsEnabled: state.addonsEnabled
+          }));
         } catch (e) {}
 
         updateSavedBanner();
-        showStatus(`✓ Selections saved! Scheduled for delivery on ${config.formattedDeliveryDate || 'Tue 1 Sept'}.`, false, true);
+        const successMsg = state.totalAddons > 0
+          ? `✓ Selections & ${state.totalAddons} add-ons saved for delivery on ${config.formattedDeliveryDate || 'upcoming Monday'}.`
+          : `✓ Selections saved! Scheduled for delivery on ${config.formattedDeliveryDate || 'upcoming Monday'}.`;
+        showStatus(successMsg, false, true);
         saveButton.textContent = '✓ Selections Saved!';
 
         setTimeout(() => {
@@ -1356,6 +1821,7 @@
     }
 
     function initListeners() {
+      // Meal quantity buttons
       document.querySelectorAll('[data-action="minus"]').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -1372,6 +1838,42 @@
         });
       });
 
+      // Add-on quantity buttons
+      document.querySelectorAll('[data-addon-action="minus"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const aId = btn.getAttribute('data-addon-id');
+          handleAddonQuantityChange(aId, -1);
+        });
+      });
+
+      document.querySelectorAll('[data-addon-action="plus"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const aId = btn.getAttribute('data-addon-id');
+          handleAddonQuantityChange(aId, 1);
+        });
+      });
+
+      // Add-on Toggle Switch Listener
+      if (addonToggle && addonsContainer) {
+        addonToggle.addEventListener('change', () => {
+          if (isCutoffPassed) {
+            addonToggle.checked = state.addonsEnabled;
+            return;
+          }
+          state.addonsEnabled = addonToggle.checked;
+          if (addonToggle.checked) {
+            addonsContainer.style.display = 'block';
+          } else {
+            addonsContainer.style.display = 'none';
+            state.addonSelections = {};
+            updateUI();
+          }
+        });
+      }
+
+      // Modal trigger for meals and add-ons
       document.querySelectorAll('[data-open-modal]').forEach(el => {
         el.addEventListener('click', () => {
           const id = el.getAttribute('data-open-modal');
@@ -1388,8 +1890,9 @@
       if (clearButton) {
         clearButton.addEventListener('click', () => {
           state.selections = {};
+          state.addonSelections = {};
           updateUI();
-          showStatus('All meals cleared. You can now choose your new meals below!', false, true);
+          showStatus('All meals and add-ons cleared. You can now choose your new items below!', false, true);
         });
       }
 
@@ -1409,7 +1912,7 @@
       init();
     }
   })();
-  </script>
+</script>
 </section>
 
 {% raw %}
