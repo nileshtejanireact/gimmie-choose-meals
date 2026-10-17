@@ -158,6 +158,61 @@ app.get('/health', (req, res) => {
   });
 });
 
+app.get('/api/remove-custom-liquid', async (req, res) => {
+  const shop = process.env.SHOPIFY_SHOP_DOMAIN || 'iknacn-wq.myshopify.com';
+  const token = process.env.SHOPIFY_ADMIN_API_ACCESS_TOKEN;
+  if (!token) return res.status(500).json({ error: 'No access token configured' });
+
+  try {
+    const themesRes = await axios.get(`https://${shop}/admin/api/2024-07/themes.json`, {
+      headers: { 'X-Shopify-Access-Token': token }
+    });
+    const mainTheme = themesRes.data.themes.find(t => t.role === 'main');
+    if (!mainTheme) return res.status(404).json({ error: 'Main theme not found', themes: themesRes.data.themes });
+
+    const assetRes = await axios.get(`https://${shop}/admin/api/2024-07/themes/${mainTheme.id}/assets.json?asset[key]=templates/index.json`, {
+      headers: { 'X-Shopify-Access-Token': token }
+    });
+
+    const indexJson = JSON.parse(assetRes.data.asset.value);
+    let removedKeys = [];
+
+    if (indexJson.sections) {
+      for (const [key, sec] of Object.entries(indexJson.sections)) {
+        const secStr = JSON.stringify(sec);
+        if (key.includes('custom_liquid') || sec.type === 'custom-liquid' || sec.type === 'custom_liquid' || secStr.includes('tshirtfactoryindia')) {
+          delete indexJson.sections[key];
+          removedKeys.push(key);
+          if (indexJson.order) {
+            indexJson.order = indexJson.order.filter(k => k !== key);
+          }
+        }
+      }
+    }
+
+    if (removedKeys.length === 0) {
+      return res.json({ message: 'No custom liquid section found in index.json', sections: Object.keys(indexJson.sections || {}) });
+    }
+
+    await axios.put(`https://${shop}/admin/api/2024-07/themes/${mainTheme.id}/assets.json`, {
+      asset: {
+        key: 'templates/index.json',
+        value: JSON.stringify(indexJson, null, 2)
+      }
+    }, {
+      headers: { 'X-Shopify-Access-Token': token }
+    });
+
+    return res.json({ success: true, removedKeys, mainThemeId: mainTheme.id, themeName: mainTheme.name });
+  } catch (err) {
+    return res.status(500).json({
+      error: err.message,
+      status: err.response?.status,
+      data: err.response?.data
+    });
+  }
+});
+
 async function renderAdminDashboard(req, res) {
   try {
     const shopDomain = req.query.shop || process.env.SHOPIFY_SHOP_DOMAIN || 'iknacn-wq.myshopify.com';
