@@ -161,7 +161,23 @@
           {% assign active_meta_addons = shop.metaobjects.addon_product.values | default: shop.metaobjects.addon.values | default: shop.metaobjects.addons.values | default: shop.metaobjects.featured_addons.values | default: shop.metaobjects.featured_add_ons.values %}
         {% endif %}
       {% endif %}
+
+      {% comment %} 🛡️ Live vs Duplicate Theme Isolation (Shapes - Shubham 13.Oct) {% endcomment %}
+      {% assign is_duplicate_theme = false %}
+      {% if theme.role != 'main' %}
+        {% assign is_duplicate_theme = true %}
+      {% endif %}
+      {% assign down_tname = theme.name | downcase %}
+      {% if down_tname contains 'shubham' or down_tname contains '13.oct' or down_tname contains 'duplicate' or down_tname contains 'copy' or down_tname contains 'draft' %}
+        {% assign is_duplicate_theme = true %}
+      {% endif %}
+      {% if content_for_header contains 'preview_theme_id' or canonical_url contains 'preview_theme_id' %}
+        {% assign is_duplicate_theme = true %}
+      {% endif %}
 {% endraw %}
+      {% if isDuplicateTheme %}
+        {% assign is_duplicate_theme = true %}
+      {% endif %}
 
 <section class="gimmie-build-box">
   <div class="gimmie-build-box__section">
@@ -706,7 +722,8 @@
             </div>
           </div>
 
-          <!-- Step 3: FEATURED ADD-ONS Panel (Matching Build Your Box) -->
+          {% raw %}{% if is_duplicate_theme %}{% endraw %}
+          <!-- Step 3: FEATURED ADD-ONS Panel (Active ONLY on Duplicate Theme: Shapes - Shubham 13.Oct) -->
           <div class="gimmie-build-box__panel gimmie-build-box__panel--addons" id="gimmie-addons-panel">
             <div class="gimmie-build-box__surface">
               <div class="gimmie-build-box__panel-header gimmie-build-box__panel-header--addons" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 0;">
@@ -939,6 +956,7 @@
 
             </div>
           </div>
+          {% raw %}{% endif %}{% endraw %}
 
         </div>
 
@@ -963,7 +981,8 @@
               <p style="color: var(--gimmie-muted); font-size: 0.9rem; margin: 0;">No meals selected yet.</p>
             </div>
 
-            <!-- Add-ons Summary Breakdown in Sidebar -->
+            {% raw %}{% if is_duplicate_theme %}{% endraw %}
+            <!-- Add-ons Summary Breakdown in Sidebar (Active ONLY on Duplicate Theme) -->
             <div id="gimmie-summary-addons-section" style="margin-top: 14px; padding-top: 12px; border-top: 1.5px dashed #ECEAE4;">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
                 <strong style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--gimmie-muted);">
@@ -977,6 +996,7 @@
                 <p style="color: var(--gimmie-muted); font-size: 0.85rem; margin: 0;">No add-ons added (Optional).</p>
               </div>
             </div>
+            {% raw %}{% endif %}{% endraw %}
 
             <!-- Save CTA -->
             <button id="gimmie-save-btn" class="gimmie-build-box__button" disabled>
@@ -1046,7 +1066,8 @@
       "nowTimestamp": {% raw %}{{ now_ts | json }}{% endraw %},
       "currentLines": {{ currentLines | json }},
       "meals": {{ meals | json }},
-      "addons": {{ addons | default: '[]' | json }}
+      "addons": {{ addons | default: '[]' | json }},
+      "isDuplicateTheme": {% raw %}{{ is_duplicate_theme | default: false | json }}{% endraw %}
     }
   </script>
 
@@ -1172,7 +1193,7 @@
         }
       });
     });
-    const addons = activeAddonList.length > 0 ? activeAddonList : (config.addons || []);
+    const addons = config.isDuplicateTheme ? (activeAddonList.length > 0 ? activeAddonList : (config.addons || [])) : [];
 
     // Unified lookup list for the nutrition modal (works for both meals & add-ons)
     const allModalItems = [...meals, ...addons];

@@ -203,7 +203,8 @@ async function handleAppProxy(req, res) {
     res.set('Content-Type', 'application/liquid');
 
     // 🔒 HIDE FROM CLIENT: If disabled and not in private test mode (?preview=true)
-    if (!SHOW_PAGE_TO_CLIENT && req.query.preview !== 'true' && req.query.test !== 'true') {
+    const isDuplicateTheme = !!(req.query.preview_theme_id || req.query.theme_id || req.query.preview === 'true' || req.query.test === 'true' || (req.headers.referer && req.headers.referer.includes('preview_theme_id')) || (req.headers.cookie && req.headers.cookie.includes('preview_theme')));
+    if (!SHOW_PAGE_TO_CLIENT && !isDuplicateTheme) {
       console.log('🔒 Page hidden from client. Rendering coming-soon placeholder.');
       return res.render('coming-soon');
     }
@@ -288,7 +289,8 @@ async function handleAppProxy(req, res) {
       formattedDeliveryDate: subscription.formattedDeliveryDate || 'Tue 1 Sept',
       currentLines: subscription.currentLines || [],
       meals: meals,
-      addons: addons
+      addons: addons,
+      isDuplicateTheme: isDuplicateTheme
     });
 
   } catch (error) {
