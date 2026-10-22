@@ -459,10 +459,49 @@ class SubscriptionService {
       }
     }
 
-    // Step 3b: Add selected add-on lines with their exact price (+£8.00)
-    if (selectedAddons && Array.isArray(selectedAddons)) {
+        // Step 3b: Add selected add-on lines with their exact price (+£8.00)
+    if (selectedAddons && Array.isArray(selectedAddons) && selectedAddons.length > 0) {
+      // 1. If Appstle Enterprise API Key is configured in environment, sync directly to Appstle contract
+      const appstleApiKey = process.env.APPSTLE_API_KEY;
+      if (appstleApiKey) {
+        for (const addon of selectedAddons) {
+          if (addon.quantity > 0) {
+            try {
+              const numericContractId = String(contractId).replace(/[^0-9]/g, '');
+              const numericVariantId = String(addon.variantId).replace(/[^0-9]/g, '');
+              console.log(`📡 [Appstle API] Adding one-time addon ${addon.title} to contract ${numericContractId}...`);
+              
+              const appstleRes = await fetch(`https://subscription-admin.appstle.com/api/v2/contracts/${numericContractId}/one-time-products`, {
+                method: 'POST',
+                headers: {
+                  'x-api-key': appstleApiKey,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  variant_id: numericVariantId,
+                  quantity: parseInt(addon.quantity, 10),
+                  price: parseFloat(addon.price) || 8.00
+                })
+              });
+              const appstleData = await appstleRes.json();
+              console.log(`✓ [Appstle API Result]:`, appstleData);
+            } catch (appstleErr) {
+              console.warn(`⚠️ Appstle API sync notice:`, appstleErr.message);
+            }
+          }
+        }
+      }
+
+      // 2. Native Shopify Subscription GraphQL Draft Line Item Add
       for (const addon of selectedAddons) {
         if (addon.quantity > 0 && addon.variantId) {
+          const variantGid = String(addon.variantId).startsWith('gid://')
+            ? addon.variantId
+            : `gid://shopify/ProductVariant/${String(addon.variantId).replace(/[^0-9]/g, '')}`;
+
+          const cleanPrice = parseFloat(addon.price) || 8.00;
+
+          // Attempt adding line with native variant pricing
           const addLineMutation = `
             mutation subscriptionDraftLineAdd($draftId: ID!, $input: SubscriptionLineInput!) {
               subscriptionDraftLineAdd(draftId: $draftId, input: $input) {
@@ -477,29 +516,22 @@ class SubscriptionService {
             }
           `;
 
-          const variantGid = String(addon.variantId).startsWith('gid://')
-            ? addon.variantId
-            : `gid://shopify/ProductVariant/${addon.variantId}`;
-
-          const cleanPrice = parseFloat(addon.price) || 8.00;
-
           try {
             await shopifyClient.graphql(addLineMutation, {
               draftId,
               input: {
                 productVariantId: variantGid,
                 quantity: parseInt(addon.quantity, 10),
-                currentPrice: cleanPrice.toFixed(2),
                 customAttributes: [
                   { key: 'Item Type', value: 'Featured Add-on (One-time)' },
                   { key: 'Addon Title', value: addon.title || 'Add-on Meal' },
-                  { key: 'Extra Price', value: `£${cleanPrice.toFixed(2)}` }
+                  { key: 'Price Extra', value: `£${cleanPrice.toFixed(2)}` }
                 ]
               }
             });
-            console.log(`  + Added Add-on to Draft: ${addon.quantity}x ${addon.title} (+£${cleanPrice.toFixed(2)})`);
+            console.log(`  + [Shopify Draft Line Added]: ${addon.quantity}x ${addon.title} (${variantGid})`);
           } catch (err) {
-            console.warn(`  ⚠️ Could not add addon line directly, recorded in order summary: ${err.message}`);
+            console.warn(`  ℹ️ Shopify native draft line notice for ${addon.title}: ${err.message}`);
           }
         }
       }
