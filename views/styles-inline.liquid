@@ -907,4 +907,293 @@
   }
 }
 
+
+/* -------------------------------------------------------------
+   THEME PREVIEW EXACT 1:1 STYLES (#s4t, #s4t1, step4, push-btn)
+   Matching build-your-box?preview_theme_id=189656826237
+   ------------------------------------------------------------- */
+.gimmie-build-box__panel-title-wrap.step4 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.add-on-flex {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+#s4t.gimmie-build-box__meals-header-side {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-top: 0.75rem;
+}
+
+#s4t .gimmie-build-box__counter {
+  margin-left: 0;
+  max-width: none;
+  min-width: 0;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.1;
+  text-align: center;
+  flex: 1 1 auto;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: #ffffff;
+  color: inherit;
+}
+
+.gimmie-build-box__meal-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  flex: 0 0 auto;
+}
+
+.gimmie-build-box__meal-carousel-button.push-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.gimmie-build-box__meal-carousel-button .push-btn__surface {
+  width: 2.85rem;
+  height: 2.85rem;
+  min-height: 2.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 1.6rem;
+  line-height: 1;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #102B10;
+  border: 2px solid currentColor;
+  box-shadow: 2.5px 2.5px 0 currentColor;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.gimmie-build-box__meal-carousel-button:hover:not(:disabled) .push-btn__surface {
+  background: var(--gimmie-accent);
+  transform: translate(-1px, -1px);
+  box-shadow: 3.5px 3.5px 0 currentColor;
+}
+
+.gimmie-build-box__meal-carousel-button:disabled .push-btn__surface,
+.gimmie-build-box__meal-carousel-button[disabled] .push-btn__surface {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: 1px 1px 0 currentColor;
+}
+
+div#s4t1.gimmie-build-box__meals {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  gap: 1.25rem;
+  padding: 0.5rem 2px 1.25rem 2px;
+  margin-top: 1rem;
+}
+
+div#s4t1.gimmie-build-box__meals::-webkit-scrollbar {
+  display: none;
+}
+
+div#s4t1 .gimmie-build-box__meal {
+  display: flex;
+  flex: 0 0 calc((100% - 2.5rem) / 3);
+  flex-direction: column;
+  width: calc((100% - 2.5rem) / 3);
+  max-width: calc((100% - 2.5rem) / 3);
+  min-width: 0;
+  margin: 0 0 8px;
+  border: 2px solid currentColor;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 4px 4px 0 currentColor;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+div#s4t1 .gimmie-build-box__meal-image-wrap {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background-color: #F6F1E7;
+  background-image:
+    radial-gradient(circle at 18% 16%, rgba(143, 175, 143, 0.28), transparent 34%),
+    radial-gradient(circle at 86% 82%, rgba(16, 43, 16, 0.10), transparent 34%),
+    linear-gradient(135deg, #fffaf0 0%, #F6F1E7 100%);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(0.8rem, 2vw, 1.25rem);
+  box-sizing: border-box;
+  position: relative;
+}
+
+div#s4t1 .gimmie-build-box__meal-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+div#s4t1 .gimmie-build-box__info-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid currentColor;
+  box-shadow: 1.5px 1.5px 0 currentColor;
+  color: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+div#s4t1 .gimmie-build-box__meal-content {
+  padding: 1.1rem 1.15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+div#s4t1 .gimmie-build-box__meal-title {
+  font-size: 1.15rem;
+  line-height: 1.2;
+  margin: 0 0 0.5rem;
+  font-weight: 800;
+}
+
+div#s4t1 .gimmie-build-box__meal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+div#s4t1 .gimmie-build-box__meal-meta span {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+div#s4t1 .gimmie-build-box__price {
+  margin-bottom: 0.85rem;
+}
+
+div#s4t1 .price-item {
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+div#s4t1 .gimmie-build-box__qty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  width: 100%;
+}
+
+div#s4t1 .gimmie-build-box__qty-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+div#s4t1 .gimmie-build-box__qty-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+div#s4t1 .gimmie-build-box__qty-value {
+  min-width: 1.5rem;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+@media (max-width: 767px) {
+  #s4t.gimmie-build-box__meals-header-side {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  #s4t .gimmie-build-box__counter {
+    width: 100%;
+  }
+  .gimmie-build-box__meal-carousel-controls {
+    display: none !important;
+  }
+  div#s4t1.gimmie-build-box__meals {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    overflow-x: visible !important;
+    padding: 0 !important;
+  }
+  div#s4t1 .gimmie-build-box__meal {
+    flex: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+  div#s4t1 .gimmie-build-box__meal-content {
+    padding: 0.85rem !important;
+  }
+  div#s4t1 .gimmie-build-box__meal-title {
+    font-size: 0.95rem !important;
+  }
+  div#s4t1 .gimmie-build-box__qty-button {
+    width: 2.2rem !important;
+    height: 2.2rem !important;
+    font-size: 1.3rem !important;
+  }
+}
+
 </style>

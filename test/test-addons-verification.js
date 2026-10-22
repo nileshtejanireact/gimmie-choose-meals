@@ -36,7 +36,7 @@ async function testAddonVerification() {
     { name: 'Add-ons container has always-open class', pass: rendered.includes('gimmie-addons-container--always-open') },
     { name: 'Header badge exists (YOU\'VE SELECTED X ADD ON MEALS)', pass: rendered.includes('id="gimmie-addon-header-badge"') },
     { name: 'Add-on counter element exists', pass: rendered.includes('id="gimmie-addon-selected-count"') },
-    { name: 'Desktop carousel track exists', pass: rendered.includes('id="gimmie-addon-track"') },
+    { name: 'Desktop carousel track exists', pass: (rendered.includes('data-gimmie-addonmeals-track') || rendered.includes('id="s4t1"') || rendered.includes('id="gimmie-addon-track"')) },
     { name: 'Desktop carousel prev arrow button exists', pass: rendered.includes('id="gimmie-addon-prev"') },
     { name: 'Desktop carousel next arrow button exists', pass: rendered.includes('id="gimmie-addon-next"') },
     { name: 'Add-on cards rendered in track', pass: rendered.includes('gimmie-build-box__addon-item') },

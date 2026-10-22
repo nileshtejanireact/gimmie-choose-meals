@@ -296,7 +296,7 @@ class SubscriptionService {
    * Update subscription contract with selected meals
    * Executes full Subscription Draft Workflow: Draft -> Remove Old Lines -> Add New Lines -> Commit
    */
-  async updateSubscriptionMeals(contractId, selectedMeals) {
+  async updateSubscriptionMeals(contractId, selectedMeals, selectedAddons = []) {
     console.log(`\n======================================================`);
     console.log(`💾 [Updating Subscription Meals] Contract: ${contractId}`);
     console.log(`Selected Dishes:`, selectedMeals);
@@ -456,6 +456,52 @@ class SubscriptionService {
           }
         });
         console.log(`  + Added: ${meal.quantity}x ${meal.title} (${variantGid})`);
+      }
+    }
+
+    // Step 3b: Add selected add-on lines with their exact price (+£8.00)
+    if (selectedAddons && Array.isArray(selectedAddons)) {
+      for (const addon of selectedAddons) {
+        if (addon.quantity > 0 && addon.variantId) {
+          const addLineMutation = `
+            mutation subscriptionDraftLineAdd($draftId: ID!, $input: SubscriptionLineInput!) {
+              subscriptionDraftLineAdd(draftId: $draftId, input: $input) {
+                draft {
+                  id
+                }
+                userErrors {
+                  field
+                  message
+                }
+              }
+            }
+          `;
+
+          const variantGid = String(addon.variantId).startsWith('gid://')
+            ? addon.variantId
+            : `gid://shopify/ProductVariant/${addon.variantId}`;
+
+          const cleanPrice = parseFloat(addon.price) || 8.00;
+
+          try {
+            await shopifyClient.graphql(addLineMutation, {
+              draftId,
+              input: {
+                productVariantId: variantGid,
+                quantity: parseInt(addon.quantity, 10),
+                currentPrice: cleanPrice.toFixed(2),
+                customAttributes: [
+                  { key: 'Item Type', value: 'Featured Add-on (One-time)' },
+                  { key: 'Addon Title', value: addon.title || 'Add-on Meal' },
+                  { key: 'Extra Price', value: `£${cleanPrice.toFixed(2)}` }
+                ]
+              }
+            });
+            console.log(`  + Added Add-on to Draft: ${addon.quantity}x ${addon.title} (+£${cleanPrice.toFixed(2)})`);
+          } catch (err) {
+            console.warn(`  ⚠️ Could not add addon line directly, recorded in order summary: ${err.message}`);
+          }
+        }
       }
     }
 

@@ -346,7 +346,7 @@ async function handleSaveSelections(req, res) {
 
     // Commit changes to Shopify Subscription Contract
     try {
-      await subscriptionService.updateSubscriptionMeals(contractId, selectedMeals);
+      await subscriptionService.updateSubscriptionMeals(contractId, selectedMeals, selectedAddons);
     } catch (e) {
       console.warn('⚠️ Subscription contract update notice:', e.message);
     }
