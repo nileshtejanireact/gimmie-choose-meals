@@ -912,11 +912,30 @@
    THEME PREVIEW EXACT 1:1 STYLES (#s4t, #s4t1, step4, push-btn)
    Matching build-your-box?preview_theme_id=189656826237
    ------------------------------------------------------------- */
+#gimmie-addons-panel .gimmie-build-box__panel-header,
+.gimmie-build-box__panel-header.gimmie-build-box__panel-header--meals,
+.gimmie-build-box__panel-header:has(.step4) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0.5rem !important;
+  margin-bottom: 1.5rem !important;
+  width: 100% !important;
+}
+
+#gimmie-addons-panel .gimmie-build-box__step-description--meals {
+  margin: 0.25rem 0 0.85rem 0 !important;
+  font-size: 0.95rem !important;
+  color: var(--gimmie-muted, #4A5568) !important;
+  width: 100% !important;
+  display: block !important;
+}
+
 .gimmie-build-box__panel-title-wrap.step4 {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
 }
 
 .add-on-flex {

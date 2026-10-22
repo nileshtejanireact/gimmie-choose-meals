@@ -726,7 +726,7 @@
           <!-- Step 3: FEATURED ADD-ONS Panel (Active ONLY on Duplicate Theme: Shapes - Shubham 13.Oct) -->
           <div class="gimmie-build-box__panel card" id="gimmie-addons-panel">
             <div class="card__surface">
-              <div class="gimmie-build-box__panel-header gimmie-build-box__panel-header--meals">
+              <div class="gimmie-build-box__panel-header gimmie-build-box__panel-header--meals" style="display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 0.5rem !important; margin-bottom: 1.5rem !important;">
                 <div class="gimmie-build-box__panel-title-wrap step4">
                   <div class="add-on-flex">
                     <span class="gimmie-build-box__step font-heading">3</span>
@@ -811,11 +811,27 @@
                       {% assign raw_p = addon_obj.price_min | default: addon_obj.price | default: addon_obj.variants.first.price | default: addon_raw.price | default: '8.00' %}
                       {% assign raw_p_str = raw_p | append: '' %}
                       {% if raw_p_str contains '.' %}
-                        {% assign a_price = raw_p | replace: '£', '' | strip %}
+                        {% assign parts = raw_p_str | split: '.' %}
+                        {% assign int_p = parts[0] | replace: '£', '' | strip %}
+                        {% assign dec_p = parts[1] | default: '00' | strip %}
+                        {% if dec_p.size == 1 %}
+                          {% assign dec_p = dec_p | append: '0' %}
+                        {% elsif dec_p.size == 0 %}
+                          {% assign dec_p = '00' %}
+                        {% endif %}
+                        {% assign a_price = int_p | append: '.' | append: dec_p %}
                       {% else %}
                         {% assign raw_p_num = raw_p | plus: 0 %}
                         {% if raw_p_num >= 100 %}
-                          {% assign a_price = raw_p_num | divided_by: 100.0 | round: 2 %}
+                          {% assign a_price_raw = raw_p_num | divided_by: 100.0 %}
+                          {% assign pounds = raw_p_num | divided_by: 100 %}
+                          {% assign pence = raw_p_num | modulo: 100 %}
+                          {% if pence < 10 %}
+                            {% assign pence_str = '0' | append: pence %}
+                          {% else %}
+                            {% assign pence_str = pence %}
+                          {% endif %}
+                          {% assign a_price = pounds | append: '.' | append: pence_str %}
                         {% elsif raw_p_num > 0 %}
                           {% assign a_price = raw_p_num | append: '.00' %}
                         {% else %}
@@ -866,7 +882,7 @@
                       {% endif %}
 
                       <article
-                        class="gimmie-build-box__meal"
+                        class="gimmie-build-box__meal gimmie-build-box__addon-item"
                         data-gimmie-addonmeal
                         data-addonmeal-id="{{ a_variant_id }}"
                         data-addonmeal-price="{{ a_price | replace: '£', '' | strip }}"
@@ -975,7 +991,7 @@
                   <!-- Fallback Addons passed from Express Server -->
                   {% for addon in addons %}
                     <article
-                      class="gimmie-build-box__meal"
+                      class="gimmie-build-box__meal gimmie-build-box__addon-item"
                       data-gimmie-addonmeal
                       data-addonmeal-id="{{ addon.variantId }}"
                       data-addonmeal-price="{{ addon.price }}"
@@ -1266,20 +1282,26 @@
     });
     const meals = activeMealList.length > 0 ? activeMealList : (config.meals || []);
 
-    // Scan DOM for rendered add-on cards
-    const renderedAddonCards = document.querySelectorAll('.gimmie-build-box__addon-item');
+    // Scan DOM for rendered add-on cards (support both class and attribute)
+    const renderedAddonCards = document.querySelectorAll('.gimmie-build-box__addon-item, [data-gimmie-addonmeal]');
     const activeAddonList = [];
     renderedAddonCards.forEach(card => {
-      const addonId = card.getAttribute('data-addon-id') || card.getAttribute('data-meal-id');
+      const addonId = card.getAttribute('data-addon-id') || card.getAttribute('data-addonmeal-id') || card.getAttribute('data-meal-id');
       const plusBtn = card.querySelector('[data-addon-action="plus"]');
-      const variantId = plusBtn ? plusBtn.getAttribute('data-addon-id') : addonId;
+      const variantId = (plusBtn ? plusBtn.getAttribute('data-addon-id') : null) || addonId;
       const titleEl = card.querySelector('.gimmie-build-box__meal-title');
       const imgEl = card.querySelector('.gimmie-build-box__meal-image');
       const descEl = card.querySelector('.gimmie-build-box__meal-description');
-      const rawPrice = card.getAttribute('data-price') || '3.50';
-      let cleanPrice = parseFloat(rawPrice.replace(/[^0-9.]/g, '')) || 3.50;
-      if (cleanPrice >= 100 && !rawPrice.includes('.')) {
+      const rawPrice = card.getAttribute('data-price') || card.getAttribute('data-addonmeal-price') || '8.00';
+      let cleanPrice = parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 8.00;
+      if (cleanPrice >= 100 && !String(rawPrice).includes('.')) {
         cleanPrice = cleanPrice / 100;
+      }
+
+      // Always format price element to 2 decimal places (£8.00, £4.00)
+      const priceEl = card.querySelector('.price-item--regular, .price-item');
+      if (priceEl) {
+        priceEl.textContent = '£' + cleanPrice.toFixed(2);
       }
 
       const rawDesc = card.getAttribute('data-desc') || (descEl ? descEl.textContent.trim() : '');
@@ -1322,7 +1344,8 @@
         }
       });
     });
-    const addons = config.isDuplicateTheme ? (activeAddonList.length > 0 ? activeAddonList : (config.addons || [])) : [];
+    const hasAddonsOnPage = activeAddonList.length > 0;
+    const addons = (config.isDuplicateTheme ? (hasAddonsOnPage ? activeAddonList : (config.addons || [])) : (hasAddonsOnPage ? activeAddonList : []));
 
     // Unified lookup list for the nutrition modal (works for both meals & add-ons)
     const allModalItems = [...meals, ...addons];
@@ -1752,10 +1775,25 @@
 
     function handleAddonQuantityChange(addonId, change) {
       if (isCutoffPassed) {
-        showStatus(`🔒 Cut-off passed. Order locked for kitchen prep.`, true);
+        showStatus('Cut-off passed. Order locked for kitchen prep.', true);
         return;
       }
-      const addon = addons.find(a => String(a.variantId) === String(addonId) || String(a.id) === String(addonId));
+      let addon = addons.find(a => String(a.variantId) === String(addonId) || String(a.id) === String(addonId));
+      if (!addon) {
+        const domCard = document.querySelector('[data-addon-id="' + addonId + '"], [data-addonmeal-id="' + addonId + '"], [data-meal-id="' + addonId + '"]');
+        if (domCard) {
+          const rawP = domCard.getAttribute('data-price') || domCard.getAttribute('data-addonmeal-price') || '8.00';
+          let p = parseFloat(String(rawP).replace(/[^0-9.]/g, '')) || 8.00;
+          if (p >= 100 && !String(rawP).includes('.')) p = p / 100;
+          addon = {
+            id: addonId,
+            variantId: addonId,
+            title: domCard.getAttribute('data-title') || domCard.getAttribute('data-addonmeal-title') || 'Add-on Meal',
+            price: p
+          };
+          addons.push(addon);
+        }
+      }
       if (!addon) return;
 
       if (!state.addonSelections[addonId]) {
@@ -2037,9 +2075,10 @@
         });
       });
 
-      // Add-on quantity buttons
+      // Add-on quantity buttons (direct listener)
       document.querySelectorAll('[data-addon-action="minus"]').forEach(btn => {
         btn.addEventListener('click', (e) => {
+          e.preventDefault();
           e.stopPropagation();
           const aId = btn.getAttribute('data-addon-id');
           handleAddonQuantityChange(aId, -1);
@@ -2048,10 +2087,28 @@
 
       document.querySelectorAll('[data-addon-action="plus"]').forEach(btn => {
         btn.addEventListener('click', (e) => {
+          e.preventDefault();
           e.stopPropagation();
           const aId = btn.getAttribute('data-addon-id');
           handleAddonQuantityChange(aId, 1);
         });
+      });
+
+      // Global click delegation to guarantee clicks are never missed
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-addon-action]');
+        if (!btn) return;
+        if (btn.disabled || btn.getAttribute('disabled') !== null) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const action = btn.getAttribute('data-addon-action');
+        const aId = btn.getAttribute('data-addon-id');
+        if (!aId) return;
+        if (action === 'plus') {
+          handleAddonQuantityChange(aId, 1);
+        } else if (action === 'minus') {
+          handleAddonQuantityChange(aId, -1);
+        }
       });
 
       // Add-on Carousel Navigation Arrows (Desktop Slider)
