@@ -343,127 +343,156 @@ class MenuService {
   getFallbackAddons() {
     return [
       {
-        id: 'gid://shopify/Product/addon_101',
-        variantId: 'gid://shopify/ProductVariant/addon_201',
-        title: 'CHOCOLATE & PEANUT BUTTER OVERNIGHT OATS',
-        handle: 'chocolate-peanut-butter-overnight-oats',
-        price: '3.50',
-        image: 'https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?auto=format&fit=crop&w=800&q=80',
-        description: 'Creamy rolled jumbo oats soaked in almond milk with rich raw cacao, crunchy peanut butter, chia seeds and pure maple.',
+        id: 'gid://shopify/Product/addon_cajun_chicken_penne',
+        variantId: 'gid://shopify/ProductVariant/addon_var_cajun',
+        title: 'CAJUN CHICKEN PENNE',
+        handle: 'cajun-chicken-penne',
+        price: '8.00',
+        image: 'https://images.unsplash.com/photo-1621996346565-e3d5d6281745?auto=format&fit=crop&w=800&q=80',
+        description: 'Spicy Cajun chicken and chorizo penne, tossed in a creamy sauce with mushrooms and garden peas. Finished with fresh parsley and parmesan.',
         badges: ['ADD-ON', 'POPULAR'],
         macros: {
-          calories: '380 kcal',
-          protein: '18g Protein',
-          carbs: '46g Carbs',
-          fat: '14.5g Fat'
+          calories: '567 kcal',
+          protein: '46g Protein',
+          carbs: '54g Carbs',
+          fat: '18g Fat'
         },
         nutrition: {
-          serving: 'Per Pot (220g)',
-          energyKj: '1590 kJ',
-          energyKcal: '380 kcal',
-          fat: '14.5g',
-          saturates: '2.8g',
-          carbs: '46.0g',
-          sugars: '8.2g',
-          fibre: '7.5g',
-          protein: '18.0g',
-          salt: '0.25g'
+          serving: 'Per Serving (450g)',
+          energyKj: '2370 kJ',
+          energyKcal: '567 kcal',
+          fat: '18.0g',
+          saturates: '5.2g',
+          carbs: '54.0g',
+          sugars: '4.8g',
+          fibre: '6.5g',
+          protein: '46.0g',
+          salt: '1.25g'
         },
-        allergens: 'Peanuts, Gluten (Oats)',
-        ingredients: 'Rolled Jumbo Oats (38%), Almond Milk (Filtered Water, Almonds), Organic Peanut Butter (Peanuts, Sea Salt), Raw Cacao Powder, Chia Seeds, Pure Canadian Maple Syrup.'
+        allergens: 'Wheat, Milk, Celery, Mustard',
+        ingredients: 'Chicken Breast (35%), Penne Pasta (Durum Wheat Semolina), Double Cream (Milk), Chorizo (Pork, Paprika, Salt, Garlic), Mushrooms, Peas, Parmesan (Milk), Cajun Seasoning, Celery Salt, Mustard Seed.'
       },
       {
-        id: 'gid://shopify/Product/addon_102',
-        variantId: 'gid://shopify/ProductVariant/addon_202',
-        title: 'GINGER & TURMERIC IMMUNITY SHOT (60ML)',
-        handle: 'ginger-turmeric-immunity-shot',
-        price: '2.50',
-        image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=800&q=80',
-        description: 'Potent cold-pressed raw Peruvian ginger root, fresh turmeric, crisp apple, lemon and cracked black pepper to boost immune defence.',
-        badges: ['ADD-ON', 'IMMUNITY'],
-        macros: {
-          calories: '35 kcal',
-          protein: '1g Protein',
-          carbs: '7.5g Carbs',
-          fat: '0.2g Fat'
-        },
-        nutrition: {
-          serving: 'Per Bottle (60ml)',
-          energyKj: '147 kJ',
-          energyKcal: '35 kcal',
-          fat: '0.2g',
-          saturates: '0.0g',
-          carbs: '7.5g',
-          sugars: '6.8g',
-          fibre: '0.5g',
-          protein: '0.8g',
-          salt: '0.02g'
-        },
-        allergens: 'None',
-        ingredients: 'Peruvian Ginger Root Juice (40%), Fresh Turmeric Juice (25%), Pressed Apple Juice (20%), Lemon Juice (15%), Black Pepper Extract.'
-      },
-      {
-        id: 'gid://shopify/Product/addon_103',
-        variantId: 'gid://shopify/ProductVariant/addon_203',
-        title: 'BERRY CRUNCH PROTEIN FLAPJACK',
-        handle: 'berry-crunch-protein-flapjack',
-        price: '2.95',
-        image: 'https://images.unsplash.com/photo-1622484216850-863a14e9f783?auto=format&fit=crop&w=800&q=80',
-        description: 'Slow-release whole grain oat bar packed with cranberries, raspberries, pumpkin seeds and premium plant protein crispies.',
+        id: 'gid://shopify/Product/addon_ginger_basil_beef',
+        variantId: 'gid://shopify/ProductVariant/addon_var_ginger_beef',
+        title: 'GINGER & BASIL BEEF',
+        handle: 'ginger-basil-beef',
+        price: '8.00',
+        image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
+        description: 'Tender sliced British beef tossed with fragrant Thai basil, ginger, mangetout, and sweet peppers in a savoury tamari garlic glaze, served with fragrant jasmine rice.',
         badges: ['ADD-ON', 'HIGH PROTEIN'],
         macros: {
-          calories: '275 kcal',
-          protein: '15g Protein',
-          carbs: '32g Carbs',
-          fat: '9.8g Fat'
+          calories: '520 kcal',
+          protein: '42g Protein',
+          carbs: '48g Carbs',
+          fat: '14g Fat'
         },
         nutrition: {
-          serving: 'Per Bar (85g)',
-          energyKj: '1150 kJ',
-          energyKcal: '275 kcal',
-          fat: '9.8g',
-          saturates: '2.1g',
-          carbs: '32.0g',
-          sugars: '9.5g',
-          fibre: '5.2g',
-          protein: '15.0g',
-          salt: '0.30g'
+          serving: 'Per Serving (450g)',
+          energyKj: '2180 kJ',
+          energyKcal: '520 kcal',
+          fat: '14.0g',
+          saturates: '3.6g',
+          carbs: '48.0g',
+          sugars: '5.2g',
+          fibre: '5.8g',
+          protein: '42.0g',
+          salt: '1.10g'
         },
-        allergens: 'Gluten (Oats), Soya',
-        ingredients: 'Rolled Oats (42%), Soy Protein Crispies, Chicory Root Fibre, Dried Cranberries, Freeze-Dried Raspberries, Pumpkin Seeds, Coconut Oil, Sea Salt.'
+        allergens: 'Soya, Sesame, Wheat',
+        ingredients: 'British Grass-Fed Beef (38%), Steamed Jasmine Rice (32%), Thai Holy Basil, Ginger Root, Mangetout, Red Peppers, Tamari Soy Sauce (Soya), Toasted Sesame Oil, Garlic.'
       },
       {
-        id: 'gid://shopify/Product/addon_104',
-        variantId: 'gid://shopify/ProductVariant/addon_204',
-        title: 'COLD-PRESSED GREEN ZING JUICE (250ML)',
-        handle: 'cold-pressed-green-zing-juice',
-        price: '3.95',
-        image: 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?auto=format&fit=crop&w=800&q=80',
-        description: 'Crisp daily green refresher pressed with cucumber, crisp Granny Smith apple, celery, spinach, fresh lime and garden mint.',
-        badges: ['ADD-ON', 'RAW & FRESH'],
+        id: 'gid://shopify/Product/addon_korean_beef_noodles',
+        variantId: 'gid://shopify/ProductVariant/addon_var_korean_noodles',
+        title: 'KOREAN BEEF NOODLES',
+        handle: 'korean-beef-noodles',
+        price: '8.00',
+        image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80',
+        description: 'A sweet and spicy balance of beef, wok-fired egg noodles and crunchy beansprouts. Tossed in a sticky gochujang glaze with vibrant peppers, fresh spring onions and sesame seeds.',
+        badges: ['ADD-ON', 'CHEF PICK'],
         macros: {
-          calories: '78 kcal',
-          protein: '2.1g Protein',
-          carbs: '16.5g Carbs',
-          fat: '0.3g Fat'
+          calories: '540 kcal',
+          protein: '44g Protein',
+          carbs: '52g Carbs',
+          fat: '15g Fat'
         },
         nutrition: {
-          serving: 'Per Bottle (250ml)',
-          energyKj: '328 kJ',
-          energyKcal: '78 kcal',
-          fat: '0.3g',
-          saturates: '0.1g',
-          carbs: '16.5g',
-          sugars: '14.2g',
-          fibre: '1.8g',
-          protein: '2.1g',
-          salt: '0.08g'
+          serving: 'Per Serving (450g)',
+          energyKj: '2260 kJ',
+          energyKcal: '540 kcal',
+          fat: '15.0g',
+          saturates: '3.9g',
+          carbs: '52.0g',
+          sugars: '7.5g',
+          fibre: '4.8g',
+          protein: '44.0g',
+          salt: '1.40g'
         },
-        allergens: 'Celery',
-        ingredients: 'Cucumber (35%), Granny Smith Apple (30%), Celery (15%), Spinach (12%), Fresh Lime (6%), Garden Mint (2%).'
+        allergens: 'Egg, Wheat, Soya, Sesame',
+        ingredients: 'Egg Noodles (Wheat, Egg), British Minced Beef (35%), Gochujang Chili Paste, Soya Sauce, Beansprouts, Red Bell Peppers, Spring Onions, Sesame Seeds.'
+      },
+      {
+        id: 'gid://shopify/Product/addon_creamy_tuscan_chicken',
+        variantId: 'gid://shopify/ProductVariant/addon_var_tuscan_chicken',
+        title: 'CREAMY TUSCAN GARLIC CHICKEN',
+        handle: 'creamy-tuscan-garlic-chicken-addon',
+        price: '8.00',
+        image: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=800&q=80',
+        description: 'Succulent sliced chicken breast in a creamy sun-dried tomato, spinach, and garlic sauce, served alongside crushed baby new potatoes.',
+        badges: ['ADD-ON', 'LOW CARB'],
+        macros: {
+          calories: '560 kcal',
+          protein: '46g Protein',
+          carbs: '28g Carbs',
+          fat: '18g Fat'
+        },
+        nutrition: {
+          serving: 'Per Serving (440g)',
+          energyKj: '2345 kJ',
+          energyKcal: '560 kcal',
+          fat: '18.0g',
+          saturates: '5.2g',
+          carbs: '28.0g',
+          sugars: '3.9g',
+          fibre: '4.8g',
+          protein: '46.0g',
+          salt: '1.20g'
+        },
+        allergens: 'Milk',
+        ingredients: 'Chicken Breast (42%), Baby Potatoes (30%), Spinach, Sun-Dried Tomatoes, Double Cream (Milk), Garlic, Parmesan (Milk), Oregano, Black Pepper.'
+      },
+      {
+        id: 'gid://shopify/Product/addon_lemon_herb_chicken',
+        variantId: 'gid://shopify/ProductVariant/addon_var_lemon_chicken',
+        title: 'LEMON & HERB CHICKEN',
+        handle: 'lemon-herb-chicken-addon',
+        price: '8.00',
+        image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=800&q=80',
+        description: 'Tender marinated chargrilled chicken breast in lemon zest and Mediterranean garden herbs, served with roasted garlic baby potatoes and steamed green beans.',
+        badges: ['ADD-ON', 'LEAN & CLEAN'],
+        macros: {
+          calories: '510 kcal',
+          protein: '48g Protein',
+          carbs: '34g Carbs',
+          fat: '12g Fat'
+        },
+        nutrition: {
+          serving: 'Per Serving (450g)',
+          energyKj: '2130 kJ',
+          energyKcal: '510 kcal',
+          fat: '12.0g',
+          saturates: '2.5g',
+          carbs: '34.0g',
+          sugars: '3.1g',
+          fibre: '6.2g',
+          protein: '48.0g',
+          salt: '1.15g'
+        },
+        allergens: 'None',
+        ingredients: 'Chicken Breast (40%), Roasted Baby Potatoes (32%), Fine Green Beans (20%), Lemon Juice & Zest, Olive Oil, Oregano, Thyme, Garlic, Sea Salt.'
       }
     ];
-  }
-}
+  }}
 
 module.exports = new MenuService();

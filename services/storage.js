@@ -29,6 +29,9 @@ const defaultSubmissions = [
       { title: 'GRASS-FED BEEF BOLOGNESE', quantity: 1 },
       { title: 'TERIYAKI SALMON & JASMINE RICE', quantity: 2 },
       { title: 'CHIPOTLE CHICKEN BURRITO BOWL', quantity: 2 }
+    ],
+    addons: [
+      { title: 'CAJUN CHICKEN PENNE', quantity: 1, price: '8.00' }
     ]
   },
   {

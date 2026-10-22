@@ -143,7 +143,7 @@
         {% endif %}
 
         {% assign active_meta_meals = next_week_menu.meals.value | default: next_week_menu.meals | default: next_week_menu.products.value | default: next_week_menu.products | default: next_week_menu.dishes.value %}
-        {% assign active_meta_addons = next_week_menu.addon_products.value | default: next_week_menu.addon_products | default: next_week_menu.addons.value | default: next_week_menu.addons | default: next_week_menu.add_ons.value | default: next_week_menu.add_ons | default: next_week_menu.featured_addons.value | default: next_week_menu.featured_addons | default: next_week_menu.featured_add_ons.value | default: next_week_menu.featured_add_ons | default: next_week_menu.addon_items.value | default: next_week_menu.addon_items | default: next_week_menu.addon_meals.value | default: next_week_menu.addon_meals | default: next_week_menu.addon_product.value | default: next_week_menu.addon_product | default: next_week_menu.extra_products.value | default: next_week_menu.extra_products | default: next_week_menu.extras.value | default: next_week_menu.extras | default: next_week_menu.step_3_products.value | default: next_week_menu.step_3_products %}
+        {% assign active_meta_addons = next_week_menu['add_on_products'].value | default: next_week_menu['add_on_products'] | default: next_week_menu.add_on_products.value | default: next_week_menu.add_on_products | default: next_week_menu['addon_meals'].value | default: next_week_menu['addon_meals'] | default: next_week_menu.addon_meals.value | default: next_week_menu.addon_meals | default: next_week_menu['addon_products'].value | default: next_week_menu['addon_products'] | default: next_week_menu.addon_products.value | default: next_week_menu.addon_products | default: next_week_menu['addons'].value | default: next_week_menu['addons'] | default: next_week_menu.addons.value | default: next_week_menu.addons | default: next_week_menu.add_ons.value | default: next_week_menu.add_ons | default: next_week_menu.featured_addons.value | default: next_week_menu.featured_addons | default: next_week_menu.featured_add_ons.value | default: next_week_menu.featured_add_ons | default: next_week_menu.addon_items.value | default: next_week_menu.addon_items | default: next_week_menu.addon_product.value | default: next_week_menu.addon_product | default: next_week_menu.extra_products.value | default: next_week_menu.extra_products | default: next_week_menu.extras.value | default: next_week_menu.extras | default: next_week_menu.step_3_products.value | default: next_week_menu.step_3_products %}
         {% if active_meta_addons == blank or active_meta_addons.size == 0 %}
           {% if next_week_menu.fields %}
             {% for f in next_week_menu.fields %}
@@ -158,7 +158,7 @@
           {% endif %}
         {% endif %}
         {% if active_meta_addons == blank or active_meta_addons.size == 0 %}
-          {% assign active_meta_addons = shop.metaobjects.addon_product.values | default: shop.metaobjects.addon.values | default: shop.metaobjects.addons.values | default: shop.metaobjects.featured_addons.values | default: shop.metaobjects.featured_add_ons.values %}
+          {% assign active_meta_addons = shop.metaobjects['add_on_product'].values | default: shop.metaobjects.add_on_product.values | default: shop.metaobjects.addon_product.values | default: shop.metaobjects.addon.values | default: shop.metaobjects.addons.values | default: shop.metaobjects.featured_addons.values | default: shop.metaobjects.featured_add_ons.values %}
         {% endif %}
       {% endif %}
 
@@ -726,231 +726,235 @@
           <!-- Step 3: FEATURED ADD-ONS Panel (Active ONLY on Duplicate Theme: Shapes - Shubham 13.Oct) -->
           <div class="gimmie-build-box__panel gimmie-build-box__panel--addons" id="gimmie-addons-panel">
             <div class="gimmie-build-box__surface">
-              <div class="gimmie-build-box__panel-header gimmie-build-box__panel-header--addons" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 0;">
-                <div style="display: flex; align-items: flex-start; gap: 14px;">
-                  <span class="gimmie-build-box__step" style="margin-top: 2px;">3</span>
+              <div class="gimmie-build-box__panel-header gimmie-build-box__panel-header--addons" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 0;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                  <span class="gimmie-build-box__step">3</span>
                   <div class="gimmie-build-box__title-wrap">
                     <h2 class="gimmie-build-box__panel-title" style="margin: 0; line-height: 1.1;">FEATURED ADD-ONS</h2>
-                    <p class="gimmie-build-box__step-description" style="margin: 6px 0 0; color: var(--gimmie-muted); font-size: 0.95rem; font-weight: 500;">
+                    <p class="gimmie-build-box__step-description" style="margin: 4px 0 0; color: var(--gimmie-muted); font-size: 0.95rem; font-weight: 500;">
                       Craving more? Check out this week's add-ons.
                     </p>
                   </div>
                 </div>
 
-                <!-- Toggle Switch from Build Your Box Screenshot -->
-                <div class="gimmie-addon-toggle-wrap" style="flex-shrink: 0; display: flex; align-items: center; gap: 10px; margin-top: 2px;">
-                  <label class="gimmie-switch" for="gimmie-addon-toggle" title="Toggle featured add-ons">
-                    <input type="checkbox" id="gimmie-addon-toggle" class="gimmie-switch__input" aria-label="Toggle featured add-ons" {% if is_cutoff_passed %}disabled{% endif %}>
-                    <span class="gimmie-switch__slider"></span>
-                  </label>
+                <!-- Header Badge matching Client PDF Page 2 Mockup (No Toggle) -->
+                <div class="gimmie-addon-header-badge-wrap">
+                  <span id="gimmie-addon-header-badge" class="gimmie-addon-header-badge">
+                    YOU'VE SELECTED <span id="gimmie-addon-selected-count">0</span> ADD ON MEALS
+                  </span>
                 </div>
               </div>
 
-              <!-- Collapsible Add-on Products Grid (Shown when toggle is checked) -->
-              <div id="gimmie-addons-container" class="gimmie-addons-container" style="display: none; margin-top: 24px; padding-top: 20px; border-top: 1.5px dashed #D5D0C6;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 8px;">
-                  <span style="font-size: 0.9rem; font-weight: 600; color: var(--gimmie-muted);">
-                    Optional one-off additions attached only to your upcoming delivery.
-                  </span>
-                  <span id="gimmie-addon-counter" style="font-size: 0.85rem; font-weight: 800; color: var(--gimmie-text); background: var(--gimmie-accent); padding: 4px 12px; border-radius: 999px; border: 1.5px solid var(--gimmie-border);">
-                    <span id="gimmie-addon-selected-count">0</span> Add-ons Added
-                  </span>
-                </div>
+              <!-- Add-on Products Container (Always Open & Visible) -->
+              <div id="gimmie-addons-container" class="gimmie-addons-container gimmie-addons-container--always-open">
+                <!-- Carousel with Left & Right Arrows for Desktop Slider -->
+                <div class="gimmie-addon-carousel-wrap">
+                  <button type="button" class="gimmie-addon-nav-btn gimmie-addon-nav-btn--prev" id="gimmie-addon-prev" aria-label="Previous add-ons">‹</button>
 
-                <!-- Add-on Items Grid -->
-                <div class="gimmie-build-box__meals-grid gimmie-build-box__addons-grid">
-                  {% raw %}
-                    {% if active_meta_addons and active_meta_addons.size > 0 %}
-                      {% for addon_raw in active_meta_addons %}
-                        {% assign addon_obj = addon_raw.product.value | default: addon_raw.product | default: addon_raw %}
-                        {% assign a_title = addon_obj.title.value | default: addon_obj.title | default: addon_raw.title | default: addon_raw.name.value | default: addon_raw.name %}
-                        
-                        {% assign a_img = nil %}
-                        {% if addon_obj.featured_image %}
-                          {% assign a_img = addon_obj.featured_image | image_url: width: 800 %}
-                        {% elsif addon_obj.featured_media %}
-                          {% assign a_img = addon_obj.featured_media | image_url: width: 800 %}
-                        {% elsif addon_obj.image.value %}
-                          {% assign a_img = addon_obj.image.value | image_url: width: 800 %}
-                        {% elsif addon_obj.image %}
-                          {% assign a_img = addon_obj.image | image_url: width: 800 %}
-                        {% elsif addon_obj.featured_image.value %}
-                          {% assign a_img = addon_obj.featured_image.value | image_url: width: 800 %}
-                        {% elsif addon_obj.photo.value %}
-                          {% assign a_img = addon_obj.photo.value | image_url: width: 800 %}
-                        {% elsif addon_obj.photo %}
-                          {% assign a_img = addon_obj.photo | image_url: width: 800 %}
-                        {% endif %}
-
-                        {% if a_img == blank or a_img == '' %}
-                          {% assign down_at = a_title | downcase %}
-                          {% if down_at contains 'oat' %}
-                            {% assign a_img = 'https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?auto=format&fit=crop&w=800&q=80' %}
-                          {% elsif down_at contains 'shot' or down_at contains 'immunity' or down_at contains 'ginger' %}
-                            {% assign a_img = 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=800&q=80' %}
-                          {% elsif down_at contains 'bar' or down_at contains 'flapjack' or down_at contains 'snack' %}
-                            {% assign a_img = 'https://images.unsplash.com/photo-1622484216850-863a14e9f783?auto=format&fit=crop&w=800&q=80' %}
-                          {% elsif down_at contains 'juice' or down_at contains 'drink' or down_at contains 'zing' %}
-                            {% assign a_img = 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?auto=format&fit=crop&w=800&q=80' %}
-                          {% else %}
-                            {% assign a_img = 'https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?auto=format&fit=crop&w=800&q=80' %}
+                  <!-- Add-on Items Track (Desktop: 3 in 1 row slider | Mobile: 2x2 grid) -->
+                  <div class="gimmie-addon-track" id="gimmie-addon-track">
+                    {% raw %}
+                      {% if active_meta_addons and active_meta_addons.size > 0 %}
+                        {% for addon_raw in active_meta_addons %}
+                          {% assign addon_obj = addon_raw.product.value | default: addon_raw.product | default: addon_raw %}
+                          {% assign a_title = addon_obj.title.value | default: addon_obj.title | default: addon_raw.title | default: addon_raw.name.value | default: addon_raw.name %}
+                          
+                          {% assign a_img = nil %}
+                          {% if addon_obj.featured_image %}
+                            {% assign a_img = addon_obj.featured_image | image_url: width: 800 %}
+                          {% elsif addon_obj.featured_media %}
+                            {% assign a_img = addon_obj.featured_media | image_url: width: 800 %}
+                          {% elsif addon_obj.image.value %}
+                            {% assign a_img = addon_obj.image.value | image_url: width: 800 %}
+                          {% elsif addon_obj.image %}
+                            {% assign a_img = addon_obj.image | image_url: width: 800 %}
+                          {% elsif addon_obj.featured_image.value %}
+                            {% assign a_img = addon_obj.featured_image.value | image_url: width: 800 %}
+                          {% elsif addon_obj.photo.value %}
+                            {% assign a_img = addon_obj.photo.value | image_url: width: 800 %}
+                          {% elsif addon_obj.photo %}
+                            {% assign a_img = addon_obj.photo | image_url: width: 800 %}
                           {% endif %}
-                        {% endif %}
 
-                        {% assign raw_p = addon_obj.price_min | default: addon_obj.price | default: addon_obj.variants.first.price | default: addon_raw.price | default: '3.50' %}
-                        {% assign raw_p_str = raw_p | append: '' %}
-                        {% if raw_p_str contains '.' %}
-                          {% assign a_price = raw_p | replace: '£', '' | strip %}
-                        {% else %}
-                          {% assign raw_p_num = raw_p | plus: 0 %}
-                          {% if raw_p_num >= 100 %}
-                            {% assign a_price = raw_p_num | divided_by: 100.0 | round: 2 %}
-                          {% else %}
+                          {% if a_img == blank or a_img == '' %}
+                            {% assign down_at = a_title | downcase %}
+                            {% if down_at contains 'penne' or down_at contains 'pasta' or down_at contains 'cajun' %}
+                              {% assign a_img = 'https://images.unsplash.com/photo-1621996346565-e3d5d6281745?auto=format&fit=crop&w=800&q=80' %}
+                            {% elsif down_at contains 'beef' or down_at contains 'noodle' %}
+                              {% assign a_img = 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80' %}
+                            {% elsif down_at contains 'chicken' %}
+                              {% assign a_img = 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=800&q=80' %}
+                            {% else %}
+                              {% assign a_img = 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80' %}
+                            {% endif %}
+                          {% endif %}
+
+                          {% assign raw_p = addon_obj.price_min | default: addon_obj.price | default: addon_obj.variants.first.price | default: addon_raw.price | default: '8.00' %}
+                          {% assign raw_p_str = raw_p | append: '' %}
+                          {% if raw_p_str contains '.' %}
                             {% assign a_price = raw_p | replace: '£', '' | strip %}
+                          {% else %}
+                            {% assign raw_p_num = raw_p | plus: 0 %}
+                            {% if raw_p_num >= 100 %}
+                              {% assign a_price = raw_p_num | divided_by: 100.0 | round: 2 %}
+                            {% elsif raw_p_num > 0 %}
+                              {% assign a_price = raw_p_num | append: '.00' %}
+                            {% else %}
+                              {% assign a_price = '8.00' %}
+                            {% endif %}
                           {% endif %}
-                        {% endif %}
 
-                        {% assign a_variant_id = addon_obj.selected_or_first_available_variant.id | default: addon_obj.variants.first.id | default: addon_raw.variants.first.id | default: addon_obj.system.id | default: addon_obj.id | default: addon_raw.id %}
-                        {% if a_variant_id == blank or a_variant_id == '' %}
-                          {% assign a_variant_id = 'addon_' | append: forloop.index %}
-                        {% endif %}
+                          {% assign a_variant_id = addon_obj.selected_or_first_available_variant.id | default: addon_obj.variants.first.id | default: addon_raw.variants.first.id | default: addon_obj.system.id | default: addon_obj.id | default: addon_raw.id %}
+                          {% if a_variant_id == blank or a_variant_id == '' %}
+                            {% assign a_variant_id = 'addon_' | append: forloop.index %}
+                          {% endif %}
 
-                        {% assign a_desc = addon_obj.metafields.custom.description.value | default: addon_obj.description.value | default: addon_obj.description | default: addon_obj.content | default: addon_raw.description.value | default: addon_raw.description | default: addon_raw.summary | default: 'Freshly prepared delicious gourmet add-on to elevate your daily routine.' %}
-                        {% if a_desc contains 'root' or a_desc contains 'children' %}
-                          {% assign meta_desc_tag = addon_raw.description | metafield_tag | strip_html | strip %}
-                          {% if meta_desc_tag != blank %}{% assign a_desc = meta_desc_tag %}{% endif %}
-                        {% endif %}
+                          {% assign a_desc = addon_obj.metafields.custom.description.value | default: addon_obj.description.value | default: addon_obj.description | default: addon_obj.content | default: addon_raw.description.value | default: addon_raw.description | default: addon_raw.summary | default: 'Freshly prepared delicious gourmet add-on to elevate your daily routine.' %}
+                          {% if a_desc contains 'root' or a_desc contains 'children' %}
+                            {% assign meta_desc_tag = addon_raw.description | metafield_tag | strip_html | strip %}
+                            {% if meta_desc_tag != blank %}{% assign a_desc = meta_desc_tag %}{% endif %}
+                          {% endif %}
 
-                        {% assign a_cals = addon_obj.metafields.custom.calories.value | default: addon_obj.calories.value | default: addon_obj.calories | default: addon_raw.calories | default: '320 kcal' %}
-                        {% assign a_prot = addon_obj.metafields.custom.protein.value | default: addon_obj.protein.value | default: addon_obj.protein | default: addon_raw.protein | default: '14g' %}
-                        {% assign a_fat = addon_obj.metafields.custom.fat.value | default: addon_obj.fat.value | default: addon_obj.fat | default: addon_raw.fat | default: '10g' %}
-                        {% assign a_sat = addon_obj.metafields.custom.of_which_saturates.value | default: addon_obj.metafields.custom.saturates.value | default: addon_obj.of_which_saturates.value | default: addon_obj.saturates | default: '2.5g' %}
-                        {% assign a_carbs = addon_obj.metafields.custom.carbohydrates.value | default: addon_obj.metafields.custom.carbs.value | default: addon_obj.carbohydrates.value | default: addon_obj.carbs | default: '35g' %}
-                        {% assign a_sug = addon_obj.metafields.custom.of_which_sugars.value | default: addon_obj.metafields.custom.sugars.value | default: addon_obj.of_which_sugars.value | default: addon_obj.sugars | default: '8g' %}
-                        {% assign a_fib = addon_obj.metafields.custom.fibre.value | default: addon_obj.metafields.custom.fiber.value | default: addon_obj.fibre.value | default: addon_obj.fiber | default: '5g' %}
-                        {% assign a_salt = addon_obj.metafields.custom.salt.value | default: addon_obj.salt.value | default: addon_obj.salt | default: '0.2g' %}
-                        {% assign a_serv = addon_obj.metafields.custom.serving_size.value | default: addon_obj.serving_size.value | default: 'Per Serving' %}
-                        {% assign a_kj = addon_obj.metafields.custom.energy.value | default: addon_obj.energy.value | default: '1340 kJ' %}
-                        {% assign a_ingr = addon_obj.metafields.custom.ingredients.value | default: addon_obj.ingredients.value | default: addon_raw.ingredients | default: 'Premium wholesome natural ingredients.' %}
-                        {% assign a_aller = addon_obj.metafields.custom.allergens.value | default: addon_obj.allergens.value | default: addon_raw.allergens | default: 'None' %}
+                          {% assign a_cals = addon_obj.metafields.custom.calories.value | default: addon_obj.calories.value | default: addon_obj.calories | default: addon_raw.calories | default: '567 kcal' %}
+                          {% assign a_prot = addon_obj.metafields.custom.protein.value | default: addon_obj.protein.value | default: addon_obj.protein | default: addon_raw.protein | default: '46g' %}
+                          {% assign a_fat = addon_obj.metafields.custom.fat.value | default: addon_obj.fat.value | default: addon_obj.fat | default: addon_raw.fat | default: '18g' %}
+                          {% assign a_sat = addon_obj.metafields.custom.of_which_saturates.value | default: addon_obj.metafields.custom.saturates.value | default: addon_obj.of_which_saturates.value | default: addon_obj.saturates | default: '5.2g' %}
+                          {% assign a_carbs = addon_obj.metafields.custom.carbohydrates.value | default: addon_obj.metafields.custom.carbs.value | default: addon_obj.carbohydrates.value | default: addon_obj.carbs | default: '54g' %}
+                          {% assign a_sug = addon_obj.metafields.custom.of_which_sugars.value | default: addon_obj.metafields.custom.sugars.value | default: addon_obj.of_which_sugars.value | default: addon_obj.sugars | default: '4.8g' %}
+                          {% assign a_fib = addon_obj.metafields.custom.fibre.value | default: addon_obj.metafields.custom.fiber.value | default: addon_obj.fibre.value | default: addon_obj.fiber | default: '6.5g' %}
+                          {% assign a_salt = addon_obj.metafields.custom.salt.value | default: addon_obj.salt.value | default: addon_obj.salt | default: '1.25g' %}
+                          {% assign a_serv = addon_obj.metafields.custom.serving_size.value | default: addon_obj.serving_size.value | default: 'Per Serving (450g)' %}
+                          {% assign a_kj = addon_obj.metafields.custom.energy.value | default: addon_obj.energy.value | default: '2370 kJ' %}
+                          {% assign a_ingr = addon_obj.metafields.custom.ingredients.value | default: addon_obj.ingredients.value | default: addon_raw.ingredients | default: 'Premium wholesome natural ingredients.' %}
+                          {% assign a_aller = addon_obj.metafields.custom.allergens.value | default: addon_obj.allergens.value | default: addon_raw.allergens | default: 'None' %}
 
-                        {% if addon_raw.fields %}
-                          {% for field in addon_raw.fields %}
-                            {% if field.key == 'calories' and field.value != blank %}{% assign a_cals = field.value %}{% endif %}
-                            {% if field.key == 'protein' and field.value != blank %}{% assign a_prot = field.value %}{% endif %}
-                            {% if field.key == 'energy' and field.value != blank %}{% assign a_kj = field.value %}{% endif %}
-                            {% if field.key == 'fat' and field.value != blank %}{% assign a_fat = field.value %}{% endif %}
-                            {% if field.key == 'of_which_saturates' or field.key == 'saturates' and field.value != blank %}{% assign a_sat = field.value %}{% endif %}
-                            {% if field.key == 'carbohydrates' or field.key == 'carbs' and field.value != blank %}{% assign a_carbs = field.value %}{% endif %}
-                            {% if field.key == 'of_which_sugars' or field.key == 'sugars' and field.value != blank %}{% assign a_sug = field.value %}{% endif %}
-                            {% if field.key == 'fibre' or field.key == 'fiber' and field.value != blank %}{% assign a_fib = field.value %}{% endif %}
-                            {% if field.key == 'salt' and field.value != blank %}{% assign a_salt = field.value %}{% endif %}
-                            {% if field.key == 'serving_size' and field.value != blank %}{% assign a_serv = field.value %}{% endif %}
-                            {% if field.key == 'allergens' and field.value != blank %}{% assign a_aller = field.value %}{% endif %}
-                            {% if field.key == 'ingredients' and field.value != blank %}{% assign a_ingr = field.value %}{% endif %}
-                            {% if field.key == 'description' and field.value != blank %}{% assign a_desc = field.value %}{% endif %}
-                          {% endfor %}
-                        {% endif %}
+                          {% if addon_raw.fields %}
+                            {% for field in addon_raw.fields %}
+                              {% if field.key == 'calories' and field.value != blank %}{% assign a_cals = field.value %}{% endif %}
+                              {% if field.key == 'protein' and field.value != blank %}{% assign a_prot = field.value %}{% endif %}
+                              {% if field.key == 'energy' and field.value != blank %}{% assign a_kj = field.value %}{% endif %}
+                              {% if field.key == 'fat' and field.value != blank %}{% assign a_fat = field.value %}{% endif %}
+                              {% if field.key == 'of_which_saturates' or field.key == 'saturates' and field.value != blank %}{% assign a_sat = field.value %}{% endif %}
+                              {% if field.key == 'carbohydrates' or field.key == 'carbs' and field.value != blank %}{% assign a_carbs = field.value %}{% endif %}
+                              {% if field.key == 'of_which_sugars' or field.key == 'sugars' and field.value != blank %}{% assign a_sug = field.value %}{% endif %}
+                              {% if field.key == 'fibre' or field.key == 'fiber' and field.value != blank %}{% assign a_fib = field.value %}{% endif %}
+                              {% if field.key == 'salt' and field.value != blank %}{% assign a_salt = field.value %}{% endif %}
+                              {% if field.key == 'serving_size' and field.value != blank %}{% assign a_serv = field.value %}{% endif %}
+                              {% if field.key == 'allergens' and field.value != blank %}{% assign a_aller = field.value %}{% endif %}
+                              {% if field.key == 'ingredients' and field.value != blank %}{% assign a_ingr = field.value %}{% endif %}
+                              {% if field.key == 'description' and field.value != blank %}{% assign a_desc = field.value %}{% endif %}
+                            {% endfor %}
+                          {% endif %}
 
-                        <article class="gimmie-build-box__meal gimmie-build-box__addon-item"
-                                 data-meal-id="{{ a_variant_id }}"
-                                 data-addon-id="{{ a_variant_id }}"
-                                 data-price="{{ a_price | replace: '£', '' | strip }}"
-                                 data-title="{{ a_title | strip_html | escape }}"
-                                 data-image="{{ a_img | escape }}"
-                                 data-desc="{{ a_desc | strip_html | escape }}"
-                                 data-ingredients="{{ a_ingr | strip_html | escape }}"
-                                 data-allergens="{{ a_aller | strip_html | escape }}"
-                                 data-cals="{{ a_cals | strip_html | escape }}"
-                                 data-prot="{{ a_prot | strip_html | escape }}"
-                                 data-carbs="{{ a_carbs | strip_html | escape }}"
-                                 data-fat="{{ a_fat | strip_html | escape }}"
-                                 data-saturates="{{ a_sat | strip_html | escape }}"
-                                 data-sugars="{{ a_sug | strip_html | escape }}"
-                                 data-fibre="{{ a_fib | strip_html | escape }}"
-                                 data-salt="{{ a_salt | strip_html | escape }}"
-                                 data-serving="{{ a_serv | strip_html | escape }}"
-                                 data-kj="{{ a_kj | strip_html | escape }}"
-                                 style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
-                          <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ a_variant_id }}">
-                            <img src="{{ a_img }}" alt="{{ a_title | strip_html | escape }}" class="gimmie-build-box__meal-image" loading="lazy">
-                            <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ a_variant_id }}">ℹ</button>
-                          </div>
-                          <div class="gimmie-build-box__meal-content">
-                            <span class="gimmie-addon-price-tag">+£{{ a_price | replace: '£', '' | strip }}</span>
-                            <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ a_variant_id }}">{{ a_title | strip_html }}</h3>
-                            <p class="gimmie-build-box__meal-description">{{ a_desc | strip_html }}</p>
-                            <div class="gimmie-build-box__meal-macros">
-                              <span class="gimmie-macro-bubble">{{ a_cals | strip_html | upcase }}</span>
-                              <span class="gimmie-macro-bubble">{{ a_prot | strip_html | upcase }}</span>
+                          <article class="gimmie-build-box__meal gimmie-build-box__addon-item"
+                                   data-meal-id="{{ a_variant_id }}"
+                                   data-addon-id="{{ a_variant_id }}"
+                                   data-price="{{ a_price | replace: '£', '' | strip }}"
+                                   data-title="{{ a_title | strip_html | escape }}"
+                                   data-image="{{ a_img | escape }}"
+                                   data-desc="{{ a_desc | strip_html | escape }}"
+                                   data-ingredients="{{ a_ingr | strip_html | escape }}"
+                                   data-allergens="{{ a_aller | strip_html | escape }}"
+                                   data-cals="{{ a_cals | strip_html | escape }}"
+                                   data-prot="{{ a_prot | strip_html | escape }}"
+                                   data-carbs="{{ a_carbs | strip_html | escape }}"
+                                   data-fat="{{ a_fat | strip_html | escape }}"
+                                   data-saturates="{{ a_sat | strip_html | escape }}"
+                                   data-sugars="{{ a_sug | strip_html | escape }}"
+                                   data-fibre="{{ a_fib | strip_html | escape }}"
+                                   data-salt="{{ a_salt | strip_html | escape }}"
+                                   data-serving="{{ a_serv | strip_html | escape }}"
+                                   data-kj="{{ a_kj | strip_html | escape }}">
+                            
+                            <!-- Image with Info (i) Icon in Corner -->
+                            <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ a_variant_id }}">
+                              <img src="{{ a_img }}" alt="{{ a_title | strip_html | escape }}" class="gimmie-build-box__meal-image" loading="lazy">
+                              <button type="button" class="gimmie-build-box__info-btn gimmie-addon-info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ a_variant_id }}" aria-label="View Nutrition & Ingredients">ℹ</button>
                             </div>
-                            <div class="gimmie-build-box__qty">
+
+                            <!-- Simplified Compact Content: Item Name, Kcal/Protein tags, Price and + / - buttons -->
+                            <div class="gimmie-build-box__meal-content gimmie-addon-card-content">
+                              <h3 class="gimmie-build-box__meal-title gimmie-addon-title" data-open-modal="{{ a_variant_id }}">{{ a_title | strip_html }}</h3>
+                              
+                              <div class="gimmie-build-box__meal-macros gimmie-addon-macros">
+                                <span class="gimmie-macro-bubble">{{ a_cals | strip_html | upcase }}</span>
+                                <span class="gimmie-macro-bubble">{{ a_prot | strip_html | upcase }}</span>
+                              </div>
+
+                              <div class="gimmie-addon-price-row">
+                                <span class="gimmie-addon-card-price">£{{ a_price | replace: '£', '' | strip }}</span>
+                              </div>
+
+                              <div class="gimmie-build-box__qty gimmie-addon-qty">
+                                {% if is_cutoff_passed %}
+                                  <button type="button" class="gimmie-build-box__qty-button is-locked" data-addon-action="minus" data-addon-id="{{ a_variant_id }}" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">−</button>
+                                  <span class="gimmie-build-box__qty-value" data-addon-qty="{{ a_variant_id }}">0</span>
+                                  <button type="button" class="gimmie-build-box__qty-button is-locked" data-addon-action="plus" data-addon-id="{{ a_variant_id }}" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">+</button>
+                                {% else %}
+                                  <button type="button" class="gimmie-build-box__qty-button" data-addon-action="minus" data-addon-id="{{ a_variant_id }}" disabled>−</button>
+                                  <span class="gimmie-build-box__qty-value" data-addon-qty="{{ a_variant_id }}">0</span>
+                                  <button type="button" class="gimmie-build-box__qty-button" data-addon-action="plus" data-addon-id="{{ a_variant_id }}">+</button>
+                                {% endif %}
+                              </div>
+                            </div>
+                          </article>
+                        {% endfor %}
+                      {% else %}
+                    {% endraw %}
+                      <!-- Fallback Addons passed from Express Server -->
+                      {% for addon in addons %}
+                        <article class="gimmie-build-box__meal gimmie-build-box__addon-item"
+                                 data-meal-id="{{ addon.variantId }}"
+                                 data-addon-id="{{ addon.variantId }}"
+                                 data-price="{{ addon.price }}"
+                                 data-title="{{ addon.title | escape }}"
+                                 data-image="{{ addon.image | escape }}"
+                                 data-desc="{{ addon.description | escape }}"
+                                 data-ingredients="{{ addon.ingredients | escape }}"
+                                 data-allergens="{{ addon.allergens | escape }}"
+                                 data-cals="{{ addon.macros.calories | escape }}"
+                                 data-prot="{{ addon.macros.protein | escape }}"
+                                 data-carbs="{{ addon.macros.carbs | escape }}"
+                                 data-fat="{{ addon.macros.fat | escape }}"
+                                 data-saturates="{{ addon.nutrition.saturates | escape }}"
+                                 data-sugars="{{ addon.nutrition.sugars | escape }}"
+                                 data-fibre="{{ addon.nutrition.fibre | escape }}"
+                                 data-salt="{{ addon.nutrition.salt | escape }}"
+                                 data-serving="{{ addon.nutrition.serving | escape }}"
+                                 data-kj="{{ addon.nutrition.energyKj | escape }}">
+                          <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ addon.variantId }}">
+                            <img src="{{ addon.image }}" alt="{{ addon.title | escape }}" class="gimmie-build-box__meal-image" loading="lazy">
+                            <button type="button" class="gimmie-build-box__info-btn gimmie-addon-info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ addon.variantId }}" aria-label="View Nutrition & Ingredients">ℹ</button>
+                          </div>
+                          <div class="gimmie-build-box__meal-content gimmie-addon-card-content">
+                            <h3 class="gimmie-build-box__meal-title gimmie-addon-title" data-open-modal="{{ addon.variantId }}">{{ addon.title }}</h3>
+                            <div class="gimmie-build-box__meal-macros gimmie-addon-macros">
+                              <span class="gimmie-macro-bubble">{{ addon.macros.calories | upcase }}</span>
+                              <span class="gimmie-macro-bubble">{{ addon.macros.protein | upcase }}</span>
+                            </div>
+                            <div class="gimmie-addon-price-row">
+                              <span class="gimmie-addon-card-price">£{{ addon.price }}</span>
+                            </div>
+                            <div class="gimmie-build-box__qty gimmie-addon-qty">
                               {% if is_cutoff_passed %}
-                                <button type="button" class="gimmie-build-box__qty-button is-locked" data-addon-action="minus" data-addon-id="{{ a_variant_id }}" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">−</button>
-                                <span class="gimmie-build-box__qty-value" data-addon-qty="{{ a_variant_id }}">0</span>
-                                <button type="button" class="gimmie-build-box__qty-button is-locked" data-addon-action="plus" data-addon-id="{{ a_variant_id }}" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">+</button>
+                                <button type="button" class="gimmie-build-box__qty-button is-locked" data-addon-action="minus" data-addon-id="{{ addon.variantId }}" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">−</button>
+                                <span class="gimmie-build-box__qty-value" data-addon-qty="{{ addon.variantId }}">0</span>
+                                <button type="button" class="gimmie-build-box__qty-button is-locked" data-addon-action="plus" data-addon-id="{{ addon.variantId }}" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">+</button>
                               {% else %}
-                                <button type="button" class="gimmie-build-box__qty-button" data-addon-action="minus" data-addon-id="{{ a_variant_id }}" disabled>−</button>
-                                <span class="gimmie-build-box__qty-value" data-addon-qty="{{ a_variant_id }}">0</span>
-                                <button type="button" class="gimmie-build-box__qty-button" data-addon-action="plus" data-addon-id="{{ a_variant_id }}">+</button>
+                                <button type="button" class="gimmie-build-box__qty-button" data-addon-action="minus" data-addon-id="{{ addon.variantId }}" disabled>−</button>
+                                <span class="gimmie-build-box__qty-value" data-addon-qty="{{ addon.variantId }}">0</span>
+                                <button type="button" class="gimmie-build-box__qty-button" data-addon-action="plus" data-addon-id="{{ addon.variantId }}">+</button>
                               {% endif %}
                             </div>
                           </div>
                         </article>
                       {% endfor %}
-                    {% else %}
-                  {% endraw %}
-                    <!-- Fallback Addons passed from Express Server -->
-                    {% for addon in addons %}
-                      <article class="gimmie-build-box__meal gimmie-build-box__addon-item"
-                               data-meal-id="{{ addon.variantId }}"
-                               data-addon-id="{{ addon.variantId }}"
-                               data-price="{{ addon.price }}"
-                               data-title="{{ addon.title | escape }}"
-                               data-image="{{ addon.image | escape }}"
-                               data-desc="{{ addon.description | escape }}"
-                               data-ingredients="{{ addon.ingredients | escape }}"
-                               data-allergens="{{ addon.allergens | escape }}"
-                               data-cals="{{ addon.macros.calories | escape }}"
-                               data-prot="{{ addon.macros.protein | escape }}"
-                               data-carbs="{{ addon.macros.carbs | escape }}"
-                               data-fat="{{ addon.macros.fat | escape }}"
-                               data-saturates="{{ addon.nutrition.saturates | escape }}"
-                               data-sugars="{{ addon.nutrition.sugars | escape }}"
-                               data-fibre="{{ addon.nutrition.fibre | escape }}"
-                               data-salt="{{ addon.nutrition.salt | escape }}"
-                               data-serving="{{ addon.nutrition.serving | escape }}"
-                               data-kj="{{ addon.nutrition.energyKj | escape }}"
-                               style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
-                        <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ addon.variantId }}">
-                          <img src="{{ addon.image }}" alt="{{ addon.title | escape }}" class="gimmie-build-box__meal-image" loading="lazy">
-                          <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ addon.variantId }}">ℹ</button>
-                        </div>
-                        <div class="gimmie-build-box__meal-content">
-                          <span class="gimmie-addon-price-tag">+£{{ addon.price }}</span>
-                          <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ addon.variantId }}">{{ addon.title }}</h3>
-                          <p class="gimmie-build-box__meal-description">{{ addon.description }}</p>
-                          <div class="gimmie-build-box__meal-macros">
-                            <span class="gimmie-macro-bubble">{{ addon.macros.calories | upcase }}</span>
-                            <span class="gimmie-macro-bubble">{{ addon.macros.protein | upcase }}</span>
-                          </div>
-                          <div class="gimmie-build-box__qty">
-                            {% if is_cutoff_passed %}
-                              <button type="button" class="gimmie-build-box__qty-button is-locked" data-addon-action="minus" data-addon-id="{{ addon.variantId }}" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">−</button>
-                              <span class="gimmie-build-box__qty-value" data-addon-qty="{{ addon.variantId }}">0</span>
-                              <button type="button" class="gimmie-build-box__qty-button is-locked" data-addon-action="plus" data-addon-id="{{ addon.variantId }}" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">+</button>
-                            {% else %}
-                              <button type="button" class="gimmie-build-box__qty-button" data-addon-action="minus" data-addon-id="{{ addon.variantId }}" disabled>−</button>
-                              <span class="gimmie-build-box__qty-value" data-addon-qty="{{ addon.variantId }}">0</span>
-                              <button type="button" class="gimmie-build-box__qty-button" data-addon-action="plus" data-addon-id="{{ addon.variantId }}">+</button>
-                            {% endif %}
-                          </div>
-                        </div>
-                      </article>
-                    {% endfor %}
-                  {% raw %}
-                    {% endif %}
-                  {% endraw %}
+                    {% raw %}
+                      {% endif %}
+                    {% endraw %}
+                  </div>
+
+                  <button type="button" class="gimmie-addon-nav-btn gimmie-addon-nav-btn--next" id="gimmie-addon-next" aria-label="Next add-ons">›</button>
                 </div>
               </div>
 
@@ -1226,7 +1230,7 @@
       addonSelections: {},
       totalAddons: 0,
       totalAddonsPrice: 0,
-      addonsEnabled: false
+      addonsEnabled: true
     };
 
     // Filter selections to only include dishes present in current rotation
@@ -1377,17 +1381,18 @@
         progressBar.style.width = `${percentage}%`;
       }
 
-      // Update Step 3 Add-on Section UI & Toggle
+      // Update Step 3 Add-on Section UI & Header Badge (Matching PDF Mockup)
+      const headerBadgeEl = document.getElementById('gimmie-addon-header-badge');
       if (addonSelectedCountEl) addonSelectedCountEl.textContent = totalAddonsCount;
-      if (addonToggle) {
-        addonToggle.checked = state.addonsEnabled;
-        if (isCutoffPassed) {
-          addonToggle.disabled = true;
-          addonToggle.style.cursor = 'not-allowed';
+      if (headerBadgeEl) {
+        if (totalAddonsCount === 1) {
+          headerBadgeEl.innerHTML = 'YOU\'VE SELECTED <span id="gimmie-addon-selected-count">1</span> ADD ON MEAL';
+        } else {
+          headerBadgeEl.innerHTML = `YOU\'VE SELECTED <span id="gimmie-addon-selected-count">${totalAddonsCount}</span> ADD ON MEALS`;
         }
       }
       if (addonsContainer) {
-        addonsContainer.style.display = state.addonsEnabled ? 'block' : 'none';
+        addonsContainer.style.display = 'block';
       }
 
       // Update Meal Cards Quantity Inputs & Plus/Minus Button States
@@ -1924,22 +1929,36 @@
         });
       });
 
-      // Add-on Toggle Switch Listener
-      if (addonToggle && addonsContainer) {
-        addonToggle.addEventListener('change', () => {
-          if (isCutoffPassed) {
-            addonToggle.checked = state.addonsEnabled;
-            return;
-          }
-          state.addonsEnabled = addonToggle.checked;
-          if (addonToggle.checked) {
-            addonsContainer.style.display = 'block';
-          } else {
-            addonsContainer.style.display = 'none';
-            state.addonSelections = {};
-            updateUI();
-          }
+      // Add-on Carousel Navigation Arrows (Desktop Slider)
+      const track = document.getElementById('gimmie-addon-track');
+      const prevBtn = document.getElementById('gimmie-addon-prev');
+      const nextBtn = document.getElementById('gimmie-addon-next');
+
+      function updateSliderArrows() {
+        if (!track || !prevBtn || !nextBtn) return;
+        const maxScroll = track.scrollWidth - track.clientWidth;
+        prevBtn.disabled = track.scrollLeft <= 5;
+        nextBtn.disabled = track.scrollLeft >= maxScroll - 5;
+      }
+
+      if (prevBtn && track) {
+        prevBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const scrollDist = track.clientWidth * 0.75;
+          track.scrollBy({ left: -scrollDist, behavior: 'smooth' });
         });
+      }
+      if (nextBtn && track) {
+        nextBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const scrollDist = track.clientWidth * 0.75;
+          track.scrollBy({ left: scrollDist, behavior: 'smooth' });
+        });
+      }
+      if (track) {
+        track.addEventListener('scroll', updateSliderArrows, { passive: true });
+        window.addEventListener('resize', updateSliderArrows);
+        setTimeout(updateSliderArrows, 300);
       }
 
       // Modal trigger for meals and add-ons

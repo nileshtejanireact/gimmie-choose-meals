@@ -1,3 +1,4 @@
+const storageService = require('./storage');
 const shopifyClient = require('../config/shopify');
 const billingScheduleService = require('./billingSchedule');
 
@@ -796,6 +797,10 @@ class SubscriptionService {
             billingScheduleService.getAssociatedDeliveryTuesday(c.nextBillingDate)
           );
 
+          const localSubs = storageService.getSubmissions();
+          const matchedLocal = localSubs.find(s => s.contractId === rawId || s.customer === email);
+          const addons = matchedLocal?.addons || [];
+
           return {
             id: `sub_${rawId}`,
             contractId: rawId,
@@ -810,7 +815,8 @@ class SubscriptionService {
               { title: 'LEMON & HERB CHICKEN', quantity: 2 },
               { title: 'GRASS-FED BEEF BOLOGNESE', quantity: 2 },
               { title: 'TERIYAKI SALMON & JASMINE RICE', quantity: 2 }
-            ]
+            ],
+            addons: addons
           };
         });
       }

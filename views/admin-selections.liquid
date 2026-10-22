@@ -218,6 +218,33 @@
                 {% endfor %}
               </div>
             </div>
+
+            <!-- Add-ons List (Shown if customer chose add-on meals) -->
+            {% if sub.addons and sub.addons.size > 0 %}
+              <div style="border-top: 1.5px dashed #c0e6c5; padding-top: 10px; margin-top: 10px; background: #f6fbf6; padding: 10px 12px; border-radius: 6px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                  <strong style="font-size: 0.82rem; color: #0e623b; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
+                    <span>✨</span> Selected Add-ons
+                  </strong>
+                  <span style="font-size: 0.75rem; font-weight: 800; background: #cbf4c9; color: #0e623b; padding: 2px 8px; border-radius: 999px;">
+                    {{ sub.addons.size }} Extra Item(s)
+                  </span>
+                </div>
+                <div style="display: grid; gap: 6px; font-size: 0.92rem; color: #1c3d1c;">
+                  {% for addon in sub.addons %}
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-weight: 800; background: #0e623b; color: #ffffff; padding: 2px 6px; border-radius: 4px; font-size: 0.82rem;">{{ addon.quantity }}x</span>
+                        <span style="font-weight: 700;">{{ addon.title }}</span>
+                      </div>
+                      {% if addon.price %}
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #0e623b;">+£{{ addon.price }}</span>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
           </div>
         {% else %}
           <p style="color: #6d7175; text-align: center; padding: 20px;">No meal submissions recorded yet.</p>
@@ -312,6 +339,43 @@
               </tbody>
             </table>
           </div>
+
+          ${sub.addons && sub.addons.length > 0 ? `
+            <!-- Add-ons Checklist -->
+            <div style="margin-bottom: 24px;">
+              <h2 style="margin: 0 0 10px; font-size: 15px; font-weight: 900; text-transform: uppercase; border-bottom: 1.5px solid #0e623b; padding-bottom: 4px; color: #0e623b;">
+                ✨ ADD-ONS PACKING CHECKLIST (${sub.addons.reduce((a, c) => a + (c.quantity || 1), 0)} items)
+              </h2>
+              <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <thead>
+                  <tr style="background: #eaf5ea; text-align: left; font-size: 11px; text-transform: uppercase; color: #0e623b;">
+                    <th style="padding: 8px 10px; border-bottom: 1px solid #0e623b; width: 40px;">PACK</th>
+                    <th style="padding: 8px 10px; border-bottom: 1px solid #0e623b; width: 60px;">QTY</th>
+                    <th style="padding: 8px 10px; border-bottom: 1px solid #0e623b;">ADD-ON ITEM</th>
+                    <th style="padding: 8px 10px; border-bottom: 1px solid #0e623b; text-align: right;">PRICE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${sub.addons.map(a => `
+                    <tr>
+                      <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; text-align: center;">
+                        <div style="width: 16px; height: 16px; border: 2px solid #0e623b; border-radius: 3px; display: inline-block;"></div>
+                      </td>
+                      <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; font-weight: 900; font-size: 15px; color: #0e623b;">
+                        ${a.quantity}×
+                      </td>
+                      <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; font-weight: 700;">
+                        ${a.title}
+                      </td>
+                      <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; text-align: right; font-weight: 600; color: #666;">
+                        +£${a.price || '8.00'}
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          ` : ''}
 
           <!-- Kitchen Signoff Footer -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1.5px dashed #102b10; padding-top: 14px; font-size: 13px;">
