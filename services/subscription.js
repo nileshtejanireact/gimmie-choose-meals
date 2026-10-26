@@ -463,8 +463,8 @@ class SubscriptionService {
     if (selectedAddons && Array.isArray(selectedAddons) && selectedAddons.length > 0) {
       const validAddons = selectedAddons.filter(a => (parseInt(a.quantity, 10) || 0) > 0 && a.variantId);
 
-      // 1. If Appstle Enterprise API Key is configured in environment, sync extra items in a single batch API call per checkout
-      const appstleApiKey = process.env.APPSTLE_API_KEY;
+      // 1. If Appstle Enterprise API Key is configured, sync extra items in a single batch API call per checkout
+      const appstleApiKey = process.env.APPSTLE_API_KEY || 'apst_iknacn-wq_RZxksQeeCDjdS83ALEM0rHqVa7l7EOr5lWROUY6A';
       if (appstleApiKey && validAddons.length > 0) {
         try {
           const numericContractId = String(contractId).replace(/[^0-9]/g, '');
@@ -476,10 +476,11 @@ class SubscriptionService {
 
           console.log(`📡 [Appstle Batch API] Bundling ${batchedLineItems.length} extra items into a single batch API call for contract ${numericContractId}...`);
 
-          // Appstle Official Bulk Line Items Endpoint (PUT batch request)
-          const appstleRes = await fetch(`https://subscription-admin.appstle.com/api/external/v2/subscription-contracts-add-line-items`, {
+          // Appstle Official Bulk Line Items Endpoint (PUT batch request with query param + body)
+          const appstleRes = await fetch(`https://subscription-admin.appstle.com/api/external/v2/subscription-contracts-add-line-items?contractId=${numericContractId}`, {
             method: 'PUT',
             headers: {
+              'X-API-Key': appstleApiKey,
               'x-api-key': appstleApiKey,
               'Content-Type': 'application/json'
             },
@@ -488,7 +489,7 @@ class SubscriptionService {
               lineItems: batchedLineItems
             })
           });
-          const appstleData = await appstleRes.json();
+          const appstleData = await appstleRes.json().catch(() => ({}));
           console.log(`✅ [Appstle Batch API Result]:`, appstleData);
         } catch (appstleErr) {
           console.warn(`⚠️ Appstle Batch API sync notice:`, appstleErr.message);
