@@ -958,19 +958,21 @@
 
 #s4t .gimmie-build-box__counter {
   margin-left: 0;
-  max-width: none;
+  max-width: fit-content;
+  width: fit-content;
   min-width: 0;
-  border: 2px solid currentColor;
+  border: 2px solid #102B10;
   border-radius: 999px;
-  padding: 0.65rem 1.25rem;
-  font-size: 0.9rem;
+  padding: 0.65rem 1.75rem;
+  font-size: 0.85rem;
   line-height: 1.1;
   text-align: center;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   font-weight: 800;
   letter-spacing: 0.04em;
   background: #ffffff;
-  color: inherit;
+  color: #102B10;
+  white-space: nowrap;
 }
 
 .gimmie-build-box__meal-carousel-controls {
@@ -982,44 +984,54 @@
 }
 
 .gimmie-build-box__meal-carousel-button.push-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  display: inline-flex;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 .gimmie-build-box__meal-carousel-button .push-btn__surface {
-  width: 2.85rem;
-  height: 2.85rem;
-  min-height: 2.85rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  font-size: 1.6rem;
-  line-height: 1;
-  border-radius: 50%;
-  background: #ffffff;
-  color: #102B10;
-  border: 2px solid currentColor;
-  box-shadow: 2.5px 2.5px 0 currentColor;
-  cursor: pointer;
-  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
-  user-select: none;
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  min-height: 2.75rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  border: 2px solid #102B10 !important;
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease !important;
+  user-select: none !important;
 }
 
-.gimmie-build-box__meal-carousel-button:hover:not(:disabled) .push-btn__surface {
-  background: var(--gimmie-accent);
-  transform: translate(-1px, -1px);
-  box-shadow: 3.5px 3.5px 0 currentColor;
+/* Enabled button: sage green background matching build-your-box */
+.gimmie-build-box__meal-carousel-button:not(:disabled) .push-btn__surface {
+  background: #8FAF8F !important;
+  color: #102B10 !important;
+  box-shadow: 2.5px 2.5px 0 #102B10 !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
 }
 
+.gimmie-build-box__meal-carousel-button:not(:disabled):hover .push-btn__surface {
+  background: #7E9E7E !important;
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 3.5px 3.5px 0 #102B10 !important;
+}
+
+/* Disabled button: light muted sage/gray background, no dark/black override, no shadow */
 .gimmie-build-box__meal-carousel-button:disabled .push-btn__surface,
 .gimmie-build-box__meal-carousel-button[disabled] .push-btn__surface {
-  opacity: 0.35;
-  cursor: not-allowed;
-  box-shadow: 1px 1px 0 currentColor;
+  background: #DCE7DC !important;
+  color: #102B10 !important;
+  opacity: 0.45 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  pointer-events: none !important;
 }
 
 div#s4t1.gimmie-build-box__meals {

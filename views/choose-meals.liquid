@@ -157,9 +157,15 @@
             {% endfor %}
           {% endif %}
         {% endif %}
-        {% if active_meta_addons == blank or active_meta_addons.size == 0 %}
-          {% assign active_meta_addons = shop.metaobjects['add_on_product'].values | default: shop.metaobjects.add_on_product.values | default: shop.metaobjects.addon_product.values | default: shop.metaobjects.addon.values | default: shop.metaobjects.addons.values | default: shop.metaobjects.featured_addons.values | default: shop.metaobjects.featured_add_ons.values %}
-        {% endif %}
+      {% endif %}
+
+      {% comment %} Hide Addon Option If Addon Meals Not Selected in Weekly Menu Metaobject {% endcomment %}
+      {% assign has_meta_addons = false %}
+      {% if active_meta_addons and active_meta_addons.size > 0 %}
+        {% assign has_meta_addons = true %}
+      {% elsif addons and addons.size > 0 and next_week_menu == nil %}
+        {% comment %} Local express server mock testing only {% endcomment %}
+        {% assign has_meta_addons = true %}
       {% endif %}
 
       {% comment %} 🛡️ Live vs Duplicate Theme Isolation (Shapes - Shubham 13.Oct) {% endcomment %}
@@ -723,7 +729,8 @@
           </div>
 
           {% raw %}{% if is_duplicate_theme %}{% endraw %}
-          <!-- Step 3: FEATURED ADD-ONS Panel (Active ONLY on Duplicate Theme: Shapes - Shubham 13.Oct) -->
+          {% raw %}{% if has_meta_addons %}{% endraw %}
+          <!-- Step 3: ADD-ONS Panel (Active ONLY on Duplicate Theme AND When Metaobject Has Add-ons) -->
           <div class="gimmie-build-box__panel card" id="gimmie-addons-panel">
             <div class="card__surface">
               <div class="gimmie-build-box__panel-header gimmie-build-box__panel-header--meals" style="display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 0.5rem !important; margin-bottom: 1.5rem !important;">
@@ -731,13 +738,13 @@
                   <div class="add-on-flex">
                     <span class="gimmie-build-box__step font-heading">3</span>
                     <h2 class="gimmie-build-box__panel-title font-heading uppercase">
-                      Featured add-ons
+                      Add-ons
                     </h2>
                   </div>
                 </div>
 
                 <p class="gimmie-build-box__step-description gimmie-build-box__step-description--meals">
-                  Craving more? Check out this week's add-ons. 
+                  Still hungry? Check out this week’s optional extras
                 </p>
 
                 <!-- Header Bar Matching build-your-box Live Theme -->
@@ -754,7 +761,11 @@
                       id="gimmie-addon-prev"
                       aria-label="Previous meal"
                     >
-                      <span class="push-btn__surface font-heading">‹</span>
+                      <span class="push-btn__surface font-heading">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                          <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                      </span>
                     </button>
 
                     <button
@@ -764,7 +775,11 @@
                       id="gimmie-addon-next"
                       aria-label="Next meal"
                     >
-                      <span class="push-btn__surface font-heading">›</span>
+                      <span class="push-btn__surface font-heading">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -1102,6 +1117,7 @@
             </div>
           </div>
           {% raw %}{% endif %}{% endraw %}
+          {% raw %}{% endif %}{% endraw %}
 
         </div>
 
@@ -1127,11 +1143,12 @@
             </div>
 
             {% raw %}{% if is_duplicate_theme %}{% endraw %}
-            <!-- Add-ons Summary Breakdown in Sidebar (Active ONLY on Duplicate Theme) -->
+            {% raw %}{% if has_meta_addons %}{% endraw %}
+            <!-- Add-ons Summary Breakdown in Sidebar (Active ONLY on Duplicate Theme AND When Metaobject Has Add-ons) -->
             <div id="gimmie-summary-addons-section" style="margin-top: 14px; padding-top: 12px; border-top: 1.5px dashed #ECEAE4;">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
                 <strong style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--gimmie-muted);">
-                  Featured Add-ons
+                  Add-ons
                 </strong>
                 <span id="gimmie-summary-addons-total" style="font-size: 0.88rem; font-weight: 800; color: var(--gimmie-text);">
                   £0.00
@@ -1141,6 +1158,7 @@
                 <p style="color: var(--gimmie-muted); font-size: 0.85rem; margin: 0;">No add-ons added (Optional).</p>
               </div>
             </div>
+            {% raw %}{% endif %}{% endraw %}
             {% raw %}{% endif %}{% endraw %}
 
             <!-- Save CTA -->
@@ -1212,7 +1230,8 @@
       "currentLines": {{ currentLines | json }},
       "meals": {{ meals | json }},
       "addons": {{ addons | default: '[]' | json }},
-      "isDuplicateTheme": {% raw %}{{ is_duplicate_theme | default: false | json }}{% endraw %}
+      "isDuplicateTheme": {% raw %}{{ is_duplicate_theme | default: false | json }}{% endraw %},
+      "hasAddons": {% raw %}{{ has_meta_addons | default: false | json }}{% endraw %}
     }
   </script>
 
@@ -1344,8 +1363,8 @@
         }
       });
     });
-    const hasAddonsOnPage = activeAddonList.length > 0;
-    const addons = (config.isDuplicateTheme ? (hasAddonsOnPage ? activeAddonList : (config.addons || [])) : (hasAddonsOnPage ? activeAddonList : []));
+    const hasAddonsOnPage = config.hasAddons && activeAddonList.length > 0;
+    const addons = (config.isDuplicateTheme ? (hasAddonsOnPage ? activeAddonList : (config.hasAddons ? (config.addons || []) : [])) : []);
 
     // Unified lookup list for the nutrition modal (works for both meals & add-ons)
     const allModalItems = [...meals, ...addons];
@@ -1529,14 +1548,16 @@
         progressBar.style.width = `${percentage}%`;
       }
 
-      // Update Step 3 Add-on Section UI & Header Badge (Matching PDF Mockup)
+      // Update Step 3 Add-on Section UI & Header Badge (Matching PDF Spec: "You've selected X add-ons.")
       const headerBadgeEl = document.getElementById('gimmie-addon-header-badge');
       if (addonSelectedCountEl) addonSelectedCountEl.textContent = totalAddonsCount;
       if (headerBadgeEl) {
-        if (totalAddonsCount === 1) {
-          headerBadgeEl.innerHTML = 'YOU\'VE SELECTED <span id="gimmie-addon-selected-count">1</span> ADD ON MEAL';
+        if (totalAddonsCount === 0) {
+          headerBadgeEl.innerHTML = 'SELECT ADD-ONS BELOW.';
+        } else if (totalAddonsCount === 1) {
+          headerBadgeEl.innerHTML = 'YOU\'VE SELECTED <span id="gimmie-addon-selected-count">1</span> ADD-ON.';
         } else {
-          headerBadgeEl.innerHTML = `YOU\'VE SELECTED <span id="gimmie-addon-selected-count">${totalAddonsCount}</span> ADD ON MEALS`;
+          headerBadgeEl.innerHTML = `YOU\'VE SELECTED <span id="gimmie-addon-selected-count">${totalAddonsCount}</span> ADD-ONS.`;
         }
       }
       if (addonsContainer) {
@@ -1816,6 +1837,11 @@
       }
 
       updateUI();
+
+      // Show toast/status notification: "You've selected X add-ons."
+      if (state.totalAddons > 0) {
+        showStatus(`You've selected ${state.totalAddons} add-on${state.totalAddons > 1 ? 's' : ''}.`, false, true);
+      }
     }
 
     function cleanIngredients(raw) {
