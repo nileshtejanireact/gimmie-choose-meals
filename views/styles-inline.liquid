@@ -1035,17 +1035,62 @@
 }
 
 div#s4t1.gimmie-build-box__meals {
-  display: flex;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-x pan-y;
-  gap: 1.25rem;
-  padding: 0.5rem 2px 1.25rem 2px;
-  margin-top: 1rem;
+  display: flex !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scroll-snap-type: x mandatory !important;
+  scroll-behavior: smooth !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-x pan-y !important;
+  gap: 1.25rem !important;
+  padding: 0.5rem 4px 1.25rem 4px !important;
+  margin: 1rem 0 0 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+div#s4t1.gimmie-build-box__meals::-webkit-scrollbar {
+  display: none !important;
+}
+
+div#s4t1 .gimmie-build-box__meal {
+  display: flex !important;
+  flex: 0 0 calc((100% - 2.5rem) / 3) !important;
+  flex-direction: column !important;
+  width: calc((100% - 2.5rem) / 3) !important;
+  max-width: calc((100% - 2.5rem) / 3) !important;
+  min-width: calc((100% - 2.5rem) / 3) !important;
+  margin: 0 0 8px 0 !important;
+  border: 2px solid currentColor !important;
+  border-radius: 1.25rem !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+  box-shadow: 4px 4px 0 currentColor !important;
+  scroll-snap-align: start !important;
+  scroll-snap-stop: always !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+}
+
+#gimmie-save-btn {
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+  line-height: 1.25 !important;
+  padding: 12px 14px !important;
+  font-size: 0.95rem !important;
+}
+
+.gimmie-btn-addon-subtext {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-top: 3px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 
 div#s4t1.gimmie-build-box__meals::-webkit-scrollbar {

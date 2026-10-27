@@ -731,8 +731,8 @@
           {% raw %}{% if is_duplicate_theme %}{% endraw %}
           {% raw %}{% if has_meta_addons %}{% endraw %}
           <!-- Step 3: ADD-ONS Panel (Active ONLY on Duplicate Theme AND When Metaobject Has Add-ons) -->
-          <div class="gimmie-build-box__panel card" id="gimmie-addons-panel">
-            <div class="card__surface">
+          <div class="gimmie-build-box__panel" id="gimmie-addons-panel">
+            <div class="gimmie-build-box__surface">
               <div class="gimmie-build-box__panel-header gimmie-build-box__panel-header--meals" style="display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 0.5rem !important; margin-bottom: 1.5rem !important;">
                 <div class="gimmie-build-box__panel-title-wrap step4">
                   <div class="add-on-flex">
@@ -1643,7 +1643,7 @@
           saveButton.removeAttribute('disabled');
           saveButton.style.cursor = 'pointer';
           if (state.totalAddonsPrice > 0) {
-            saveButton.textContent = `Save Selection (+£${state.totalAddonsPrice.toFixed(2)} Add-ons)`;
+            saveButton.innerHTML = `Save Selection <span class="gimmie-btn-addon-subtext">(+£${state.totalAddonsPrice.toFixed(2)} Add-ons)</span>`;
           } else {
             saveButton.textContent = 'Save My Meal Selection';
           }
@@ -1838,10 +1838,7 @@
 
       updateUI();
 
-      // Show toast/status notification: "You've selected X add-ons."
-      if (state.totalAddons > 0) {
-        showStatus(`You've selected ${state.totalAddons} add-on${state.totalAddons > 1 ? 's' : ''}.`, false, true);
-      }
+      // Status text reserved for save confirmation
     }
 
     function cleanIngredients(raw) {

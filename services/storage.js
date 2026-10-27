@@ -153,7 +153,8 @@ class StorageService {
       status: 'Submitted',
       submittedAt: now.toISOString(),
       formattedDate: now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      meals: entry.meals || []
+      meals: entry.meals || [],
+      addons: entry.addons || []
     };
 
     // Remove previous entry for this customer
