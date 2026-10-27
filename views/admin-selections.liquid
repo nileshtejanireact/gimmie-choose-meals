@@ -232,14 +232,26 @@
                 </div>
                 <div style="display: grid; gap: 6px; font-size: 0.92rem; color: #1c3d1c;">
                   {% for addon in sub.addons %}
+                    {% assign a_qty = addon.quantity | default: 1 | plus: 0 %}
+                    {% assign a_unit = addon.unitPrice | default: addon.price | default: '0' | replace: '£', '' | plus: 0 %}
+                    {% if addon.lineTotal %}
+                      {% assign a_total = addon.lineTotal | replace: '£', '' | plus: 0 %}
+                    {% elsif a_qty > 1 and addon.unitPrice %}
+                      {% assign a_total = a_qty | times: a_unit %}
+                    {% elsif a_qty > 1 and a_unit <= 15 %}
+                      {% assign a_total = a_qty | times: a_unit %}
+                    {% else %}
+                      {% assign a_total = addon.price | replace: '£', '' | plus: 0 %}
+                    {% endif %}
                     <div style="display: flex; align-items: center; justify-content: space-between;">
                       <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-weight: 800; background: #0e623b; color: #ffffff; padding: 2px 6px; border-radius: 4px; font-size: 0.82rem;">{{ addon.quantity }}x</span>
+                        <span style="font-weight: 800; background: #0e623b; color: #ffffff; padding: 2px 6px; border-radius: 4px; font-size: 0.82rem;">{{ a_qty }}x</span>
                         <span style="font-weight: 700;">{{ addon.title }}</span>
+                        {% if a_qty > 1 and a_unit > 0 and a_total != a_unit %}
+                          <span style="font-size: 0.78rem; color: #6d7175;">(£{{ a_unit }} each)</span>
+                        {% endif %}
                       </div>
-                      {% if addon.price %}
-                        <span style="font-size: 0.85rem; font-weight: 700; color: #0e623b;">+£{{ addon.price }}</span>
-                      {% endif %}
+                      <span style="font-size: 0.88rem; font-weight: 800; color: #0e623b;">+£{{ a_total }}</span>
                     </div>
                   {% endfor %}
                 </div>
@@ -356,22 +368,27 @@
                   </tr>
                 </thead>
                 <tbody>
-                  ${sub.addons.map(a => `
+                  ${sub.addons.map(a => {
+                    const q = parseInt(a.quantity, 10) || 1;
+                    const u = parseFloat(a.unitPrice || a.price) || 0;
+                    const tot = a.lineTotal ? parseFloat(a.lineTotal) : (q * u);
+                    return `
                     <tr>
                       <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; text-align: center;">
                         <div style="width: 16px; height: 16px; border: 2px solid #0e623b; border-radius: 3px; display: inline-block;"></div>
                       </td>
                       <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; font-weight: 900; font-size: 15px; color: #0e623b;">
-                        ${a.quantity}×
+                        ${q}×
                       </td>
                       <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; font-weight: 700;">
-                        ${a.title}
+                        ${a.title}${q > 1 && u > 0 ? ` <span style="font-size: 11px; color: #666; font-weight: normal;">(£${u.toFixed(2)} each)</span>` : ''}
                       </td>
-                      <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; text-align: right; font-weight: 600; color: #666;">
-                        +£${a.price || '8.00'}
+                      <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; text-align: right; font-weight: 800; color: #0e623b;">
+                        +£${tot.toFixed(2)}
                       </td>
                     </tr>
-                  `).join('')}
+                  `;
+                  }).join('')}
                 </tbody>
               </table>
             </div>

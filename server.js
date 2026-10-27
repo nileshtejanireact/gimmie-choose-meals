@@ -366,7 +366,18 @@ async function handleSaveSelections(req, res) {
       boxSize: totalSelected,
       deliveryDate: deliveryDate,
       meals: selectedMeals.map(m => ({ title: m.title, quantity: parseInt(m.quantity, 10) })),
-      addons: (selectedAddons || []).map(a => ({ title: a.title, quantity: parseInt(a.quantity, 10), price: a.price }))
+      addons: (selectedAddons || []).map(a => {
+        const qty = parseInt(a.quantity, 10) || 1;
+        const unitPrice = parseFloat(a.unitPrice || a.price) || 0;
+        const lineTotal = a.lineTotal ? a.lineTotal : (qty * unitPrice).toFixed(2);
+        return {
+          title: a.title,
+          quantity: qty,
+          unitPrice: unitPrice.toFixed(2),
+          lineTotal: lineTotal,
+          price: lineTotal
+        };
+      })
     });
 
     console.log(`✅ [SUBMISSION SAVED LIVE]: ${customerName} (${customerEmail}) -> ${fullOrderSummary}`);

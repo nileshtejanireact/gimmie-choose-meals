@@ -1998,7 +1998,20 @@
         deliveryDate: config.formattedDeliveryDate || 'Upcoming Monday',
         isCutoffPassed: isCutoffPassed,
         selectedMeals: Object.values(state.selections).filter(item => item.quantity > 0),
-        selectedAddons: Object.values(state.addonSelections).filter(item => item.quantity > 0),
+        selectedAddons: Object.values(state.addonSelections).filter(item => item.quantity > 0).map(item => {
+            const q = parseInt(item.quantity, 10);
+            const uPrice = parseFloat(item.unitPrice || item.price) || 0;
+            const lTotal = (q * uPrice).toFixed(2);
+            return {
+              id: item.id,
+              variantId: item.variantId,
+              title: item.title,
+              quantity: q,
+              unitPrice: uPrice.toFixed(2),
+              lineTotal: lTotal,
+              price: lTotal
+            };
+          }),
         addonsTotal: state.totalAddonsPrice.toFixed(2),
         addonsEnabled: state.addonsEnabled
       };
