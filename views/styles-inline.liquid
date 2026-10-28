@@ -1146,7 +1146,7 @@ div#s4t1 .gimmie-build-box__meal-image-wrap {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 10px 14px !important;
+  padding: 14px 18px !important;
   box-sizing: border-box !important;
   position: relative !important;
 }
@@ -1154,8 +1154,8 @@ div#s4t1 .gimmie-build-box__meal-image-wrap {
 div#s4t1 .gimmie-build-box__meal-image {
   width: 100% !important;
   height: 100% !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
+  max-width: 88% !important;
+  max-height: 88% !important;
   object-fit: contain !important;
   display: block !important;
 }
@@ -1260,12 +1260,22 @@ div#s4t1 .gimmie-build-box__qty-value {
 
 @media (max-width: 767px) {
   #s4t.gimmie-build-box__meals-header-side {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 0.75rem !important;
+    box-sizing: border-box !important;
   }
   #s4t .gimmie-build-box__counter {
-    width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
   }
   .gimmie-build-box__meal-carousel-controls {
     display: none !important;
@@ -1296,6 +1306,27 @@ div#s4t1 .gimmie-build-box__qty-value {
     height: 2.4rem !important;
     font-size: 1.4rem !important;
   }
+}
+
+#gimmie-modal-image-wrap {
+  width: 100% !important;
+  aspect-ratio: 16 / 10 !important;
+  background: #F6F1E7 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 10px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+#gimmie-modal-image {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 88% !important;
+  max-height: 88% !important;
+  object-fit: contain !important;
+  display: block !important;
 }
 
 </style>
