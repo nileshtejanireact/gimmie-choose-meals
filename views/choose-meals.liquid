@@ -922,9 +922,9 @@
                         {% if a_cals == blank or a_cals == '567 kcal' %}{% assign a_cals = '560 kcal' %}{% endif %}
                         {% if a_prot == blank or a_prot == '46g' %}{% assign a_prot = '38g' %}{% endif %}
                       {% elsif down_at contains 'cajun' or down_at contains 'penne' %}
-                        {% if a_desc == blank or a_desc contains 'Freshly' or a_desc contains 'root' %}{% assign a_desc = 'Spiced grilled chicken breast strips tossed with penne pasta in a smoky, creamy Cajun sauce with sliced bell peppers, sweet red onions and fresh herbs.' %}{% endif %}
-                        {% if a_ingr == blank or a_ingr contains 'Premium' %}{% assign a_ingr = 'Penne Pasta (Durum Wheat Semolina), British Chicken Breast (35%), Light Cream (Milk), Bell Peppers, Red Onion, Cajun Seasoning (Paprika, Garlic, Onion, Oregano, Thyme, Cayenne), Olive Oil, Sea Salt, Fresh Parsley.' %}{% endif %}
-                        {% if a_aller == blank or a_aller == 'None' %}{% assign a_aller = 'Wheat, Milk, Celery' %}{% endif %}
+                        {% if a_desc == blank or a_desc contains 'Freshly' or a_desc contains 'root' %}{% assign a_desc = 'Spicy Cajun chicken and chorizo penne, tossed in a creamy sauce with mushrooms and garden peas. Finished with fresh parsley and parmesan.' %}{% endif %}
+                        {% if a_ingr == blank or a_ingr contains 'Premium' %}{% assign a_ingr = 'Chicken Breast (35%), Penne Pasta (Durum Wheat Semolina), Double Cream (Milk), Chorizo (Pork, Paprika, Salt, Garlic), Mushrooms, Peas, Parmesan (Milk), Cajun Seasoning, Celery Salt, Mustard Seed.' %}{% endif %}
+                        {% if a_aller == blank or a_aller == 'None' %}{% assign a_aller = 'Wheat, Milk, Celery, Mustard' %}{% endif %}
                         {% if a_cals == blank %}{% assign a_cals = '567 kcal' %}{% endif %}
                         {% if a_prot == blank %}{% assign a_prot = '46g' %}{% endif %}
                       {% elsif down_at contains 'ginger' or down_at contains 'basil beef' %}
@@ -2013,9 +2013,9 @@
         };
       } else if (titleLower.includes('cajun') || titleLower.includes('penne')) {
         fallbackDish = {
-          desc: 'Spiced grilled chicken breast strips tossed with penne pasta in a smoky, creamy Cajun sauce with sliced bell peppers, sweet red onions and fresh herbs.',
-          ingredients: 'Penne Pasta (Durum Wheat Semolina), British Chicken Breast (35%), Light Cream (Milk), Bell Peppers, Red Onion, Cajun Seasoning (Paprika, Garlic, Onion, Oregano, Thyme, Cayenne), Olive Oil, Sea Salt, Fresh Parsley.',
-          allergens: 'Wheat, Milk, Celery'
+          desc: 'Spicy Cajun chicken and chorizo penne, tossed in a creamy sauce with mushrooms and garden peas. Finished with fresh parsley and parmesan.',
+          ingredients: 'Chicken Breast (35%), Penne Pasta (Durum Wheat Semolina), Double Cream (Milk), Chorizo (Pork, Paprika, Salt, Garlic), Mushrooms, Peas, Parmesan (Milk), Cajun Seasoning, Celery Salt, Mustard Seed.',
+          allergens: 'Wheat, Milk, Celery, Mustard'
         };
       } else if (titleLower.includes('ginger') || titleLower.includes('basil beef')) {
         fallbackDish = {
