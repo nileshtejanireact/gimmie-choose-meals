@@ -290,7 +290,8 @@ async function handleAppProxy(req, res) {
       currentLines: subscription.currentLines || [],
       meals: meals,
       addons: addons,
-      isDuplicateTheme: isDuplicateTheme
+      isDuplicateTheme: isDuplicateTheme,
+      discount: req.query.discount || subscription.discount || null
     });
 
   } catch (error) {

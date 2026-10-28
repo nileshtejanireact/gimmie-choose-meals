@@ -1224,7 +1224,7 @@
             {% raw %}{% endif %}{% endraw %}
 
             <!-- Automatic Discount Badge / Breakdown (if customer has active subscription discount) -->
-            <div id="gimmie-summary-discount-section" style="margin-top: 14px; padding: 10px 12px; background: #E8F5E9; border: 1.5px solid #2E7D32; border-radius: 10px; display: none;">
+            <div id="gimmie-summary-discount-section" style="margin-top: 14px; padding: 10px 12px; background: #E8F5E9; border: 1.5px solid #2E7D32; border-radius: 10px; {% unless is_duplicate_theme or discount %}display: none;{% endunless %}">
               <div style="display: flex; align-items: center; justify-content: space-between;">
                 <span style="font-size: 0.82rem; font-weight: 800; color: #1B5E20; text-transform: uppercase;">
                   🎉 Applied Discount
@@ -1308,7 +1308,8 @@
       "meals": {{ meals | json }},
       "addons": {{ addons | default: '[]' | json }},
       "isDuplicateTheme": {% raw %}{{ is_duplicate_theme | default: false | json }}{% endraw %},
-      "hasAddons": {% raw %}{{ has_meta_addons | default: false | json }}{% endraw %}
+      "hasAddons": {% raw %}{{ has_meta_addons | default: false | json }}{% endraw %},
+      "discount": {{ discount | default: null | json }}
     }
   </script>
 
@@ -2351,9 +2352,37 @@
       }
     }
 
+    function initDiscountUI() {
+      const discountSection = document.getElementById('gimmie-summary-discount-section');
+      const discountAmountEl = document.getElementById('gimmie-summary-discount-amount');
+      const discountNoteEl = document.getElementById('gimmie-summary-discount-note');
+
+      if (!discountSection) return;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const discountParam = urlParams.get('discount');
+      const isPreview = config.isDuplicateTheme || urlParams.has('preview') || urlParams.has('preview_theme_id') || urlParams.get('test') === 'true';
+
+      if (discountParam) {
+        discountSection.style.display = 'block';
+        const cleanVal = discountParam.includes('%') ? discountParam : (discountParam + '%');
+        if (discountAmountEl) discountAmountEl.textContent = '-' + cleanVal;
+        if (discountNoteEl) discountNoteEl.textContent = cleanVal + ' off auto-applies at billing to your upcoming order.';
+      } else if (config.discount) {
+        discountSection.style.display = 'block';
+        const dVal = typeof config.discount === 'string' ? config.discount : (config.discount.title || config.discount.value || '15%');
+        const cleanVal = dVal.includes('%') ? dVal : (dVal + '%');
+        if (discountAmountEl) discountAmountEl.textContent = cleanVal.startsWith('-') ? cleanVal : ('-' + cleanVal);
+        if (discountNoteEl) discountNoteEl.textContent = cleanVal.replace(/^-/, '') + ' off auto-applies at billing to your upcoming order.';
+      } else if (isPreview) {
+        discountSection.style.display = 'block';
+      }
+    }
+
     function init() {
       initListeners();
       updateUI();
+      initDiscountUI();
     }
 
     if (document.readyState === 'loading') {
