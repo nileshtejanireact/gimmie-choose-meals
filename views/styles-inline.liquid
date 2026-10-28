@@ -204,13 +204,20 @@
   background: #EFECE6 !important;
   overflow: hidden !important;
   cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 12px !important;
+  box-sizing: border-box !important;
 }
 
 .gimmie-build-box__meal-image,
 .gimmie-build-box__image {
   width: 100% !important;
   height: 100% !important;
-  object-fit: cover !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
   display: block !important;
 }
 
@@ -219,8 +226,8 @@
   position: absolute !important;
   top: 10px !important;
   right: 10px !important;
-  width: 32px !important;
-  height: 32px !important;
+  width: 30px !important;
+  height: 30px !important;
   border-radius: 999px !important;
   border: 1.5px solid var(--gimmie-border) !important;
   background: #FFFFFF !important;
@@ -234,6 +241,9 @@
   cursor: pointer !important;
   box-shadow: 2px 2px 0 var(--gimmie-border) !important;
   z-index: 2 !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  padding: 0 !important;
 }
 
 .gimmie-build-box__info-btn:hover,
@@ -871,10 +881,11 @@
   }
   .gimmie-addon-track {
     display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
     overflow-x: visible !important;
-    padding: 0 !important;
+    padding: 4px 6px 12px 6px !important;
+    box-sizing: border-box !important;
   }
   .gimmie-addon-track > .gimmie-build-box__addon-item {
     flex: none !important;
@@ -924,7 +935,7 @@
 }
 
 #gimmie-addons-panel .gimmie-build-box__step-description--meals {
-  margin: 0.25rem 0 0.85rem 0 !important;
+  margin: 0.2rem 0 0.25rem 0 !important;
   font-size: 0.95rem !important;
   color: var(--gimmie-muted, #4A5568) !important;
   width: 100% !important;
@@ -953,7 +964,7 @@
   width: 100% !important;
   max-width: 100% !important;
   min-width: 0 !important;
-  margin-top: 0.75rem !important;
+  margin-top: 0.25rem !important;
   box-sizing: border-box !important;
 }
 
@@ -1124,27 +1135,29 @@ div#s4t1 .gimmie-build-box__meal {
 }
 
 div#s4t1 .gimmie-build-box__meal-image-wrap {
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  background-color: #F6F1E7;
+  aspect-ratio: 4 / 3 !important;
+  overflow: hidden !important;
+  background-color: #F6F1E7 !important;
   background-image:
     radial-gradient(circle at 18% 16%, rgba(143, 175, 143, 0.28), transparent 34%),
     radial-gradient(circle at 86% 82%, rgba(16, 43, 16, 0.10), transparent 34%),
-    linear-gradient(135deg, #fffaf0 0%, #F6F1E7 100%);
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(0.8rem, 2vw, 1.25rem);
-  box-sizing: border-box;
-  position: relative;
+    linear-gradient(135deg, #fffaf0 0%, #F6F1E7 100%) !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 10px 14px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
 }
 
 div#s4t1 .gimmie-build-box__meal-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
 }
 
 div#s4t1 .gimmie-build-box__info-btn {
@@ -1154,17 +1167,20 @@ div#s4t1 .gimmie-build-box__info-btn {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #ffffff;
-  border: 2px solid currentColor;
-  box-shadow: 1.5px 1.5px 0 currentColor;
-  color: inherit;
+  background: #ffffff !important;
+  border: 2px solid #102B10 !important;
+  box-shadow: 1.5px 1.5px 0 #102B10 !important;
+  color: #102B10 !important;
   font-size: 13px;
   font-weight: 800;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   z-index: 3;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  padding: 0 !important;
 }
 
 div#s4t1 .gimmie-build-box__meal-content {
@@ -1185,7 +1201,8 @@ div#s4t1 .gimmie-build-box__meal-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin-bottom: 0.75rem;
+  margin-top: auto !important;
+  margin-bottom: 0.5rem !important;
 }
 
 div#s4t1 .gimmie-build-box__meal-meta span {
@@ -1198,7 +1215,7 @@ div#s4t1 .gimmie-build-box__meal-meta span {
 }
 
 div#s4t1 .gimmie-build-box__price {
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.75rem !important;
 }
 
 div#s4t1 .price-item {
@@ -1210,7 +1227,7 @@ div#s4t1 .gimmie-build-box__qty {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: auto;
+  margin-top: 0 !important;
   width: 100%;
 }
 
@@ -1255,27 +1272,29 @@ div#s4t1 .gimmie-build-box__qty-value {
   }
   div#s4t1.gimmie-build-box__meals {
     display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
     overflow-x: visible !important;
-    padding: 0 !important;
+    padding: 4px 6px 12px 6px !important;
+    box-sizing: border-box !important;
   }
   div#s4t1 .gimmie-build-box__meal {
     flex: none !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
+    box-sizing: border-box !important;
   }
   div#s4t1 .gimmie-build-box__meal-content {
-    padding: 0.85rem !important;
+    padding: 1rem !important;
   }
   div#s4t1 .gimmie-build-box__meal-title {
-    font-size: 0.95rem !important;
+    font-size: 1.05rem !important;
   }
   div#s4t1 .gimmie-build-box__qty-button {
-    width: 2.2rem !important;
-    height: 2.2rem !important;
-    font-size: 1.3rem !important;
+    width: 2.4rem !important;
+    height: 2.4rem !important;
+    font-size: 1.4rem !important;
   }
 }
 

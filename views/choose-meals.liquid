@@ -597,10 +597,14 @@
                         {% assign m_cals = energy_parts[1] | strip %}
                       {% endif %}
 
-                      {% assign m_prot_display = m_prot %}
-                      {% unless m_prot_display contains 'Protein' or m_prot_display contains 'g' %}
-                        {% assign m_prot_display = m_prot | append: 'g Protein' %}
-                      {% endunless %}
+                      {% assign m_prot_raw = m_prot | strip_html | strip %}
+                      {% if m_prot_raw contains 'Protein' or m_prot_raw contains 'PROTEIN' %}
+                        {% assign m_prot_display = m_prot_raw %}
+                      {% elsif m_prot_raw contains 'g' or m_prot_raw contains 'G' %}
+                        {% assign m_prot_display = m_prot_raw | append: ' Protein' %}
+                      {% else %}
+                        {% assign m_prot_display = m_prot_raw | append: 'g Protein' %}
+                      {% endif %}
 
                       {% assign m_fat_display = m_fat %}
                       {% unless m_fat_display contains 'g' %}
@@ -674,7 +678,7 @@
                                style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
                         <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ m_id }}">
                           <img src="{{ m_img }}" alt="{{ m_title_clean }}" class="gimmie-build-box__meal-image" loading="lazy" onerror="if(!this.dataset.errored){this.dataset.errored=true;this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';}">
-                          <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ m_id }}">ℹ</button>
+                          <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ m_id }}" aria-label="View Nutrition & Ingredients"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display: block; pointer-events: none;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></button>
                         </div>
                         <div class="gimmie-build-box__meal-content">
                           <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ m_id }}">{{ m_title | strip_html }}</h3>
@@ -703,14 +707,22 @@
                       <article class="gimmie-build-box__meal" data-meal-id="{{ meal.id }}" style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
                         <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ meal.id }}">
                           <img src="{{ meal.image }}" alt="{{ meal.title }}" class="gimmie-build-box__meal-image" loading="lazy">
-                          <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ meal.id }}">ℹ</button>
+                          <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ meal.id }}" aria-label="View Nutrition & Ingredients"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display: block; pointer-events: none;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></button>
                         </div>
                         <div class="gimmie-build-box__meal-content">
                           <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ meal.id }}">{{ meal.title }}</h3>
                           <p class="gimmie-build-box__meal-description">{{ meal.description }}</p>
                           <div class="gimmie-build-box__meal-macros">
                             <span class="gimmie-macro-bubble">{{ meal.macros.calories | upcase }}</span>
-                            <span class="gimmie-macro-bubble">{{ meal.macros.protein | upcase }}</span>
+                            {% assign fb_m_prot = meal.macros.protein | strip_html | strip %}
+                            {% if fb_m_prot contains 'Protein' or fb_m_prot contains 'PROTEIN' %}
+                              {% assign fb_m_prot_display = fb_m_prot | upcase %}
+                            {% elsif fb_m_prot contains 'g' or fb_m_prot contains 'G' %}
+                              {% assign fb_m_prot_display = fb_m_prot | upcase | append: ' PROTEIN' %}
+                            {% else %}
+                              {% assign fb_m_prot_display = fb_m_prot | append: 'G PROTEIN' %}
+                            {% endif %}
+                            <span class="gimmie-macro-bubble">{{ fb_m_prot_display }}</span>
                           </div>
                           <div class="gimmie-build-box__qty">
                             <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ meal.variantId }}" aria-label="Decrease quantity" disabled>−</button>
@@ -733,7 +745,7 @@
           <!-- Step 3: ADD-ONS Panel (Active ONLY on Duplicate Theme AND When Metaobject Has Add-ons) -->
           <div class="gimmie-build-box__panel" id="gimmie-addons-panel">
             <div class="gimmie-build-box__surface">
-              <div class="gimmie-build-box__panel-header gimmie-build-box__panel-header--meals" style="display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 0.5rem !important; margin-bottom: 1.5rem !important;">
+              <div class="gimmie-build-box__panel-header gimmie-build-box__panel-header--meals" style="display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 0.25rem !important; margin-bottom: 0.85rem !important;">
                 <div class="gimmie-build-box__panel-title-wrap step4">
                   <div class="add-on-flex">
                     <span class="gimmie-build-box__step font-heading">3</span>
@@ -896,6 +908,48 @@
                         {% endfor %}
                       {% endif %}
 
+                      {% assign down_at = a_title | downcase %}
+                      {% if down_at contains 'tarragon' %}
+                        {% if a_desc == blank or a_desc contains 'Freshly' or a_desc contains 'root' %}{% assign a_desc = 'Pan-seared tender British chicken breast in a velvety French tarragon, white wine and light cream reduction, served with roasted baby potatoes and steamed seasonal vegetables.' %}{% endif %}
+                        {% if a_ingr == blank or a_ingr contains 'Premium' %}{% assign a_ingr = 'British Chicken Breast (42%), Roasted Baby Potatoes (30%), Green Beans (16%), Double Cream (Milk), Shallots, White Wine Reduction (Sulphites), Fresh Tarragon, Garlic, Dijon Mustard (Mustard), Olive Oil, Sea Salt, Cracked Black Pepper.' %}{% endif %}
+                        {% if a_aller == blank or a_aller == 'None' %}{% assign a_aller = 'Milk, Mustard, Sulphites' %}{% endif %}
+                        {% if a_cals == blank or a_cals == '567 kcal' %}{% assign a_cals = '480 kcal' %}{% endif %}
+                        {% if a_prot == blank or a_prot == '46g' %}{% assign a_prot = '48g' %}{% endif %}
+                      {% elsif down_at contains 'poke' or down_at contains 'salmon poke' %}
+                        {% if a_desc == blank or a_desc contains 'Freshly' or a_desc contains 'root' %}{% assign a_desc = 'Flaked roasted Scottish salmon over seasoned sushi rice with edamame beans, crunchy cucumber, pickled ginger and a toasted sesame soy dressing.' %}{% endif %}
+                        {% if a_ingr == blank or a_ingr contains 'Premium' %}{% assign a_ingr = 'Atlantic Salmon (Fish) (35%), Sushi Rice (35%), Edamame Beans (Soya), Cucumber, Pickled Ginger, Sesame Oil, Toasted Sesame Seeds, Tamari Soy Sauce (Soya, Wheat), Spring Onions.' %}{% endif %}
+                        {% if a_aller == blank or a_aller == 'None' %}{% assign a_aller = 'Fish, Soya, Sesame, Wheat' %}{% endif %}
+                        {% if a_cals == blank or a_cals == '567 kcal' %}{% assign a_cals = '560 kcal' %}{% endif %}
+                        {% if a_prot == blank or a_prot == '46g' %}{% assign a_prot = '38g' %}{% endif %}
+                      {% elsif down_at contains 'cajun' or down_at contains 'penne' %}
+                        {% if a_desc == blank or a_desc contains 'Freshly' or a_desc contains 'root' %}{% assign a_desc = 'Spiced grilled chicken breast strips tossed with penne pasta in a smoky, creamy Cajun sauce with sliced bell peppers, sweet red onions and fresh herbs.' %}{% endif %}
+                        {% if a_ingr == blank or a_ingr contains 'Premium' %}{% assign a_ingr = 'Penne Pasta (Durum Wheat Semolina), British Chicken Breast (35%), Light Cream (Milk), Bell Peppers, Red Onion, Cajun Seasoning (Paprika, Garlic, Onion, Oregano, Thyme, Cayenne), Olive Oil, Sea Salt, Fresh Parsley.' %}{% endif %}
+                        {% if a_aller == blank or a_aller == 'None' %}{% assign a_aller = 'Wheat, Milk, Celery' %}{% endif %}
+                        {% if a_cals == blank %}{% assign a_cals = '567 kcal' %}{% endif %}
+                        {% if a_prot == blank %}{% assign a_prot = '46g' %}{% endif %}
+                      {% elsif down_at contains 'ginger' or down_at contains 'basil beef' %}
+                        {% if a_desc == blank or a_desc contains 'Freshly' or a_desc contains 'root' %}{% assign a_desc = 'Tender sliced British grass-fed beef tossed with fragrant Thai holy basil, ginger root, mangetout, and sweet peppers in a savoury tamari garlic glaze, served with fragrant jasmine rice.' %}{% endif %}
+                        {% if a_ingr == blank or a_ingr contains 'Premium' %}{% assign a_ingr = 'British Grass-Fed Beef (38%), Steamed Jasmine Rice (32%), Thai Holy Basil, Ginger Root, Mangetout, Red Peppers, Tamari Soy Sauce (Soya), Toasted Sesame Oil, Garlic.' %}{% endif %}
+                        {% if a_aller == blank or a_aller == 'None' %}{% assign a_aller = 'Soya, Sesame, Wheat' %}{% endif %}
+                        {% if a_cals == blank or a_cals == '567 kcal' %}{% assign a_cals = '520 kcal' %}{% endif %}
+                        {% if a_prot == blank or a_prot == '46g' %}{% assign a_prot = '42g' %}{% endif %}
+                      {% elsif down_at contains 'korean' or down_at contains 'beef noodles' %}
+                        {% if a_desc == blank or a_desc contains 'Freshly' or a_desc contains 'root' %}{% assign a_desc = 'A sweet and spicy balance of minced beef, wok-fired egg noodles and crunchy beansprouts. Tossed in a sticky gochujang glaze with vibrant peppers, fresh spring onions and sesame seeds.' %}{% endif %}
+                        {% if a_ingr == blank or a_ingr contains 'Premium' %}{% assign a_ingr = 'Egg Noodles (Wheat, Egg), British Minced Beef (35%), Gochujang Chili Paste, Soya Sauce, Beansprouts, Red Bell Peppers, Spring Onions, Sesame Seeds.' %}{% endif %}
+                        {% if a_aller == blank or a_aller == 'None' %}{% assign a_aller = 'Egg, Wheat, Soya, Sesame' %}{% endif %}
+                        {% if a_cals == blank or a_cals == '567 kcal' %}{% assign a_cals = '540 kcal' %}{% endif %}
+                        {% if a_prot == blank or a_prot == '46g' %}{% assign a_prot = '44g' %}{% endif %}
+                      {% endif %}
+
+                      {% assign a_prot_raw = a_prot | strip_html | strip %}
+                      {% if a_prot_raw contains 'Protein' or a_prot_raw contains 'PROTEIN' %}
+                        {% assign a_prot_display = a_prot_raw | upcase %}
+                      {% elsif a_prot_raw contains 'g' or a_prot_raw contains 'G' %}
+                        {% assign a_prot_display = a_prot_raw | upcase | append: ' PROTEIN' %}
+                      {% else %}
+                        {% assign a_prot_display = a_prot_raw | append: 'G PROTEIN' %}
+                      {% endif %}
+
                       <article
                         class="gimmie-build-box__meal gimmie-build-box__addon-item"
                         data-gimmie-addonmeal
@@ -923,7 +977,7 @@
                       >
                         <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ a_variant_id }}">
                           <img src="{{ a_img }}" alt="{{ a_title | strip_html | escape }}" class="gimmie-build-box__meal-image" loading="lazy">
-                          <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ a_variant_id }}">ℹ</button>
+                          <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ a_variant_id }}" aria-label="View Nutrition & Ingredients"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display: block; pointer-events: none;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></button>
                         </div>
 
                         <div class="gimmie-build-box__meal-content">
@@ -933,7 +987,7 @@
 
                           <div class="gimmie-build-box__meal-meta font-heading uppercase">
                             <span>{{ a_cals | strip_html | upcase }}</span>
-                            <span>{{ a_prot | strip_html | upcase }}</span>
+                            <span>{{ a_prot_display }}</span>
                           </div>
 
                           <div class="gimmie-build-box__price">
@@ -1032,7 +1086,7 @@
                     >
                       <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ addon.variantId }}">
                         <img src="{{ addon.image }}" alt="{{ addon.title | escape }}" class="gimmie-build-box__meal-image" loading="lazy">
-                        <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ addon.variantId }}">ℹ</button>
+                        <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ addon.variantId }}" aria-label="View Nutrition & Ingredients"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display: block; pointer-events: none;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></button>
                       </div>
 
                       <div class="gimmie-build-box__meal-content">
@@ -1040,9 +1094,17 @@
                           {{ addon.title }}
                         </h3>
 
+                        {% assign fb_a_prot = addon.macros.protein | strip_html | strip %}
+                        {% if fb_a_prot contains 'Protein' or fb_a_prot contains 'PROTEIN' %}
+                          {% assign fb_a_prot_display = fb_a_prot | upcase %}
+                        {% elsif fb_a_prot contains 'g' or fb_a_prot contains 'G' %}
+                          {% assign fb_a_prot_display = fb_a_prot | upcase | append: ' PROTEIN' %}
+                        {% else %}
+                          {% assign fb_a_prot_display = fb_a_prot | append: 'G PROTEIN' %}
+                        {% endif %}
                         <div class="gimmie-build-box__meal-meta font-heading uppercase">
                           <span>{{ addon.macros.calories | upcase }}</span>
-                          <span>{{ addon.macros.protein | upcase }}</span>
+                          <span>{{ fb_a_prot_display }}</span>
                         </div>
 
                         <div class="gimmie-build-box__price">
@@ -1160,6 +1222,21 @@
             </div>
             {% raw %}{% endif %}{% endraw %}
             {% raw %}{% endif %}{% endraw %}
+
+            <!-- Automatic Discount Badge / Breakdown (if customer has active subscription discount) -->
+            <div id="gimmie-summary-discount-section" style="margin-top: 14px; padding: 10px 12px; background: #E8F5E9; border: 1.5px solid #2E7D32; border-radius: 10px; display: none;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 0.82rem; font-weight: 800; color: #1B5E20; text-transform: uppercase;">
+                  🎉 Applied Discount
+                </span>
+                <span id="gimmie-summary-discount-amount" style="font-size: 0.88rem; font-weight: 800; color: #1B5E20;">
+                  -15%
+                </span>
+              </div>
+              <p id="gimmie-summary-discount-note" style="margin: 4px 0 0; font-size: 0.76rem; color: #2E7D32;">
+                Auto-applies at billing to your upcoming order.
+              </p>
+            </div>
 
             <!-- Save CTA -->
             <button id="gimmie-save-btn" class="gimmie-build-box__button" disabled>
@@ -1920,19 +1997,81 @@
         }
       }
 
+      const titleLower = (item.title || '').toLowerCase();
+      let fallbackDish = null;
+      if (titleLower.includes('tarragon')) {
+        fallbackDish = {
+          desc: 'Pan-seared tender British chicken breast in a velvety French tarragon, white wine and light cream reduction, served with roasted baby potatoes and steamed seasonal vegetables.',
+          ingredients: 'British Chicken Breast (42%), Roasted Baby Potatoes (30%), Green Beans (16%), Double Cream (Milk), Shallots, White Wine Reduction (Sulphites), Fresh Tarragon, Garlic, Dijon Mustard (Mustard), Olive Oil, Sea Salt, Cracked Black Pepper.',
+          allergens: 'Milk, Mustard, Sulphites'
+        };
+      } else if (titleLower.includes('poke') || titleLower.includes('salmon poke')) {
+        fallbackDish = {
+          desc: 'Flaked roasted Scottish salmon over seasoned sushi rice with edamame beans, crunchy cucumber, pickled ginger and a toasted sesame soy dressing.',
+          ingredients: 'Atlantic Salmon (Fish) (35%), Sushi Rice (35%), Edamame Beans (Soya), Cucumber, Pickled Ginger, Sesame Oil, Toasted Sesame Seeds, Tamari Soy Sauce (Soya, Wheat), Spring Onions.',
+          allergens: 'Fish, Soya, Sesame, Wheat'
+        };
+      } else if (titleLower.includes('cajun') || titleLower.includes('penne')) {
+        fallbackDish = {
+          desc: 'Spiced grilled chicken breast strips tossed with penne pasta in a smoky, creamy Cajun sauce with sliced bell peppers, sweet red onions and fresh herbs.',
+          ingredients: 'Penne Pasta (Durum Wheat Semolina), British Chicken Breast (35%), Light Cream (Milk), Bell Peppers, Red Onion, Cajun Seasoning (Paprika, Garlic, Onion, Oregano, Thyme, Cayenne), Olive Oil, Sea Salt, Fresh Parsley.',
+          allergens: 'Wheat, Milk, Celery'
+        };
+      } else if (titleLower.includes('ginger') || titleLower.includes('basil beef')) {
+        fallbackDish = {
+          desc: 'Tender sliced British grass-fed beef tossed with fragrant Thai holy basil, ginger root, mangetout, and sweet peppers in a savoury tamari garlic glaze, served with fragrant jasmine rice.',
+          ingredients: 'British Grass-Fed Beef (38%), Steamed Jasmine Rice (32%), Thai Holy Basil, Ginger Root, Mangetout, Red Peppers, Tamari Soy Sauce (Soya), Toasted Sesame Oil, Garlic.',
+          allergens: 'Soya, Sesame, Wheat'
+        };
+      } else if (titleLower.includes('korean') || titleLower.includes('beef noodles')) {
+        fallbackDish = {
+          desc: 'A sweet and spicy balance of minced beef, wok-fired egg noodles and crunchy beansprouts. Tossed in a sticky gochujang glaze with vibrant peppers, fresh spring onions and sesame seeds.',
+          ingredients: 'Egg Noodles (Wheat, Egg), British Minced Beef (35%), Gochujang Chili Paste, Soya Sauce, Beansprouts, Red Bell Peppers, Spring Onions, Sesame Seeds.',
+          allergens: 'Egg, Wheat, Soya, Sesame'
+        };
+      } else if (titleLower.includes('tuscan') || titleLower.includes('creamy tuscan')) {
+        fallbackDish = {
+          desc: 'Succulent sliced chicken breast in a creamy sun-dried tomato, spinach, and garlic sauce, served alongside crushed baby new potatoes.',
+          ingredients: 'British Chicken Breast (42%), Baby Potatoes (30%), Spinach, Sun-Dried Tomatoes, Double Cream (Milk), Garlic, Parmesan (Milk), Oregano, Black Pepper.',
+          allergens: 'Milk'
+        };
+      } else if (titleLower.includes('lemon') && titleLower.includes('herb')) {
+        fallbackDish = {
+          desc: 'Tender marinated chargrilled chicken breast in lemon zest and Mediterranean garden herbs, served with roasted garlic baby potatoes and steamed green beans.',
+          ingredients: 'British Chicken Breast (40%), Roasted Baby Potatoes (32%), Fine Green Beans (20%), Lemon Juice & Zest, Olive Oil, Oregano, Thyme, Garlic, Sea Salt.',
+          allergens: 'None'
+        };
+      }
+
       if (modalTitle) modalTitle.textContent = item.title;
       if (modalDesc) {
         const d = cleanIngredients(item.description);
-        modalDesc.textContent = (d && d.length > 0 && !d.includes('root')) ? d : item.description;
+        if (d && d.length > 20 && !d.includes('root') && !d.includes('gourmet add-on') && !d.includes('delicious gourmet')) {
+          modalDesc.textContent = d;
+        } else if (fallbackDish && fallbackDish.desc) {
+          modalDesc.textContent = fallbackDish.desc;
+        } else {
+          modalDesc.textContent = d || 'Chef-crafted meal prepared fresh in our kitchen with premium whole ingredients.';
+        }
       }
 
       const ingredientsEl = document.getElementById('gimmie-modal-ingredients');
       if (ingredientsEl) {
-        ingredientsEl.textContent = cleanIngredients(item.ingredients) || 'Fresh, natural ingredients prepared in our kitchen.';
+        const ing = cleanIngredients(item.ingredients);
+        if (ing && ing.length > 25 && !ing.includes('wholesome natural') && !ing.includes('Fresh, wholesome')) {
+          ingredientsEl.textContent = ing;
+        } else if (fallbackDish && fallbackDish.ingredients) {
+          ingredientsEl.textContent = fallbackDish.ingredients;
+        } else {
+          ingredientsEl.textContent = ing || 'Fresh, natural ingredients prepared in our kitchen.';
+        }
       }
 
       if (modalAllergens) {
-        const cleanAllergens = cleanIngredients(item.allergens);
+        let cleanAllergens = cleanIngredients(item.allergens);
+        if ((!cleanAllergens || cleanAllergens === 'None') && fallbackDish && fallbackDish.allergens) {
+          cleanAllergens = fallbackDish.allergens;
+        }
         modalAllergens.textContent = cleanAllergens && cleanAllergens !== 'None' ? `⚠️ Allergens: ${cleanAllergens}` : '✓ No common allergens listed.';
         modalAllergens.style.color = cleanAllergens && cleanAllergens !== 'None' ? '#b42318' : '#1E6B24';
       }
