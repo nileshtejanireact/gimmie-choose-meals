@@ -281,6 +281,22 @@ class SubscriptionService {
 
     const customer = customerObj || contract.customer || { firstName: 'Subscriber', lastName: '', email: '' };
 
+    // Extract active discount from contract (Shopify Subscription Discounts / Custom Attributes)
+    let contractDiscount = null;
+    if (contract.discounts && contract.discounts.edges && contract.discounts.edges.length > 0) {
+      const dNode = contract.discounts.edges[0].node;
+      contractDiscount = {
+        title: dNode.title || 'Discount',
+        value: dNode.percentage || (dNode.amount && dNode.amount.amount) || 0,
+        type: dNode.percentage ? 'percentage' : 'fixed_amount'
+      };
+    } else if (contract.customAttributes && Array.isArray(contract.customAttributes)) {
+      const discAttr = contract.customAttributes.find(a => a.key === 'discount_code' || a.key === '_discount' || a.key === 'discount');
+      if (discAttr) {
+        contractDiscount = { title: discAttr.value, value: discAttr.value };
+      }
+    }
+
     return {
       id: contract.id,
       status: contract.status,
@@ -288,7 +304,8 @@ class SubscriptionService {
       formattedDeliveryDate,
       mealQuota: mealCount,
       customer,
-      currentLines: lines
+      currentLines: lines,
+      discount: contractDiscount
     };
   }
 
