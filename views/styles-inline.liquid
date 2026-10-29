@@ -200,14 +200,12 @@
 .gimmie-build-box__image-wrap {
   position: relative !important;
   width: 100% !important;
-  aspect-ratio: 16 / 11 !important;
+  aspect-ratio: 4 / 3 !important;
   background: #EFECE6 !important;
   overflow: hidden !important;
   cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 8px 12px !important;
+  display: block !important;
+  padding: 0 !important;
   box-sizing: border-box !important;
 }
 
@@ -217,8 +215,9 @@
   height: 100% !important;
   max-width: 100% !important;
   max-height: 100% !important;
-  object-fit: contain !important;
+  object-fit: cover !important;
   display: block !important;
+  transition: transform 300ms ease !important;
 }
 
 .gimmie-build-box__info-btn,
@@ -1132,30 +1131,28 @@ div#s4t1 .gimmie-build-box__meal {
   box-sizing: border-box;
 }
 
-div#s4t1 .gimmie-build-box__meal-image-wrap {
+div#s4t1 .gimmie-build-box__meal-image-wrap,
+.gimmie-addon-track .gimmie-build-box__meal-image-wrap {
   aspect-ratio: 4 / 3 !important;
   overflow: hidden !important;
   background-color: #F6F1E7 !important;
-  background-image:
-    radial-gradient(circle at 18% 16%, rgba(143, 175, 143, 0.28), transparent 34%),
-    radial-gradient(circle at 86% 82%, rgba(16, 43, 16, 0.10), transparent 34%),
-    linear-gradient(135deg, #fffaf0 0%, #F6F1E7 100%) !important;
+  background-image: none !important;
   width: 100% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 14px 18px !important;
+  display: block !important;
+  padding: 0 !important;
   box-sizing: border-box !important;
   position: relative !important;
 }
 
-div#s4t1 .gimmie-build-box__meal-image {
+div#s4t1 .gimmie-build-box__meal-image,
+.gimmie-addon-track .gimmie-build-box__meal-image {
   width: 100% !important;
   height: 100% !important;
-  max-width: 88% !important;
-  max-height: 88% !important;
-  object-fit: contain !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
   display: block !important;
+  transition: transform 300ms ease !important;
 }
 
 div#s4t1 .gimmie-build-box__info-btn {

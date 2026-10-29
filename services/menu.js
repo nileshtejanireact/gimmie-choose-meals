@@ -366,7 +366,7 @@ class MenuService {
           carbs: '54.0g',
           sugars: '4.8g',
           fibre: '6.5g',
-          protein: '46.0g',
+          protein: '46g',
           salt: '1.25g'
         },
         allergens: 'Wheat, Milk, Celery, Mustard',
@@ -396,7 +396,7 @@ class MenuService {
           carbs: '48.0g',
           sugars: '5.2g',
           fibre: '5.8g',
-          protein: '42.0g',
+          protein: '42g',
           salt: '1.10g'
         },
         allergens: 'Soya, Sesame, Wheat',
@@ -426,7 +426,7 @@ class MenuService {
           carbs: '52.0g',
           sugars: '7.5g',
           fibre: '4.8g',
-          protein: '44.0g',
+          protein: '44g',
           salt: '1.40g'
         },
         allergens: 'Egg, Wheat, Soya, Sesame',
@@ -456,7 +456,7 @@ class MenuService {
           carbs: '28.0g',
           sugars: '3.9g',
           fibre: '4.8g',
-          protein: '46.0g',
+          protein: '46g',
           salt: '1.20g'
         },
         allergens: 'Milk',
@@ -486,7 +486,7 @@ class MenuService {
           carbs: '34.0g',
           sugars: '3.1g',
           fibre: '6.2g',
-          protein: '48.0g',
+          protein: '48g',
           salt: '1.15g'
         },
         allergens: 'None',
