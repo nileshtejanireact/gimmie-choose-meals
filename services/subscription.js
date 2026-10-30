@@ -643,13 +643,13 @@ class SubscriptionService {
   /**
    * Update the latest unfulfilled order for this customer in Shopify with the selected meals in Note & Tags
    */
-  async updateRecentOrderDetails(customerEmail, mealSummaryText, deliveryDate = 'Tuesday Delivery') {
+  async updateRecentOrderDetails(customerEmail, mealSummaryText, deliveryDate = 'Tuesday Delivery', selectedAddons = []) {
     if (!customerEmail) return;
 
     try {
       const query = `
         query getCustomerRecentOrder($query: String!) {
-          orders(first: 3, query: $query, sortKey: CREATED_AT, reverse: true) {
+          orders(first: 5, query: $query, sortKey: CREATED_AT, reverse: true) {
             edges {
               node {
                 id
@@ -698,6 +698,160 @@ class SubscriptionService {
         });
 
         console.log(`✓ [SUCCESS] Shopify Order ${targetOrder.name} Note & Tags updated!`);
+
+        // SYNC ADD-ON PRODUCTS & PRICES DIRECTLY INTO THE SHOPIFY ORDER LINE ITEMS
+        if (selectedAddons && Array.isArray(selectedAddons) && selectedAddons.length > 0) {
+          const validAddons = selectedAddons.filter(a => (parseInt(a.quantity, 10) || 0) > 0);
+          if (validAddons.length > 0) {
+            console.log(`🛒 [Syncing Add-on Line Items to Order] Adding ${validAddons.length} add-on items with price to Order ${targetOrder.name}...`);
+            try {
+              const editBeginMutation = `
+                mutation orderEditBegin($id: ID!) {
+                  orderEditBegin(id: $id) {
+                    calculatedOrder {
+                      id
+                      lineItems(first: 50) {
+                        edges {
+                          node {
+                            id
+                            title
+                            quantity
+                          }
+                        }
+                      }
+                    }
+                    userErrors {
+                      field
+                      message
+                    }
+                  }
+                }
+              `;
+
+              const beginRes = await shopifyClient.graphql(editBeginMutation, { id: targetOrder.id });
+              const calculatedOrder = beginRes?.orderEditBegin?.calculatedOrder;
+              const beginErrors = beginRes?.orderEditBegin?.userErrors;
+
+              if (calculatedOrder && calculatedOrder.id) {
+                const calcOrderId = calculatedOrder.id;
+
+                for (const addon of validAddons) {
+                  const qty = parseInt(addon.quantity, 10) || 1;
+                  const unitPrice = parseFloat(addon.unitPrice || addon.price) || 6.00;
+                  const variantGid = addon.variantId
+                    ? (String(addon.variantId).startsWith('gid://') ? addon.variantId : `gid://shopify/ProductVariant/${String(addon.variantId).replace(/[^0-9]/g, '')}`)
+                    : null;
+
+                  let lineAdded = false;
+
+                  if (variantGid) {
+                    const addVarMutation = `
+                      mutation orderEditAddVariant($id: ID!, $variantId: ID!, $quantity: Int!) {
+                        orderEditAddVariant(id: $id, variantId: $variantId, quantity: $quantity) {
+                          calculatedLineItem {
+                            id
+                            title
+                            quantity
+                          }
+                          userErrors {
+                            field
+                            message
+                          }
+                        }
+                      }
+                    `;
+                    try {
+                      const varRes = await shopifyClient.graphql(addVarMutation, {
+                        id: calcOrderId,
+                        variantId: variantGid,
+                        quantity: qty
+                      });
+                      if (!varRes?.orderEditAddVariant?.userErrors?.length) {
+                        lineAdded = true;
+                        console.log(`  + [Order Edit] Added Variant: ${qty}x ${addon.title} (${variantGid})`);
+                      } else {
+                        console.warn(`  ⚠️ orderEditAddVariant errors:`, varRes.orderEditAddVariant.userErrors);
+                      }
+                    } catch (vErr) {
+                      console.warn(`  ⚠️ orderEditAddVariant error:`, vErr.message);
+                    }
+                  }
+
+                  if (!lineAdded) {
+                    const addCustomMutation = `
+                      mutation orderEditAddCustomItem($id: ID!, $title: String!, $quantity: Int!, $price: MoneyInput!) {
+                        orderEditAddCustomItem(id: $id, title: $title, quantity: $quantity, price: $price) {
+                          calculatedLineItem {
+                            id
+                            title
+                            quantity
+                          }
+                          userErrors {
+                            field
+                            message
+                          }
+                        }
+                      }
+                    `;
+                    try {
+                      const customRes = await shopifyClient.graphql(addCustomMutation, {
+                        id: calcOrderId,
+                        title: addon.title || 'Add-on Meal',
+                        quantity: qty,
+                        price: {
+                          amount: unitPrice.toFixed(2),
+                          currencyCode: 'GBP'
+                        }
+                      });
+                      if (!customRes?.orderEditAddCustomItem?.userErrors?.length) {
+                        console.log(`  + [Order Edit] Added Custom Line Item: ${qty}x ${addon.title} @ £${unitPrice.toFixed(2)}`);
+                      } else {
+                        console.warn(`  ⚠️ orderEditAddCustomItem errors:`, customRes.orderEditAddCustomItem.userErrors);
+                      }
+                    } catch (cErr) {
+                      console.warn(`  ⚠️ orderEditAddCustomItem error:`, cErr.message);
+                    }
+                  }
+                }
+
+                // Commit the edit to update the Order Total and Line Items
+                const commitMutation = `
+                  mutation orderEditCommit($id: ID!) {
+                    orderEditCommit(id: $id, notifyCustomer: false, staffNote: "Add-on meals synced via Customer Portal") {
+                      order {
+                        id
+                        name
+                        totalPriceSet {
+                          shopMoney {
+                            amount
+                            currencyCode
+                          }
+                        }
+                      }
+                      userErrors {
+                        field
+                        message
+                      }
+                    }
+                  }
+                `;
+
+                const commitRes = await shopifyClient.graphql(commitMutation, { id: calcOrderId });
+                const commitErrs = commitRes?.orderEditCommit?.userErrors;
+                if (!commitErrs || commitErrs.length === 0) {
+                  const newTotal = commitRes?.orderEditCommit?.order?.totalPriceSet?.shopMoney?.amount;
+                  console.log(`🎉 [SUCCESS] Shopify Order ${targetOrder.name} line items updated! New Order Total: £${newTotal}`);
+                } else {
+                  console.warn(`⚠️ orderEditCommit notice:`, commitErrs);
+                }
+              } else if (beginErrors && beginErrors.length > 0) {
+                console.warn(`⚠️ orderEditBegin errors:`, beginErrors);
+              }
+            } catch (editErr) {
+              console.warn(`⚠️ Order editing line item sync notice:`, editErr.message);
+            }
+          }
+        }
       }
     } catch (err) {
       console.warn('⚠️ Could not update recent order note directly:', err.message);

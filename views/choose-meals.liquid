@@ -1727,7 +1727,7 @@
 
       // Update Save Button State & Wording
       if (saveButton) {
-        if (isCutoffPassed) {
+        if (isCutoffPassed && state.totalAddonsPrice <= 0 && !config.isDuplicateTheme) {
           saveButton.disabled = true;
           saveButton.setAttribute('disabled', 'disabled');
           saveButton.style.cursor = 'not-allowed';
@@ -1736,7 +1736,7 @@
           } else {
             saveButton.textContent = `Select ${mealQuota} Meals`;
           }
-        } else if (totalMeals === mealQuota) {
+        } else if (totalMeals === mealQuota || state.totalAddonsPrice > 0) {
           saveButton.disabled = false;
           saveButton.removeAttribute('disabled');
           saveButton.style.cursor = 'pointer';

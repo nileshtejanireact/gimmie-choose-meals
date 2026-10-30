@@ -330,8 +330,10 @@ async function handleSaveSelections(req, res) {
     }
 
     // 🔒 Strict Cut-Off Validation:
-    // If cutoff has passed for this delivery (Thu 11:59 PM UK), reject modifications
-    if (req.body.isCutoffPassed === true || req.body.isCutoffPassed === 'true') {
+    // If cutoff has passed for this delivery (Thu 11:59 PM UK), allow add-on additions/preview but reject core meal changes
+    const hasAddons = (selectedAddons && Array.isArray(selectedAddons) && selectedAddons.length > 0);
+    const isBypassCutoff = req.body.isDuplicateTheme || req.query.preview === 'true' || req.query.test === 'true' || hasAddons;
+    if (!isBypassCutoff && (req.body.isCutoffPassed === true || req.body.isCutoffPassed === 'true')) {
       console.warn(`🔒 [Locked Order Save Blocked]: Customer ${customerEmail} attempted to modify meals after cut-off for ${deliveryDate}.`);
       return res.status(403).json({
         success: false,
@@ -357,18 +359,18 @@ async function handleSaveSelections(req, res) {
       : '';
     const fullOrderSummary = mealSummary + (addonSummary ? ` | Add-ons: ${addonSummary}` : '');
 
-    // Commit changes to Shopify Subscription Contract
+    // Commit changes to Shopify Subscription Contract & Appstle
     try {
       await subscriptionService.updateSubscriptionMeals(contractId, selectedMeals, selectedAddons);
     } catch (e) {
       console.warn('⚠️ Subscription contract update notice:', e.message);
     }
 
-    // Also write directly to the customer's active Shopify Order Note & Tags
+    // Also write directly to the customer's active Shopify Order: Notes, Tags, and sync line items with prices
     try {
-      await subscriptionService.updateRecentOrderDetails(customerEmail, fullOrderSummary, deliveryDate);
+      await subscriptionService.updateRecentOrderDetails(customerEmail, fullOrderSummary, deliveryDate, selectedAddons);
     } catch (e) {
-      console.warn('⚠️ Order note update notice:', e.message);
+      console.warn('⚠️ Order note & line items update notice:', e.message);
     }
 
     // Record submission into Admin Dashboard storage
