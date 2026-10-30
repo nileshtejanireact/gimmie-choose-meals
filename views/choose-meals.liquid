@@ -994,8 +994,14 @@
                             <div class="price">
                               <div class="price__container">
                                 <div class="price__regular">
-                                  <span class="price-item price-item--regular font-heading uppercase">
+                                  <span class="price-item price-item--compare font-heading uppercase" style="text-decoration: line-through; opacity: 0.55; margin-right: 6px; font-weight: 600; display: inline;">
                                     £{{ a_price | replace: '£', '' | strip }}
+                                  </span>
+                                  <span class="price-item price-item--regular font-heading uppercase" style="font-weight: 800;">
+                                    £{{ a_price | replace: '£', '' | strip | times: 0.85 | round: 2 }}
+                                  </span>
+                                  <span class="price-item--discount-badge font-heading uppercase" style="display: inline-block;">
+                                    15% OFF
                                   </span>
                                 </div>
                               </div>
@@ -1111,8 +1117,14 @@
                           <div class="price">
                             <div class="price__container">
                               <div class="price__regular">
-                                <span class="price-item price-item--regular font-heading uppercase">
+                                <span class="price-item price-item--compare font-heading uppercase" style="text-decoration: line-through; opacity: 0.55; margin-right: 6px; font-weight: 600; display: inline;">
                                   £{{ addon.price }}
+                                </span>
+                                <span class="price-item price-item--regular font-heading uppercase" style="font-weight: 800;">
+                                  £{{ addon.price | times: 0.85 | round: 2 }}
+                                </span>
+                                <span class="price-item--discount-badge font-heading uppercase" style="display: inline-block;">
+                                  15% OFF
                                 </span>
                               </div>
                             </div>
@@ -2394,10 +2406,20 @@
     };
 
     function applyAddonDiscounts(discountData) {
-      const discountPercent = (discountData && discountData.valid) ? (parseFloat(discountData.percent) || 0) : 0;
+      let activeDiscount = discountData;
+      if (!activeDiscount && state.activeDiscount && state.activeDiscount.valid) {
+        activeDiscount = state.activeDiscount;
+      }
+      // If still no discount specified, and not explicitly disabled, default to 15% subscriber discount
+      if (!activeDiscount && config.discount !== false && config.discount !== 0 && config.discount !== 'none') {
+        activeDiscount = { valid: true, code: 'GIMMIEAGO', percent: 15 };
+      }
+
+      const discountPercent = (activeDiscount && activeDiscount.valid) ? (parseFloat(activeDiscount.percent) || 0) : 0;
       const discountFactor = discountPercent > 0 ? Math.max(0, (100 - discountPercent) / 100) : 1;
 
-      renderedAddonCards.forEach(card => {
+      const addonCards = document.querySelectorAll('.gimmie-build-box__addon-item, [data-gimmie-addonmeal]');
+      addonCards.forEach(card => {
         const rawPrice = card.getAttribute('data-price') || card.getAttribute('data-addonmeal-price') || '8.00';
         let originalPrice = parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 8.00;
         if (originalPrice >= 100 && !String(rawPrice).includes('.')) {
@@ -2409,7 +2431,7 @@
         // Locate price elements on add-on card
         const priceContainer = card.querySelector('.price__regular') || card.querySelector('.gimmie-build-box__price');
         let compareEl = card.querySelector('.price-item--compare');
-        let currentEl = card.querySelector('.price-item--regular');
+        let currentEl = card.querySelector('.price-item--regular, .price-item');
 
         if (!compareEl && priceContainer) {
           compareEl = document.createElement('span');
@@ -2477,6 +2499,7 @@
         if (matched) {
           item.price = matched.price;
           item.originalPrice = matched.originalPrice;
+          item.discountPercent = matched.discountPercent;
         }
       });
 
@@ -2570,6 +2593,13 @@
       const urlParams = new URLSearchParams(window.location.search);
       const discountParam = urlParams.get('discount') || urlParams.get('code') || urlParams.get('discount_code');
 
+      // Check if discount is explicitly turned off via URL (?discount=0 or ?discount=none)
+      if (discountParam === '0' || discountParam === 'none' || discountParam === 'false') {
+        config.discount = false;
+        applyDynamicBoxDiscount(null);
+        return;
+      }
+
       // Automatically evaluate and apply recurring subscriber discount if attached to account or URL
       if (discountParam) {
         evaluateDiscountCode(discountParam).then(result => {
@@ -2580,8 +2610,10 @@
           applyDynamicBoxDiscount(result);
         });
       } else {
-        // No discount on account: render default base price with compare price hidden
-        applyDynamicBoxDiscount(null);
+        // Automatically activate 15% recurring subscriber discount for add-ons & subscription
+        evaluateDiscountCode('GIMMIEAGO').then(result => {
+          applyDynamicBoxDiscount(result);
+        });
       }
     }
 

@@ -312,6 +312,17 @@ class SubscriptionService {
       }
     }
 
+    // Default to active Gimmie recurring subscriber discount (15% OFF) if no custom code is on file
+    if (!contractDiscount) {
+      contractDiscount = {
+        title: 'GIMMIEAGO',
+        code: 'GIMMIEAGO',
+        percent: 15,
+        value: 15,
+        type: 'percentage'
+      };
+    }
+
     // Handle GIMMIEAGO welcome promotion (30% 1st order + 15% next 3 recurring orders)
     if (contractDiscount && String(contractDiscount.title || contractDiscount.value).toUpperCase() === 'GIMMIEAGO') {
       const orderCount = customer.numberOfOrders || customer.ordersCount || 2;

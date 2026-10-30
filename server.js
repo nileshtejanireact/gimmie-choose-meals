@@ -285,6 +285,15 @@ async function handleAppProxy(req, res) {
     res.set('Pragma', 'no-cache');
     res.set('Expires', '0');
 
+    // Default to active Gimmie recurring subscriber discount (15% OFF)
+    const subscriberDiscount = subscription.discount || {
+      title: 'GIMMIEAGO',
+      code: 'GIMMIEAGO',
+      percent: 15,
+      value: 15,
+      type: 'percentage'
+    };
+
     res.render('choose-meals', {
       customer: customerObj,
       customerName: customerName,
@@ -296,7 +305,7 @@ async function handleAppProxy(req, res) {
       meals: meals,
       addons: addons,
       isDuplicateTheme: isDuplicateTheme,
-      discount: req.query.discount || subscription.discount || null
+      discount: req.query.discount || subscriberDiscount
     });
 
   } catch (error) {
