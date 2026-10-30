@@ -1235,7 +1235,7 @@
             </div>
 
             <!-- Total Price Row (Box + Add-ons) -->
-            <div id="gimmie-summary-total-row" style="margin-top: 8px; display: flex; align-items: center; justify-content: space-between;">
+            <div id="gimmie-summary-total-row" style="margin-top: 8px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;">
               <strong style="font-size: 0.92rem; font-weight: 800; color: var(--gimmie-text);">
                 Total
               </strong>
@@ -1244,35 +1244,7 @@
               </strong>
             </div>
 
-            <!-- Discount Code Input Box (Matching Build Your Box) -->
-            <div class="gimmie-build-box__discount-area" style="margin-top: 14px; padding-top: 12px; border-top: 1.5px dashed #ECEAE4;">
-              <label class="gimmie-build-box__field gimmie-build-box__discount-field" style="display: block;">
-                <span class="font-heading uppercase" style="font-size: 0.78rem; font-weight: 800; color: var(--gimmie-muted); letter-spacing: 0.04em; display: block; margin-bottom: 6px;">Discount code</span>
-                <div class="gimmie-build-box__discount-row" style="display: flex; gap: 8px;">
-                  <input type="text" id="gimmie-portal-discount-code" class="gimmie-build-box__input font-heading" placeholder="Enter discount code" autocomplete="off" spellcheck="false" style="flex: 1; min-width: 0; padding: 8px 12px; border: 1.5px solid var(--gimmie-border); border-radius: 8px; font-size: 0.88rem; text-transform: uppercase; background: #fff; font-weight: 600;">
-                  <button type="button" id="gimmie-portal-apply-discount" class="push-btn" style="padding: 8px 16px; background: #102B10; color: #fff; border: 2px solid #102B10; border-radius: 8px; font-weight: 800; font-size: 0.82rem; cursor: pointer; text-transform: uppercase; white-space: nowrap;">
-                    Apply
-                  </button>
-                </div>
-                <span id="gimmie-portal-discount-msg" class="gimmie-build-box__discount-message" style="display: block; font-size: 0.78rem; margin-top: 6px; font-weight: 600;"></span>
-              </label>
-            </div>
-
-            <!-- Automatic Discount Badge / Breakdown (if customer has active subscription discount) -->
-            <div id="gimmie-summary-discount-section" style="margin-top: 12px; padding: 10px 12px; background: #E8F5E9; border: 1.5px solid #2E7D32; border-radius: 10px; {% unless discount %}display: none;{% endunless %}">
-              <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="font-size: 0.82rem; font-weight: 800; color: #1B5E20; text-transform: uppercase;">
-                  🎉 Applied Discount
-                </span>
-                <span id="gimmie-summary-discount-amount" style="font-size: 0.88rem; font-weight: 800; color: #1B5E20;">
-                  -15%
-                </span>
-              </div>
-              <p id="gimmie-summary-discount-note" style="margin: 4px 0 0; font-size: 0.76rem; color: #2E7D32;">
-                Auto-applies at billing to your upcoming order.
-              </p>
-            </div>
-
+            
             <!-- Save CTA -->
             <button id="gimmie-save-btn" class="gimmie-build-box__button" disabled>
               Select {{ mealQuota }} Meals
@@ -2519,12 +2491,10 @@
     }
 
     function initDiscountUI() {
-      const applyBtn = document.getElementById('gimmie-portal-apply-discount');
-      const inputEl = document.getElementById('gimmie-portal-discount-code');
       const urlParams = new URLSearchParams(window.location.search);
       const discountParam = urlParams.get('discount') || urlParams.get('code') || urlParams.get('discount_code');
 
-      // Check if active discount is on contract or passed via URL parameter
+      // Automatically evaluate and apply discount if present on subscription contract or passed via URL parameter
       if (discountParam) {
         evaluateDiscountCode(discountParam).then(result => {
           applyDynamicBoxDiscount(result);
@@ -2537,30 +2507,6 @@
       } else {
         // No discount on account: render default base price with compare price hidden
         applyDynamicBoxDiscount(null);
-      }
-
-      if (applyBtn && inputEl) {
-        const handleApply = async () => {
-          const val = inputEl.value.trim();
-          if (!val) {
-            applyDynamicBoxDiscount(null);
-            return;
-          }
-          applyBtn.disabled = true;
-          applyBtn.textContent = '...';
-          const res = await evaluateDiscountCode(val);
-          applyDynamicBoxDiscount(res);
-          applyBtn.disabled = false;
-          applyBtn.textContent = 'Apply';
-        };
-
-        applyBtn.addEventListener('click', handleApply);
-        inputEl.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            handleApply();
-          }
-        });
       }
     }
 
