@@ -441,9 +441,19 @@ class SubscriptionService {
 
     console.log(`✓ Subscription Draft Created: ${draftId}`);
 
-    // Step 2: Remove existing lines from draft
+    // Step 2: Identify Box Line vs existing Add-on Lines in draft
     const existingDraftLines = draft.lines?.edges?.map(e => e.node) || [];
-    for (const existingLine of existingDraftLines) {
+    
+    // Find the primary Box line (Build Your Box / 6 Pack / primary subscription product)
+    const boxLine = existingDraftLines.find(l => {
+      const text = `${l.title || ''} ${l.variantTitle || ''}`.toLowerCase();
+      return text.includes('box') || text.includes('pack') || text.includes('meal') || text.includes('build');
+    }) || existingDraftLines[0];
+
+    const nonBoxLines = existingDraftLines.filter(l => l.id !== boxLine?.id);
+
+    // Remove any previous add-on lines so selections are updated cleanly without duplicating
+    for (const oldAddonLine of nonBoxLines) {
       const removeLineMutation = `
         mutation subscriptionDraftLineRemove($draftId: ID!, $lineId: ID!) {
           subscriptionDraftLineRemove(draftId: $draftId, lineId: $lineId) {
@@ -457,50 +467,81 @@ class SubscriptionService {
           }
         }
       `;
-      await shopifyClient.graphql(removeLineMutation, {
-        draftId,
-        lineId: existingLine.id
-      });
-    }
-
-    console.log(`✓ Cleared ${existingDraftLines.length} old line item(s) from draft.`);
-
-    // Step 3: Add new selected meal lines to draft
-    for (const meal of selectedMeals) {
-      if (meal.quantity > 0 && meal.variantId) {
-        const addLineMutation = `
-          mutation subscriptionDraftLineAdd($draftId: ID!, $input: SubscriptionLineInput!) {
-            subscriptionDraftLineAdd(draftId: $draftId, input: $input) {
-              draft {
-                id
-              }
-              userErrors {
-                field
-                message
-              }
-            }
-          }
-        `;
-
-        const variantGid = String(meal.variantId).startsWith('gid://')
-          ? meal.variantId
-          : `gid://shopify/ProductVariant/${meal.variantId}`;
-
-        await shopifyClient.graphql(addLineMutation, {
+      try {
+        await shopifyClient.graphql(removeLineMutation, {
           draftId,
-          input: {
-            productVariantId: variantGid,
-            quantity: parseInt(meal.quantity, 10),
-            customAttributes: [
-              { key: 'Meal Title', value: meal.title || 'Meal Selection' }
-            ]
-          }
+          lineId: oldAddonLine.id
         });
-        console.log(`  + Added: ${meal.quantity}x ${meal.title} (${variantGid})`);
+        console.log(`  - Removed previous add-on line: ${oldAddonLine.title} (${oldAddonLine.id})`);
+      } catch (rErr) {
+        console.warn(`  ⚠️ Line remove notice:`, rErr.message);
       }
     }
 
-        // Step 3b: Add selected add-on lines with their exact price (+£8.00)
+    // Step 3: Update the Main Box Line's custom attributes with chosen meals
+    if (boxLine) {
+      const updateBoxLineMutation = `
+        mutation subscriptionDraftLineUpdate($draftId: ID!, $lineId: ID!, $input: SubscriptionLineUpdateInput!) {
+          subscriptionDraftLineUpdate(draftId: $draftId, lineId: $lineId, input: $input) {
+            draft {
+              id
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }
+      `;
+
+      const boxAttributes = [
+        { key: 'Meal Selection', value: mealSummaryText },
+        { key: 'Total Meals', value: String(selectedMeals.reduce((s, m) => s + (parseInt(m.quantity, 10) || 0), 0)) },
+        ...selectedMeals.map((m, idx) => ({ key: `Dish ${idx + 1}`, value: `${m.quantity}x ${m.title}` }))
+      ];
+
+      try {
+        await shopifyClient.graphql(updateBoxLineMutation, {
+          draftId,
+          lineId: boxLine.id,
+          input: {
+            customAttributes: boxAttributes
+          }
+        });
+        console.log(`✓ Updated Main Box (${boxLine.title}) with ${selectedMeals.length} meal selections.`);
+      } catch (uErr) {
+        console.warn(`⚠️ Box line update notice:`, uErr.message);
+      }
+    } else {
+      // If no pre-existing box line, attempt adding selected meals
+      for (const meal of selectedMeals) {
+        if (meal.quantity > 0 && meal.variantId) {
+          const addLineMutation = `
+            mutation subscriptionDraftLineAdd($draftId: ID!, $input: SubscriptionLineInput!) {
+              subscriptionDraftLineAdd(draftId: $draftId, input: $input) {
+                draft { id }
+                userErrors { field message }
+              }
+            }
+          `;
+          const variantGid = String(meal.variantId).startsWith('gid://')
+            ? meal.variantId
+            : `gid://shopify/ProductVariant/${meal.variantId}`;
+          try {
+            await shopifyClient.graphql(addLineMutation, {
+              draftId,
+              input: {
+                productVariantId: variantGid,
+                quantity: parseInt(meal.quantity, 10),
+                customAttributes: [{ key: 'Meal Title', value: meal.title || 'Meal Selection' }]
+              }
+            });
+          } catch (mErr) {}
+        }
+      }
+    }
+
+    // Step 3b: Add selected add-on lines with their exact price (+£12.00) for NEXT order
     if (selectedAddons && Array.isArray(selectedAddons) && selectedAddons.length > 0) {
       const validAddons = selectedAddons.filter(a => (parseInt(a.quantity, 10) || 0) > 0 && a.variantId);
 
@@ -510,7 +551,7 @@ class SubscriptionService {
         try {
           const numericContractId = String(contractId).replace(/[^0-9]/g, '');
           const batchedLineItems = validAddons.map(addon => {
-            const unitPrice = parseFloat(addon.unitPrice || addon.price) || 8.00;
+            const unitPrice = parseFloat(addon.unitPrice || addon.price) || 6.00;
             return {
               variantId: String(addon.variantId).replace(/[^0-9]/g, ''),
               quantity: parseInt(addon.quantity, 10),
@@ -541,55 +582,54 @@ class SubscriptionService {
       }
 
       // 2. Native Shopify Subscription GraphQL Draft Line Item Add
-      for (const addon of selectedAddons) {
-        if (addon.quantity > 0 && addon.variantId) {
-          const variantGid = String(addon.variantId).startsWith('gid://')
-            ? addon.variantId
-            : `gid://shopify/ProductVariant/${String(addon.variantId).replace(/[^0-9]/g, '')}`;
+      for (const addon of validAddons) {
+        const variantGid = String(addon.variantId).startsWith('gid://')
+          ? addon.variantId
+          : `gid://shopify/ProductVariant/${String(addon.variantId).replace(/[^0-9]/g, '')}`;
 
-          const cleanPrice = parseFloat(addon.unitPrice || addon.price) || 8.00;
-          const origPrice = parseFloat(addon.originalPrice || cleanPrice) || cleanPrice;
-          const discPct = parseInt(addon.discountPercent, 10) || (origPrice > cleanPrice ? Math.round((1 - cleanPrice / origPrice) * 100) : 0);
+        const cleanPrice = parseFloat(addon.unitPrice || addon.price) || 6.00;
+        const origPrice = parseFloat(addon.originalPrice || cleanPrice) || cleanPrice;
+        const discPct = parseInt(addon.discountPercent, 10) || (origPrice > cleanPrice ? Math.round((1 - cleanPrice / origPrice) * 100) : 0);
+        const addonQty = parseInt(addon.quantity, 10);
 
-          // Attempt adding line with native variant pricing
-          const addLineMutation = `
-            mutation subscriptionDraftLineAdd($draftId: ID!, $input: SubscriptionLineInput!) {
-              subscriptionDraftLineAdd(draftId: $draftId, input: $input) {
-                draft {
-                  id
-                }
-                userErrors {
-                  field
-                  message
-                }
+        const addLineMutation = `
+          mutation subscriptionDraftLineAdd($draftId: ID!, $input: SubscriptionLineInput!) {
+            subscriptionDraftLineAdd(draftId: $draftId, input: $input) {
+              draft {
+                id
+              }
+              userErrors {
+                field
+                message
               }
             }
-          `;
-
-          const customAttributes = [
-            { key: 'Item Type', value: 'Featured Add-on (One-time)' },
-            { key: 'Addon Title', value: addon.title || 'Add-on Meal' },
-            { key: 'Price Extra', value: `£${cleanPrice.toFixed(2)}` }
-          ];
-
-          if (discPct > 0) {
-            customAttributes.push({ key: 'Discount Applied', value: `${discPct}% Subscriber Discount` });
-            customAttributes.push({ key: 'Original Price', value: `£${origPrice.toFixed(2)}` });
           }
+        `;
 
-          try {
-            await shopifyClient.graphql(addLineMutation, {
-              draftId,
-              input: {
-                productVariantId: variantGid,
-                quantity: parseInt(addon.quantity, 10),
-                customAttributes
-              }
-            });
-            console.log(`  + [Shopify Draft Line Added]: ${addon.quantity}x ${addon.title} (${variantGid})`);
-          } catch (err) {
-            console.warn(`  ℹ️ Shopify native draft line notice for ${addon.title}: ${err.message}`);
-          }
+        const customAttributes = [
+          { key: 'Item Type', value: 'Featured Add-on (One-time)' },
+          { key: 'Addon Title', value: addon.title || 'Add-on Meal' },
+          { key: 'Unit Price', value: `£${cleanPrice.toFixed(2)}` },
+          { key: 'Line Total', value: `£${(addonQty * cleanPrice).toFixed(2)}` }
+        ];
+
+        if (discPct > 0) {
+          customAttributes.push({ key: 'Discount Applied', value: `${discPct}% Subscriber Discount` });
+          customAttributes.push({ key: 'Original Price', value: `£${origPrice.toFixed(2)}` });
+        }
+
+        try {
+          await shopifyClient.graphql(addLineMutation, {
+            draftId,
+            input: {
+              productVariantId: variantGid,
+              quantity: addonQty,
+              customAttributes
+            }
+          });
+          console.log(`  + [Shopify Draft Line Added]: ${addonQty}x ${addon.title} (${variantGid}) @ £${cleanPrice.toFixed(2)}`);
+        } catch (err) {
+          console.warn(`  ℹ️ Shopify native draft line notice for ${addon.title}: ${err.message}`);
         }
       }
     }
@@ -628,9 +668,9 @@ class SubscriptionService {
 
     const updatedContract = commitResult?.subscriptionDraftCommit?.contract;
     console.log(`\n🎉 [SUCCESS] Subscription Contract ${updatedContract.id} committed successfully!`);
-    // Step 5: Also update the latest Shopify Order Note & Tags if an order exists
+    // Step 5: Also update the latest Shopify Order Note & Tags and line items if an order exists
     try {
-      await this.updateRecentOrderDetails(customer?.email, mealSummaryText);
+      await this.updateRecentOrderDetails(customer?.email, mealSummaryText, 'Next Delivery', selectedAddons);
     } catch (e) {}
 
     return {
