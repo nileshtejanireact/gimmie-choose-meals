@@ -346,7 +346,14 @@ async function handleSaveSelections(req, res) {
     const totalSelected = selectedMeals.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0);
     const mealSummary = selectedMeals.map(m => `${m.quantity}x ${m.title}`).join(', ');
     const addonSummary = (selectedAddons && selectedAddons.length > 0)
-      ? selectedAddons.map(a => `${a.quantity}x ${a.title} (+£${a.price || '0'})`).join(', ')
+      ? selectedAddons.map(a => {
+          const uPrice = parseFloat(a.unitPrice || a.price || 0).toFixed(2);
+          const origPrice = a.originalPrice ? parseFloat(a.originalPrice).toFixed(2) : null;
+          const disc = (origPrice && parseFloat(origPrice) > parseFloat(uPrice))
+            ? ` (~£${origPrice}~ £${uPrice})`
+            : ` (+£${uPrice})`;
+          return `${a.quantity}x ${a.title}${disc}`;
+        }).join(', ')
       : '';
     const fullOrderSummary = mealSummary + (addonSummary ? ` | Add-ons: ${addonSummary}` : '');
 

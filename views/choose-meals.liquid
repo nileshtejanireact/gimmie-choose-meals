@@ -1920,12 +1920,16 @@
       if (!addon) return;
 
       if (!state.addonSelections[addonId]) {
+        const uPrice = parseFloat(addon.price) || 0;
+        const origPrice = parseFloat(addon.originalPrice || addon.price) || uPrice;
         state.addonSelections[addonId] = {
           quantity: 0,
           title: addon.title,
           id: addon.id,
           variantId: addon.variantId,
-          price: parseFloat(addon.price) || 0
+          price: uPrice,
+          originalPrice: origPrice,
+          discountPercent: addon.discountPercent || (state.activeDiscount ? state.activeDiscount.percent : 0)
         };
       }
 
@@ -2170,6 +2174,7 @@
         selectedAddons: Object.values(state.addonSelections).filter(item => item.quantity > 0).map(item => {
             const q = parseInt(item.quantity, 10);
             const uPrice = parseFloat(item.unitPrice || item.price) || 0;
+            const origPrice = parseFloat(item.originalPrice || uPrice) || uPrice;
             const lTotal = (q * uPrice).toFixed(2);
             return {
               id: item.id,
@@ -2177,8 +2182,10 @@
               title: item.title,
               quantity: q,
               unitPrice: uPrice.toFixed(2),
+              price: uPrice.toFixed(2),
+              originalPrice: origPrice.toFixed(2),
               lineTotal: lTotal,
-              price: lTotal
+              discountPercent: item.discountPercent || (state.activeDiscount ? state.activeDiscount.percent : 0)
             };
           }),
         addonsTotal: state.totalAddonsPrice.toFixed(2),

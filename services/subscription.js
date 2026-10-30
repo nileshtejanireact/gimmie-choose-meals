@@ -509,11 +509,14 @@ class SubscriptionService {
       if (appstleApiKey && validAddons.length > 0) {
         try {
           const numericContractId = String(contractId).replace(/[^0-9]/g, '');
-          const batchedLineItems = validAddons.map(addon => ({
-            variantId: String(addon.variantId).replace(/[^0-9]/g, ''),
-            quantity: parseInt(addon.quantity, 10),
-            price: parseFloat(addon.price) || 8.00
-          }));
+          const batchedLineItems = validAddons.map(addon => {
+            const unitPrice = parseFloat(addon.unitPrice || addon.price) || 8.00;
+            return {
+              variantId: String(addon.variantId).replace(/[^0-9]/g, ''),
+              quantity: parseInt(addon.quantity, 10),
+              price: unitPrice
+            };
+          });
 
           console.log(`📡 [Appstle Batch API] Bundling ${batchedLineItems.length} extra items into a single batch API call for contract ${numericContractId}...`);
 
@@ -544,7 +547,9 @@ class SubscriptionService {
             ? addon.variantId
             : `gid://shopify/ProductVariant/${String(addon.variantId).replace(/[^0-9]/g, '')}`;
 
-          const cleanPrice = parseFloat(addon.price) || 8.00;
+          const cleanPrice = parseFloat(addon.unitPrice || addon.price) || 8.00;
+          const origPrice = parseFloat(addon.originalPrice || cleanPrice) || cleanPrice;
+          const discPct = parseInt(addon.discountPercent, 10) || (origPrice > cleanPrice ? Math.round((1 - cleanPrice / origPrice) * 100) : 0);
 
           // Attempt adding line with native variant pricing
           const addLineMutation = `
@@ -561,17 +566,24 @@ class SubscriptionService {
             }
           `;
 
+          const customAttributes = [
+            { key: 'Item Type', value: 'Featured Add-on (One-time)' },
+            { key: 'Addon Title', value: addon.title || 'Add-on Meal' },
+            { key: 'Price Extra', value: `£${cleanPrice.toFixed(2)}` }
+          ];
+
+          if (discPct > 0) {
+            customAttributes.push({ key: 'Discount Applied', value: `${discPct}% Subscriber Discount` });
+            customAttributes.push({ key: 'Original Price', value: `£${origPrice.toFixed(2)}` });
+          }
+
           try {
             await shopifyClient.graphql(addLineMutation, {
               draftId,
               input: {
                 productVariantId: variantGid,
                 quantity: parseInt(addon.quantity, 10),
-                customAttributes: [
-                  { key: 'Item Type', value: 'Featured Add-on (One-time)' },
-                  { key: 'Addon Title', value: addon.title || 'Add-on Meal' },
-                  { key: 'Price Extra', value: `£${cleanPrice.toFixed(2)}` }
-                ]
+                customAttributes
               }
             });
             console.log(`  + [Shopify Draft Line Added]: ${addon.quantity}x ${addon.title} (${variantGid})`);
