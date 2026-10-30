@@ -2425,6 +2425,13 @@
           }
         }
 
+        let badgeEl = card.querySelector('.price-item--discount-badge');
+        if (!badgeEl && priceContainer) {
+          badgeEl = document.createElement('span');
+          badgeEl.className = 'price-item--discount-badge font-heading uppercase';
+          priceContainer.appendChild(badgeEl);
+        }
+
         if (discountPercent > 0) {
           // Auto-detected subscriber discount: show slashed original price and discounted rate
           if (compareEl) {
@@ -2435,6 +2442,10 @@
             currentEl.textContent = '£' + discountedPrice.toFixed(2);
             currentEl.style.fontWeight = '800';
           }
+          if (badgeEl) {
+            badgeEl.textContent = discountPercent + '% OFF';
+            badgeEl.style.display = 'inline-block';
+          }
         } else {
           // Regular subscriber without discount: no slash
           if (compareEl) {
@@ -2443,6 +2454,9 @@
           if (currentEl) {
             currentEl.textContent = '£' + originalPrice.toFixed(2);
             currentEl.style.fontWeight = '700';
+          }
+          if (badgeEl) {
+            badgeEl.style.display = 'none';
           }
         }
 
