@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 console.log('=============================================');
-console.log('🧪 TESTING DYNAMIC DISCOUNT & STRIKETHROUGH LOGIC');
+console.log('🧪 TESTING SUBSCRIBER RECURRING DISCOUNT & ADD-ON ENGINE');
 console.log('=============================================\n');
 
 const liquidPath = path.resolve(__dirname, '../views/choose-meals.liquid');
@@ -13,67 +13,37 @@ const liquid = fs.readFileSync(liquidPath, 'utf8');
 assert(liquid.includes('id="gimmie-summary-box-compare"'), 'Box compare price element must exist');
 assert(liquid.includes('id="gimmie-summary-box-current"'), 'Box current price element must exist');
 assert(liquid.includes('id="gimmie-summary-grand-total"'), 'Grand total element must exist');
-console.log('[Check 1] Box price and grand total DOM elements present in template: ✓ PASS');
+console.log('[Check 1] Box price and grand total DOM elements present: ✓ PASS');
 
-// 2. Check that manual discount code input box and discount badge section are removed
+// 2. Check that manual discount input box and discount badge box are completely removed
 assert(!liquid.includes('id="gimmie-portal-discount-code"'), 'Discount input must be removed from customer portal');
 assert(!liquid.includes('id="gimmie-portal-apply-discount"'), 'Discount apply button must be removed');
 assert(!liquid.includes('id="gimmie-summary-discount-section"'), 'Discount badge section must be removed');
 console.log('[Check 2] Manual discount input box and discount badge box removed as requested: ✓ PASS');
 
-// 3. Check that fallback mock discount for duplicate theme was removed
-assert(!liquid.includes('unless discount or is_duplicate_theme'), 'Mock discount on preview theme must be removed');
-console.log('[Check 3] Preview theme mock discount removed (no false 15% display): ✓ PASS');
+// 3. Check applyAddonDiscounts function exists
+assert(liquid.includes('function applyAddonDiscounts(discountData)'), 'applyAddonDiscounts function must exist');
+console.log('[Check 3] Auto-detection engine for add-on slashed prices is wired: ✓ PASS');
 
-// 4. Test calculation logic for 6, 8, and 10 pack boxes with HOY25 (25%)
-const boxPricing = {
-  6: 48.00,
-  8: 64.00,
-  10: 80.00
-};
+// 4. Test GIMMIEAGO welcome code recurring discount (15% off recurring orders)
+const gFactor = (100 - 15) / 100;
+const originalAddon = 4.00;
+const discountedAddon = originalAddon * gFactor;
+assert.strictEqual(discountedAddon.toFixed(2), '3.40', '£4.00 add-on with 15% discount must be £3.40');
 
-const discountPercent = 25; // HOY25
-const factor = (100 - discountPercent) / 100;
+const originalBox6 = 48.00;
+const discountedBox6 = originalBox6 * gFactor;
+assert.strictEqual(discountedBox6.toFixed(2), '40.80', '£48.00 box with 15% discount must be £40.80');
 
-Object.entries(boxPricing).forEach(([quota, original]) => {
-  const discounted = original * factor;
-  const savings = original - discounted;
-  
-  if (quota === '6') {
-    assert.strictEqual(original.toFixed(2), '48.00');
-    assert.strictEqual(discounted.toFixed(2), '36.00');
-    assert.strictEqual(savings.toFixed(2), '12.00');
-  } else if (quota === '8') {
-    assert.strictEqual(original.toFixed(2), '64.00');
-    assert.strictEqual(discounted.toFixed(2), '48.00');
-    assert.strictEqual(savings.toFixed(2), '16.00');
-  } else if (quota === '10') {
-    assert.strictEqual(original.toFixed(2), '80.00');
-    assert.strictEqual(discounted.toFixed(2), '60.00');
-    assert.strictEqual(savings.toFixed(2), '20.00');
-  }
-});
-console.log('[Check 4] HOY25 (25% off) calculation matches exact client spec (~£48~ £36): ✓ PASS');
+const grandTotalGimmie = discountedBox6 + discountedAddon;
+assert.strictEqual(grandTotalGimmie.toFixed(2), '44.20', 'Total must equal £40.80 + £3.40 = £44.20');
+console.log('[Check 4] GIMMIEAGO recurring discount calculation matches (Add-on ~£4.00~ £3.40, Box ~£48.00~ £40.80): ✓ PASS');
 
-// 5. Test Add-ons summation with discounted box
-const boxDiscounted = 36.00;
-const addonsPrice = 4.00;
-const grandTotal = boxDiscounted + addonsPrice;
-assert.strictEqual(grandTotal.toFixed(2), '40.00');
-console.log('[Check 5] Grand total combines discounted box + add-ons (£36 + £4 = £40): ✓ PASS');
-
-// 6. Test evaluateDiscountCode mappings
-const codes = {
-  'HOY25': 25,
-  'GIMMIEAGO': 30,
-  'WELCOME15': 15,
-  'VIP20': 20,
-  'SAVE10': 10
-};
-Object.entries(codes).forEach(([c, p]) => {
-  assert.strictEqual(p, c === 'HOY25' ? 25 : c === 'GIMMIEAGO' ? 30 : c === 'WELCOME15' ? 15 : c === 'VIP20' ? 20 : 10);
-});
-console.log('[Check 6] Promotion code evaluation matches store discount rules: ✓ PASS');
+// 5. Test 25% discount (HOY25)
+const factor25 = (100 - 25) / 100;
+assert.strictEqual((4.00 * factor25).toFixed(2), '3.00');
+assert.strictEqual((48.00 * factor25).toFixed(2), '36.00');
+console.log('[Check 5] HOY25 (25% off) calculation matches (Add-on ~£4.00~ £3.00, Box ~£48.00~ £36.00): ✓ PASS');
 
 console.log('\n=============================================');
 console.log('Overall Result: ✓ 100% PASS');

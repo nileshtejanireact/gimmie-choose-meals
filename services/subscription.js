@@ -291,10 +291,34 @@ class SubscriptionService {
         type: dNode.percentage ? 'percentage' : 'fixed_amount'
       };
     } else if (contract.customAttributes && Array.isArray(contract.customAttributes)) {
-      const discAttr = contract.customAttributes.find(a => a.key === 'discount_code' || a.key === '_discount' || a.key === 'discount');
+      const discAttr = contract.customAttributes.find(a => 
+        a.key === 'discount_code' || a.key === '_discount' || a.key === 'discount' || 
+        a.key === 'appstle_discount' || a.key === '_discount_code' || a.key === 'promo_code'
+      );
       if (discAttr) {
         contractDiscount = { title: discAttr.value, value: discAttr.value };
       }
+    }
+
+    // Auto-detect customer tags for recurring welcome codes (e.g. GIMMIEAGO)
+    if (!contractDiscount && customer.tags) {
+      const tags = Array.isArray(customer.tags) ? customer.tags : String(customer.tags).split(',').map(t => t.trim());
+      const knownCode = tags.find(t => {
+        const u = t.toUpperCase();
+        return u === 'GIMMIEAGO' || u === 'HOY25' || u === 'WELCOME15' || u === 'VIP20' || u.includes('15%') || u.includes('30%');
+      });
+      if (knownCode) {
+        contractDiscount = { title: knownCode.toUpperCase(), value: knownCode.toUpperCase() };
+      }
+    }
+
+    // Handle GIMMIEAGO welcome promotion (30% 1st order + 15% next 3 recurring orders)
+    if (contractDiscount && String(contractDiscount.title || contractDiscount.value).toUpperCase() === 'GIMMIEAGO') {
+      const orderCount = customer.numberOfOrders || customer.ordersCount || 2;
+      const recurringPercent = orderCount <= 1 ? 30 : 15;
+      contractDiscount.percent = recurringPercent;
+      contractDiscount.value = recurringPercent;
+      contractDiscount.code = 'GIMMIEAGO';
     }
 
     return {

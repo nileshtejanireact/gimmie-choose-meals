@@ -1831,11 +1831,15 @@
           addonItems.forEach(([vId, item]) => {
             const removeHtml = isCutoffPassed ? '' : `<span style="cursor: pointer; opacity: 0.7; font-size: 1.1rem; margin-left: 6px;" data-remove-addon="${vId}">&times;</span>`;
             const itemPrice = (item.quantity * item.price).toFixed(2);
+            const origTotal = (item.quantity * (item.originalPrice || item.price)).toFixed(2);
+            const compareHtml = (item.originalPrice && item.price < item.originalPrice)
+              ? `<span style="text-decoration: line-through; opacity: 0.55; margin-right: 4px; font-size: 0.85em;">+£${origTotal}</span>`
+              : '';
             html += `
               <div class="gimmie-build-box__selected-addon-row">
                 <span>${item.quantity} × ${item.title}</span>
                 <span style="display: flex; align-items: center; gap: 4px; font-weight: 800;">
-                  +£${itemPrice}
+                  ${compareHtml}<span>+£${itemPrice}</span>
                   ${removeHtml}
                 </span>
               </div>
@@ -2382,17 +2386,89 @@
       10: { original: 80.00, formatted: '£80.00' }
     };
 
+    function applyAddonDiscounts(discountData) {
+      const discountPercent = (discountData && discountData.valid) ? (parseFloat(discountData.percent) || 0) : 0;
+      const discountFactor = discountPercent > 0 ? Math.max(0, (100 - discountPercent) / 100) : 1;
+
+      renderedAddonCards.forEach(card => {
+        const rawPrice = card.getAttribute('data-price') || card.getAttribute('data-addonmeal-price') || '8.00';
+        let originalPrice = parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 8.00;
+        if (originalPrice >= 100 && !String(rawPrice).includes('.')) {
+          originalPrice = originalPrice / 100;
+        }
+
+        const discountedPrice = originalPrice * discountFactor;
+
+        // Locate price elements on add-on card
+        const priceContainer = card.querySelector('.price__regular') || card.querySelector('.gimmie-build-box__price');
+        let compareEl = card.querySelector('.price-item--compare');
+        let currentEl = card.querySelector('.price-item--regular');
+
+        if (!compareEl && priceContainer) {
+          compareEl = document.createElement('span');
+          compareEl.className = 'price-item price-item--compare font-heading uppercase';
+          compareEl.style.textDecoration = 'line-through';
+          compareEl.style.opacity = '0.55';
+          compareEl.style.marginRight = '6px';
+          compareEl.style.fontWeight = '600';
+          if (currentEl) {
+            priceContainer.insertBefore(compareEl, currentEl);
+          } else {
+            priceContainer.appendChild(compareEl);
+          }
+        }
+
+        if (discountPercent > 0) {
+          // Auto-detected subscriber discount: show slashed original price and discounted rate
+          if (compareEl) {
+            compareEl.textContent = '£' + originalPrice.toFixed(2);
+            compareEl.style.display = 'inline';
+          }
+          if (currentEl) {
+            currentEl.textContent = '£' + discountedPrice.toFixed(2);
+            currentEl.style.fontWeight = '800';
+          }
+        } else {
+          // Regular subscriber without discount: no slash
+          if (compareEl) {
+            compareEl.style.display = 'none';
+          }
+          if (currentEl) {
+            currentEl.textContent = '£' + originalPrice.toFixed(2);
+            currentEl.style.fontWeight = '700';
+          }
+        }
+
+        // Update effective price in addons data array
+        const cardId = card.getAttribute('data-addon-id') || card.getAttribute('data-addonmeal-id') || card.getAttribute('data-meal-id');
+        const matched = addons.find(a => String(a.variantId) === String(cardId) || String(a.id) === String(cardId));
+        if (matched) {
+          matched.originalPrice = originalPrice;
+          matched.price = discountPercent > 0 ? discountedPrice : originalPrice;
+          matched.discountPercent = discountPercent;
+        }
+      });
+
+      // Update state.addonSelections items with new effective price
+      Object.keys(state.addonSelections).forEach(id => {
+        const item = state.addonSelections[id];
+        const matched = addons.find(a => String(a.variantId) === String(id) || String(a.id) === String(id));
+        if (matched) {
+          item.price = matched.price;
+          item.originalPrice = matched.originalPrice;
+        }
+      });
+
+      updateUI();
+    }
+
     function applyDynamicBoxDiscount(discountData) {
       const quota = parseInt(config.mealQuota || 6, 10);
       const baseInfo = boxPricingTable[quota] || { original: quota * 8.00, formatted: '£' + (quota * 8.00).toFixed(2) };
       
       const boxCompareEl = document.getElementById('gimmie-summary-box-compare');
       const boxCurrentEl = document.getElementById('gimmie-summary-box-current');
-      const discountSection = document.getElementById('gimmie-summary-discount-section');
-      const discountAmountEl = document.getElementById('gimmie-summary-discount-amount');
-      const discountNoteEl = document.getElementById('gimmie-summary-discount-note');
-      const discountMsgEl = document.getElementById('gimmie-portal-discount-msg');
-      const discountInput = document.getElementById('gimmie-portal-discount-code');
+      const grandTotalEl = document.getElementById('gimmie-summary-grand-total');
 
       if (!boxCurrentEl) return;
 
@@ -2401,13 +2477,8 @@
         state.activeDiscount = null;
         if (boxCompareEl) boxCompareEl.style.display = 'none';
         boxCurrentEl.textContent = baseInfo.formatted;
-        if (discountSection) discountSection.style.display = 'none';
-        const grandTotalEl = document.getElementById('gimmie-summary-grand-total');
+        applyAddonDiscounts(null);
         if (grandTotalEl) grandTotalEl.textContent = '£' + (baseInfo.original + (state.totalAddonsPrice || 0)).toFixed(2);
-        if (discountMsgEl && discountData && discountData.error) {
-          discountMsgEl.textContent = (discountData.code || 'Code') + ' cannot be applied to this box.';
-          discountMsgEl.style.color = '#b42318';
-        }
         return;
       }
 
@@ -2417,91 +2488,74 @@
       const percent = parseFloat(discountData.percent) || 0;
       const discountFactor = Math.max(0, (100 - percent) / 100);
       const finalPrice = baseInfo.original * discountFactor;
-      const savings = baseInfo.original - finalPrice;
 
-      // 1. Strike out the original price with slash, show new discounted price
+      // Strike out the original box price with slash, show new discounted price
       if (boxCompareEl) {
         boxCompareEl.textContent = baseInfo.formatted;
         boxCompareEl.style.display = 'inline';
       }
       boxCurrentEl.textContent = '£' + finalPrice.toFixed(2);
 
-      const grandTotalEl = document.getElementById('gimmie-summary-grand-total');
+      // Auto-apply subscriber discount to add-ons
+      applyAddonDiscounts(discountData);
+
       if (grandTotalEl) {
         grandTotalEl.textContent = '£' + (finalPrice + (state.totalAddonsPrice || 0)).toFixed(2);
-      }
-
-      // 2. Update discount callout badge
-      if (discountSection) {
-        discountSection.style.display = 'block';
-        if (discountAmountEl) {
-          discountAmountEl.textContent = '-' + percent + '%';
-        }
-        if (discountNoteEl) {
-          discountNoteEl.textContent = (discountData.code ? discountData.code + ': ' : '') + percent + '% off auto-applies at billing. Saves £' + savings.toFixed(2) + ' on your upcoming box.';
-        }
-      }
-
-      // 3. Show success message
-      if (discountMsgEl) {
-        discountMsgEl.textContent = (discountData.code || 'Discount') + ' — ' + percent + '% off applied.';
-        discountMsgEl.style.color = '#1E6B24';
-      }
-
-      if (discountInput && discountData.code) {
-        discountInput.value = discountData.code;
       }
     }
 
     async function evaluateDiscountCode(rawCode) {
-      const code = String(rawCode || '').replace(/\s+/g, '').toUpperCase().trim();
-      if (!code) return { valid: false };
+      if (!rawCode) return { valid: false };
 
-      // Exact store promotion mappings (HOY25 = 25% off, GIMMIEAGO = 30% off, etc.)
-      if (code === 'HOY25') return { valid: true, code: 'HOY25', percent: 25 };
-      if (code === 'GIMMIEAGO') return { valid: true, code: 'GIMMIEAGO', percent: 30 };
-      if (code === 'WELCOME15') return { valid: true, code: 'WELCOME15', percent: 15 };
-      if (code === 'VIP20') return { valid: true, code: 'VIP20', percent: 20 };
+      let code = '';
+      let percent = 0;
 
-      // Dynamic percentage detection from code name (e.g., SAVE15, 20OFF, 10PERCENT)
-      const numMatch = code.match(/(\d{1,2})/);
-      if (numMatch) {
-        const p = parseInt(numMatch[1], 10);
-        if (p >= 5 && p <= 50) {
-          return { valid: true, code: code, percent: p };
+      if (typeof rawCode === 'object') {
+        code = String(rawCode.title || rawCode.code || rawCode.name || '').toUpperCase().trim();
+        percent = parseFloat(rawCode.percent || rawCode.value || rawCode.percentage || 0);
+      } else {
+        code = String(rawCode).replace(/\s+/g, '').toUpperCase().trim();
+      }
+
+      // If code is GIMMIEAGO: 30% off 1st order + 15% off next 3 recurring orders
+      if (!percent || isNaN(percent) || percent <= 0) {
+        if (code === 'GIMMIEAGO') {
+          percent = 15; // Recurring subscriber discount for weekly meal picker
+        } else if (code === 'HOY25') {
+          percent = 25;
+        } else if (code === 'WELCOME15') {
+          percent = 15;
+        } else if (code === 'VIP20') {
+          percent = 20;
+        } else if (code === 'SAVE10') {
+          percent = 10;
+        } else {
+          const numMatch = code.match(/(\d{1,2})/);
+          if (numMatch) {
+            const p = parseInt(numMatch[1], 10);
+            if (p >= 5 && p <= 50) percent = p;
+          }
         }
       }
 
-      // Live Shopify cart API check if running on store domain
-      try {
-        const res = await fetch('/cart/update.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ discount: code })
-        });
-        if (res.ok) {
-          const cart = await res.json();
-          if (cart.discount_codes && cart.discount_codes.length > 0) {
-            return { valid: true, code: code, percent: 15 };
-          }
-        }
-      } catch (e) {}
+      if (percent > 0) {
+        return { valid: true, code: code || `${percent}% OFF`, percent: percent };
+      }
 
-      return { valid: false, code: code, error: true };
+      return { valid: false, code: code };
     }
 
     function initDiscountUI() {
       const urlParams = new URLSearchParams(window.location.search);
       const discountParam = urlParams.get('discount') || urlParams.get('code') || urlParams.get('discount_code');
 
-      // Automatically evaluate and apply discount if present on subscription contract or passed via URL parameter
+      // Automatically evaluate and apply recurring subscriber discount if attached to account or URL
       if (discountParam) {
         evaluateDiscountCode(discountParam).then(result => {
           applyDynamicBoxDiscount(result);
         });
       } else if (config.discount) {
-        const dVal = typeof config.discount === 'string' ? config.discount : (config.discount.title || config.discount.value || '');
-        evaluateDiscountCode(dVal).then(result => {
+        evaluateDiscountCode(config.discount).then(result => {
           applyDynamicBoxDiscount(result);
         });
       } else {

@@ -1337,20 +1337,15 @@ div#s4t1 .gimmie-build-box__qty-value {
   color: var(--gimmie-text) !important;
 }
 
-.gimmie-build-box__discount-area {
-  width: 100%;
-}
-
-.gimmie-build-box__discount-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.gimmie-build-box__discount-field input:focus {
-  outline: none !important;
-  border-color: #102B10 !important;
-  box-shadow: 0 0 0 2px rgba(16, 43, 16, 0.15) !important;
+/* Slashed Compare Price for Discounted Add-on Items */
+.price-item--compare,
+.gimmie-addon-price-compare {
+  text-decoration: line-through !important;
+  opacity: 0.55 !important;
+  margin-right: 6px !important;
+  font-weight: 600 !important;
+  font-size: 0.9em !important;
+  display: inline-block !important;
 }
 
 </style>
