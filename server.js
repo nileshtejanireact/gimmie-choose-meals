@@ -280,6 +280,11 @@ async function handleAppProxy(req, res) {
     const customerName = `${customerObj.firstName || ''} ${customerObj.lastName || ''}`.trim();
     const customerEmail = customerObj.email || '';
 
+    // Prevent proxy/browser caching so real-time updates reflect immediately
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+
     res.render('choose-meals', {
       customer: customerObj,
       customerName: customerName,
