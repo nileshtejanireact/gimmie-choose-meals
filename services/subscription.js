@@ -545,39 +545,76 @@ class SubscriptionService {
     if (selectedAddons && Array.isArray(selectedAddons) && selectedAddons.length > 0) {
       const validAddons = selectedAddons.filter(a => (parseInt(a.quantity, 10) || 0) > 0 && a.variantId);
 
-      // 1. If Appstle Enterprise API Key is configured, sync extra items in a single batch API call per checkout
+      // 1. Appstle Subscriptions API: Real-time contract line item sync
       const appstleApiKey = process.env.APPSTLE_API_KEY || 'apst_iknacn-wq_RZxksQeeCDjdS83ALEM0rHqVa7l7EOr5lWROUY6A';
       if (appstleApiKey && validAddons.length > 0) {
         try {
-          const numericContractId = String(contractId).replace(/[^0-9]/g, '');
-          const batchedLineItems = validAddons.map(addon => {
-            const unitPrice = parseFloat(addon.unitPrice || addon.price) || 6.00;
-            return {
-              variantId: String(addon.variantId).replace(/[^0-9]/g, ''),
-              quantity: parseInt(addon.quantity, 10),
-              price: unitPrice
-            };
+          const rawId = String(contractId).replace(/[^0-9]/g, '');
+          let targetAppstleContractId = rawId;
+
+          // Query Appstle to resolve the active subscriptionContractId
+          const detailsUrl = `https://subscription-admin.appstle.com/api/external/v2/subscription-contract-details?contractId=${rawId}`;
+          const detailsRes = await fetch(detailsUrl, {
+            headers: { 'X-API-Key': appstleApiKey }
           });
 
-          console.log(`📡 [Appstle Batch API] Bundling ${batchedLineItems.length} extra items into a single batch API call for contract ${numericContractId}...`);
+          if (detailsRes.ok) {
+            const listOrObj = await detailsRes.json();
+            const activeContract = Array.isArray(listOrObj)
+              ? (listOrObj.find(c => c.status === 'active' || c.status === 'ACTIVE') || listOrObj[0])
+              : listOrObj;
 
-          // Appstle Official Bulk Line Items Endpoint (PUT batch request with query param + body)
-          const appstleRes = await fetch(`https://subscription-admin.appstle.com/api/external/v2/subscription-contracts-add-line-items?contractId=${numericContractId}`, {
-            method: 'PUT',
-            headers: {
-              'X-API-Key': appstleApiKey,
-              'x-api-key': appstleApiKey,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              contractId: numericContractId,
-              lineItems: batchedLineItems
-            })
-          });
-          const appstleData = await appstleRes.json().catch(() => ({}));
-          console.log(`✅ [Appstle Batch API Result]:`, appstleData);
+            if (activeContract) {
+              targetAppstleContractId = String(activeContract.subscriptionContractId || activeContract.id || rawId);
+              console.log(`📡 [Appstle Active Contract Resolved]: ID ${targetAppstleContractId} for customer ${activeContract.customerEmail || customerEmail}`);
+
+              // Clean up previous add-on lines from Appstle contract so selections do not duplicate
+              if (activeContract.contractDetailsJSON) {
+                try {
+                  const existingLines = JSON.parse(activeContract.contractDetailsJSON);
+                  for (const l of existingLines) {
+                    const text = (l.title || '').toLowerCase();
+                    if (!text.includes('box') && !text.includes('pack') && l.lineId) {
+                      const remUrl = `https://subscription-admin.appstle.com/api/external/v2/subscription-contracts-remove-line-item?contractId=${targetAppstleContractId}&lineId=${encodeURIComponent(l.lineId)}`;
+                      await fetch(remUrl, {
+                        method: 'PUT',
+                        headers: { 'X-API-Key': appstleApiKey, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contractId: targetAppstleContractId, lineId: l.lineId })
+                      });
+                      console.log(`  - [Appstle] Removed previous add-on line: ${l.title} (${l.lineId})`);
+                    }
+                  }
+                } catch (e) {}
+              }
+            }
+          }
+
+          // Add each add-on line item into Appstle contract with exact price
+          for (const addon of validAddons) {
+            const cleanVarId = String(addon.variantId).replace(/[^0-9]/g, '');
+            const qty = parseInt(addon.quantity, 10) || 1;
+            const unitPrice = parseFloat(addon.unitPrice || addon.price || 0).toFixed(2);
+
+            if (cleanVarId && cleanVarId.length > 3) {
+              const addUrl = `https://subscription-admin.appstle.com/api/external/v2/subscription-contract-add-line-item?contractId=${targetAppstleContractId}&variantId=${cleanVarId}&quantity=${qty}&price=${unitPrice}`;
+              const addRes = await fetch(addUrl, {
+                method: 'PUT',
+                headers: {
+                  'X-API-Key': appstleApiKey,
+                  'Content-Type': 'application/json'
+                }
+              });
+
+              if (addRes.ok) {
+                console.log(`  ✅ [Appstle API Line Added]: ${qty}x ${addon.title} (Variant ${cleanVarId}) @ £${unitPrice} on Contract ${targetAppstleContractId}`);
+              } else {
+                const errText = await addRes.text();
+                console.warn(`  ⚠️ Appstle add line notice:`, addRes.status, errText);
+              }
+            }
+          }
         } catch (appstleErr) {
-          console.warn(`⚠️ Appstle Batch API sync notice:`, appstleErr.message);
+          console.warn(`⚠️ Appstle sync notice:`, appstleErr.message);
         }
       }
 
@@ -624,6 +661,7 @@ class SubscriptionService {
             input: {
               productVariantId: variantGid,
               quantity: addonQty,
+              currentPrice: cleanPrice.toFixed(2),
               customAttributes
             }
           });
