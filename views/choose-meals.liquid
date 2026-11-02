@@ -195,13 +195,13 @@
       {% if content_for_header contains 'preview_theme_id' or canonical_url contains 'preview_theme_id' %}
         {% assign is_duplicate_theme = true %}
       {% endif %}
+      {% comment %} 🔓 Preview Theme Safety: Always keep selections active and unlocked on duplicate theme for testing {% endcomment %}
+      {% if is_duplicate_theme %}
+        {% assign is_cutoff_passed = false %}
+      {% endif %}
 {% endraw %}
       {% if isDuplicateTheme %}
         {% assign is_duplicate_theme = true %}
-      {% endif %}
-{% raw %}
-      {% comment %} 🔓 Preview Theme Safety: Always keep selections active and unlocked on duplicate theme for testing {% endcomment %}
-      {% if is_duplicate_theme %}
         {% assign is_cutoff_passed = false %}
       {% endif %}
 
