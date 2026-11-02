@@ -150,7 +150,12 @@
           {% assign weeks_to_add = time_past | divided_by: week_sec | plus: 1 %}
           {% assign extra_sec = weeks_to_add | times: week_sec %}
           {% assign roll_cutoff_ts = cutoff_ts | plus: extra_sec %}
-          {% assign roll_deliv_ts = deliv_ts | plus: extra_sec %}
+          {% if deliv_ts > 0 %}
+            {% assign roll_deliv_ts = deliv_ts | plus: extra_sec %}
+          {% else %}
+            {% comment %} Monday delivery is exactly 4 days (345600s) after Thursday 11:59 PM {% endcomment %}
+            {% assign roll_deliv_ts = roll_cutoff_ts | plus: 345600 %}
+          {% endif %}
           {% assign active_delivery_date = roll_deliv_ts | date: "%a %d %b" %}
           {% assign active_cutoff_date = roll_cutoff_ts | date: "%a %d %b @ 11:59 PM UK" %}
           {% assign cutoff_ts = roll_cutoff_ts %}

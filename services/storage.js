@@ -170,6 +170,12 @@ class StorageService {
   getSubmissions() {
     return this.submissions;
   }
+
+  getSubmission(email) {
+    if (!email) return null;
+    const clean = String(email).toLowerCase().trim();
+    return this.submissions.find(s => String(s.customer).toLowerCase().trim() === clean) || null;
+  }
 }
 
 module.exports = new StorageService();

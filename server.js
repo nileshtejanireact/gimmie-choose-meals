@@ -361,7 +361,7 @@ async function handleSaveSelections(req, res) {
 
     // Commit changes to Shopify Subscription Contract & Appstle
     try {
-      await subscriptionService.updateSubscriptionMeals(contractId, selectedMeals, selectedAddons);
+      await subscriptionService.updateSubscriptionMeals(contractId, selectedMeals, selectedAddons, customerEmail);
     } catch (e) {
       console.warn('⚠️ Subscription contract update notice:', e.message);
     }
@@ -458,6 +458,35 @@ app.post('/api/webhooks/subscription-contract-created', async (req, res) => {
     }
     res.status(200).send('Webhook processed');
   } catch (e) {
+    res.status(200).send('Processed with notice');
+  }
+});
+
+/**
+ * Webhook: When a new order is placed in Shopify (e.g. from subscription recurring billing)
+ * Automatically sync chosen meals & add-ons into the order note, tags, and line items
+ */
+app.post('/api/webhooks/orders-create', async (req, res) => {
+  try {
+    const order = req.body;
+    const orderId = order?.admin_graphql_api_id || (order?.id ? `gid://shopify/Order/${order.id}` : null);
+    const email = (order?.email || order?.customer?.email || '').toLowerCase().trim();
+    console.log(`⚡ [Webhook: orders/create] Order ${order?.name || orderId} created for ${email}`);
+
+    if (email && orderId) {
+      const submission = storageService.getSubmission ? storageService.getSubmission(email) : null;
+      if (submission && submission.addons && submission.addons.length > 0) {
+        const mealSummary = (submission.meals || []).map(m => `${m.quantity}x ${m.title}`).join(', ');
+        const addonSummary = submission.addons.map(a => `${a.quantity}x ${a.title} (+£${a.unitPrice || a.price})`).join(', ');
+        const fullSummary = mealSummary + (addonSummary ? ` | Add-ons: ${addonSummary}` : '');
+
+        console.log(`📦 [Webhook orders/create] Syncing saved add-ons to new Order ${order?.name}: ${fullSummary}`);
+        await subscriptionService.updateRecentOrderDetails(email, fullSummary, submission.deliveryDate || 'Upcoming Delivery', submission.addons);
+      }
+    }
+    res.status(200).send('Order create webhook processed');
+  } catch (err) {
+    console.warn('⚠️ orders/create webhook notice:', err.message);
     res.status(200).send('Processed with notice');
   }
 });

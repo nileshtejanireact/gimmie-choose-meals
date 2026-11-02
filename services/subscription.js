@@ -337,7 +337,7 @@ class SubscriptionService {
    * Update subscription contract with selected meals
    * Executes full Subscription Draft Workflow: Draft -> Remove Old Lines -> Add New Lines -> Commit
    */
-  async updateSubscriptionMeals(contractId, selectedMeals, selectedAddons = []) {
+  async updateSubscriptionMeals(contractId, selectedMeals, selectedAddons = [], customerEmail = '') {
     console.log(`\n======================================================`);
     console.log(`💾 [Updating Subscription Meals] Contract: ${contractId}`);
     console.log(`Selected Dishes:`, selectedMeals);
@@ -670,7 +670,7 @@ class SubscriptionService {
     console.log(`\n🎉 [SUCCESS] Subscription Contract ${updatedContract.id} committed successfully!`);
     // Step 5: Also update the latest Shopify Order Note & Tags and line items if an order exists
     try {
-      await this.updateRecentOrderDetails(customer?.email, mealSummaryText, 'Next Delivery', selectedAddons);
+      await this.updateRecentOrderDetails(customerEmail, mealSummaryText, 'Next Delivery', selectedAddons);
     } catch (e) {}
 
     return {
@@ -778,9 +778,8 @@ class SubscriptionService {
                 for (const addon of validAddons) {
                   const qty = parseInt(addon.quantity, 10) || 1;
                   const unitPrice = parseFloat(addon.unitPrice || addon.price) || 6.00;
-                  const variantGid = addon.variantId
-                    ? (String(addon.variantId).startsWith('gid://') ? addon.variantId : `gid://shopify/ProductVariant/${String(addon.variantId).replace(/[^0-9]/g, '')}`)
-                    : null;
+                  const cleanNumeric = String(addon.variantId || '').replace(/[^0-9]/g, '');
+                  const variantGid = String(addon.variantId || '').startsWith('gid://') ? addon.variantId : (cleanNumeric ? 'gid://shopify/ProductVariant/' + cleanNumeric : null);
 
                   let lineAdded = false;
 
