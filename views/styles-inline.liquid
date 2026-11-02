@@ -1305,23 +1305,27 @@ div#s4t1 .gimmie-build-box__qty-value {
 
 #gimmie-modal-image-wrap {
   width: 100% !important;
-  aspect-ratio: 16 / 10 !important;
+  aspect-ratio: 4 / 3 !important;
   background: #F6F1E7 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 10px !important;
+  display: block !important;
+  padding: 0 !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
+  border-radius: 16px !important;
+  border: 1.5px solid var(--gimmie-border) !important;
+  margin-bottom: 18px !important;
+  position: relative !important;
 }
 
 #gimmie-modal-image {
   width: 100% !important;
   height: 100% !important;
-  max-width: 88% !important;
-  max-height: 88% !important;
-  object-fit: contain !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
   display: block !important;
+  transition: transform 300ms ease !important;
 }
 
 /* Build Your Box Box Pricing & Discount Strikethrough */
