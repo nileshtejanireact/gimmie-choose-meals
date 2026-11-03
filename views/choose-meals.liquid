@@ -712,7 +712,7 @@
                             <span class="gimmie-macro-bubble">{{ m_cals | strip_html | upcase }}</span>
                             <span class="gimmie-macro-bubble">{{ m_prot_display | strip_html | upcase }}</span>
                           </div>
-                          <div class="gimmie-build-box__qty">
+                          <div class="gimmie-build-box__qty" style="display: flex !important; align-items: center !important; justify-content: center !important; gap: 14px !important; width: 100% !important; margin: auto auto 0 auto !important; text-align: center !important;">
                             {% if is_cutoff_passed and is_duplicate_theme == false %}
                               <button type="button" class="gimmie-build-box__qty-button is-locked" data-action="minus" data-variant-id="{{ m_variant_id }}" aria-label="Decrease quantity" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">−</button>
                               <span class="gimmie-build-box__qty-value" data-meal-qty="{{ m_variant_id }}">0</span>
@@ -749,7 +749,7 @@
                             {% endif %}
                             <span class="gimmie-macro-bubble">{{ fb_m_prot_display }}</span>
                           </div>
-                          <div class="gimmie-build-box__qty">
+                          <div class="gimmie-build-box__qty" style="display: flex !important; align-items: center !important; justify-content: center !important; gap: 14px !important; width: 100% !important; margin: auto auto 0 auto !important; text-align: center !important;">
                             <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ meal.variantId }}" aria-label="Decrease quantity" disabled>−</button>
                             <span class="gimmie-build-box__qty-value" data-meal-qty="{{ meal.variantId }}">0</span>
                             <button type="button" class="gimmie-build-box__qty-button" data-action="plus" data-variant-id="{{ meal.variantId }}" aria-label="Increase quantity">+</button>
@@ -1027,7 +1027,7 @@
                             </div>
                           </div>
 
-                          <div class="gimmie-build-box__qty">
+                          <div class="gimmie-build-box__qty" style="display: flex !important; align-items: center !important; justify-content: center !important; gap: 14px !important; width: 100% !important; margin: auto auto 0 auto !important; text-align: center !important;">
                             {% if is_cutoff_passed and is_duplicate_theme == false %}
                               <button
                                 type="button"
@@ -1144,7 +1144,7 @@
                           </div>
                         </div>
 
-                        <div class="gimmie-build-box__qty">
+                        <div class="gimmie-build-box__qty" style="display: flex !important; align-items: center !important; justify-content: center !important; gap: 14px !important; width: 100% !important; margin: auto auto 0 auto !important; text-align: center !important;">
                           {% if is_cutoff_passed and is_duplicate_theme == false %}
                             <button
                               type="button"

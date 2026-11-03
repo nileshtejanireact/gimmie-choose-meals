@@ -1218,12 +1218,19 @@ div#s4t1 .price-item {
   font-weight: 900;
 }
 
-div#s4t1 .gimmie-build-box__qty {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 0 !important;
-  width: 100%;
+div#s4t1 .gimmie-build-box__qty,
+.gimmie-addon-track .gimmie-build-box__qty,
+.gimmie-build-box__addon-item .gimmie-build-box__qty,
+[data-gimmie-addonmeal] .gimmie-build-box__qty,
+.gimmie-addon-qty {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  margin: auto auto 0 auto !important;
+  padding-top: 10px !important;
+  width: 100% !important;
+  text-align: center !important;
 }
 
 div#s4t1 .gimmie-build-box__qty-button {
@@ -1295,6 +1302,19 @@ div#s4t1 .gimmie-build-box__qty-value {
   }
   div#s4t1 .gimmie-build-box__meal-title {
     font-size: 1.05rem !important;
+  }
+  div#s4t1 .gimmie-build-box__qty,
+  .gimmie-addon-track .gimmie-build-box__qty,
+  .gimmie-build-box__addon-item .gimmie-build-box__qty,
+  [data-gimmie-addonmeal] .gimmie-build-box__qty,
+  .gimmie-addon-qty {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 14px !important;
+    width: 100% !important;
+    margin: auto auto 0 auto !important;
+    text-align: center !important;
   }
   div#s4t1 .gimmie-build-box__qty-button {
     width: 2.4rem !important;
