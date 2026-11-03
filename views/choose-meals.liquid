@@ -138,28 +138,8 @@
         {% assign active_cutoff_date = raw_cutoff | date: "%a %d %b @ 11:59 PM UK" %}
 
         {% assign cutoff_ts = raw_cutoff | date: '%s' | plus: 0 %}
-        {% assign deliv_ts = raw_deliv | date: '%s' | plus: 0 %}
-
-        {% comment %} 
-          If cutoff date has passed, automatically roll forward by 7-day increments to the upcoming active delivery cycle
-          so customers selecting meals for the upcoming week are never locked out!
-        {% endcomment %}
         {% if cutoff_ts > 0 and now_ts > cutoff_ts %}
-          {% assign week_sec = 604800 %}
-          {% assign time_past = now_ts | minus: cutoff_ts %}
-          {% assign weeks_to_add = time_past | divided_by: week_sec | plus: 1 %}
-          {% assign extra_sec = weeks_to_add | times: week_sec %}
-          {% assign roll_cutoff_ts = cutoff_ts | plus: extra_sec %}
-          {% if deliv_ts > 0 %}
-            {% assign roll_deliv_ts = deliv_ts | plus: extra_sec %}
-          {% else %}
-            {% comment %} Monday delivery is exactly 4 days (345600s) after Thursday 11:59 PM {% endcomment %}
-            {% assign roll_deliv_ts = roll_cutoff_ts | plus: 345600 %}
-          {% endif %}
-          {% assign active_delivery_date = roll_deliv_ts | date: "%a %d %b" %}
-          {% assign active_cutoff_date = roll_cutoff_ts | date: "%a %d %b @ 11:59 PM UK" %}
-          {% assign cutoff_ts = roll_cutoff_ts %}
-          {% assign is_cutoff_passed = false %}
+          {% assign is_cutoff_passed = true %}
         {% endif %}
 
         {% assign active_meta_meals = next_week_menu.meals.value | default: next_week_menu.meals | default: next_week_menu.products.value | default: next_week_menu.products | default: next_week_menu.dishes.value %}
@@ -200,14 +180,9 @@
       {% if content_for_header contains 'preview_theme_id' or canonical_url contains 'preview_theme_id' %}
         {% assign is_duplicate_theme = true %}
       {% endif %}
-      {% comment %} 🔓 Preview Theme Safety: Always keep selections active and unlocked on duplicate theme for testing {% endcomment %}
-      {% if is_duplicate_theme %}
-        {% assign is_cutoff_passed = false %}
-      {% endif %}
 {% endraw %}
       {% if isDuplicateTheme %}
         {% assign is_duplicate_theme = true %}
-        {% assign is_cutoff_passed = false %}
       {% endif %}
 
 <section class="gimmie-build-box">
@@ -713,7 +688,7 @@
                             <span class="gimmie-macro-bubble">{{ m_prot_display | strip_html | upcase }}</span>
                           </div>
                           <div class="gimmie-build-box__qty" style="display: flex !important; align-items: center !important; justify-content: center !important; gap: 14px !important; width: 100% !important; margin: auto auto 0 auto !important; text-align: center !important;">
-                            {% if is_cutoff_passed and is_duplicate_theme == false %}
+                            {% if is_cutoff_passed %}
                               <button type="button" class="gimmie-build-box__qty-button is-locked" data-action="minus" data-variant-id="{{ m_variant_id }}" aria-label="Decrease quantity" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">−</button>
                               <span class="gimmie-build-box__qty-value" data-meal-qty="{{ m_variant_id }}">0</span>
                               <button type="button" class="gimmie-build-box__qty-button is-locked" data-action="plus" data-variant-id="{{ m_variant_id }}" aria-label="Increase quantity" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">+</button>
@@ -1028,7 +1003,7 @@
                           </div>
 
                           <div class="gimmie-build-box__qty" style="display: flex !important; align-items: center !important; justify-content: center !important; gap: 14px !important; width: 100% !important; margin: auto auto 0 auto !important; text-align: center !important;">
-                            {% if is_cutoff_passed and is_duplicate_theme == false %}
+                            {% if is_cutoff_passed %}
                               <button
                                 type="button"
                                 class="gimmie-build-box__qty-button font-heading"
@@ -1145,7 +1120,7 @@
                         </div>
 
                         <div class="gimmie-build-box__qty" style="display: flex !important; align-items: center !important; justify-content: center !important; gap: 14px !important; width: 100% !important; margin: auto auto 0 auto !important; text-align: center !important;">
-                          {% if is_cutoff_passed and is_duplicate_theme == false %}
+                          {% if is_cutoff_passed %}
                             <button
                               type="button"
                               class="gimmie-build-box__qty-button font-heading"
@@ -1355,10 +1330,9 @@
     const config = JSON.parse(configEl.textContent || '{}');
     const mealQuota = parseInt(config.mealQuota || 6, 10);
     const contractId = config.contractId || '';
-    const isCutoffPassed = config.isDuplicateTheme ? false : (
-                           config.isCutoffPassed === true || 
+    const isCutoffPassed = config.isCutoffPassed === true || 
                            config.isCutoffPassed === 'true' || 
-                           (config.cutoffTimestamp && config.cutoffTimestamp > 0 && Math.floor(Date.now() / 1000) > config.cutoffTimestamp));
+                           (config.cutoffTimestamp && config.cutoffTimestamp > 0 && Math.floor(Date.now() / 1000) > config.cutoffTimestamp);
     
     // Scan DOM for rendered meals (excluding add-ons)
     const renderedMealCards = document.querySelectorAll('.gimmie-build-box__meal:not(.gimmie-build-box__addon-item)');
@@ -1684,7 +1658,7 @@
         const currentQty = state.selections[meal.variantId]?.quantity || 0;
         if (qtyEl) qtyEl.textContent = currentQty;
 
-        if (isCutoffPassed && !config.isDuplicateTheme) {
+        if (isCutoffPassed) {
           if (minusBtn) {
             minusBtn.disabled = true;
             minusBtn.setAttribute('disabled', 'disabled');
@@ -1714,7 +1688,7 @@
         const currentQty = state.addonSelections[addon.variantId]?.quantity || 0;
         if (qtyEl) qtyEl.textContent = currentQty;
 
-        if (isCutoffPassed && !config.isDuplicateTheme) {
+        if (isCutoffPassed) {
           if (minusBtn) {
             minusBtn.disabled = true;
             minusBtn.setAttribute('disabled', 'disabled');
@@ -1753,7 +1727,7 @@
 
       // Update Save Button State & Wording
       if (saveButton) {
-        if (isCutoffPassed && state.totalAddonsPrice <= 0 && !config.isDuplicateTheme) {
+        if (isCutoffPassed && state.totalAddonsPrice <= 0) {
           saveButton.disabled = true;
           saveButton.setAttribute('disabled', 'disabled');
           saveButton.style.cursor = 'not-allowed';
@@ -1889,7 +1863,7 @@
     }
 
     function handleQuantityChange(variantId, change) {
-      if (isCutoffPassed && !config.isDuplicateTheme) {
+      if (isCutoffPassed) {
         showStatus(`🔒 Cut-off passed on ${config.activeCutoffDate || 'Thu 11:59 PM UK'}. Your meals for delivery on ${config.formattedDeliveryDate} are locked for kitchen prep and cannot be changed.`, true);
         return;
       }
@@ -1923,7 +1897,7 @@
     }
 
     function handleAddonQuantityChange(addonId, change) {
-      if (isCutoffPassed && !config.isDuplicateTheme) {
+      if (isCutoffPassed) {
         showStatus('Cut-off passed. Order locked for kitchen prep.', true);
         return;
       }
@@ -2169,7 +2143,7 @@
     }
 
     async function saveSelections() {
-      if (isCutoffPassed && !config.isDuplicateTheme) {
+      if (isCutoffPassed) {
         showStatus(`🔒 Cut-off has passed for delivery on ${config.formattedDeliveryDate}. Your order is locked for kitchen prep and cannot be edited.`, true);
         return;
       }
