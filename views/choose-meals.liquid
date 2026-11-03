@@ -2514,11 +2514,10 @@
           }
         }
 
-        let badgeEl = card.querySelector('.price-item--discount-badge');
-        if (!badgeEl && priceContainer) {
-          badgeEl = document.createElement('span');
-          badgeEl.className = 'price-item--discount-badge font-heading uppercase';
-          priceContainer.appendChild(badgeEl);
+        // Remove % discount badge from add-on cards as requested (clean slashed original + bold discounted price)
+        const badgeEl = card.querySelector('.price-item--discount-badge');
+        if (badgeEl) {
+          badgeEl.remove();
         }
 
         if (discountPercent > 0) {
@@ -2531,21 +2530,14 @@
             currentEl.textContent = '£' + discountedPrice.toFixed(2);
             currentEl.style.fontWeight = '800';
           }
-          if (badgeEl) {
-            badgeEl.textContent = discountPercent + '% OFF';
-            badgeEl.style.display = 'inline-block';
-          }
         } else {
-          // Native pricing from App/Shopify: clean price, no slash or fake badge
+          // Native pricing from App/Shopify: clean price, no slash
           if (compareEl) {
             compareEl.style.display = 'none';
           }
           if (currentEl) {
             currentEl.textContent = '£' + originalPrice.toFixed(2);
             currentEl.style.fontWeight = '700';
-          }
-          if (badgeEl) {
-            badgeEl.style.display = 'none';
           }
         }
 
