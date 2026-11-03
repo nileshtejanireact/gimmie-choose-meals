@@ -1916,15 +1916,11 @@
           addonItems.forEach(([vId, item]) => {
             const removeHtml = isCutoffPassed ? '' : `<span style="cursor: pointer; opacity: 0.7; font-size: 1.1rem; margin-left: 6px;" data-remove-addon="${vId}">&times;</span>`;
             const itemPrice = (item.quantity * item.price).toFixed(2);
-            const origTotal = (item.quantity * (item.originalPrice || item.price)).toFixed(2);
-            const compareHtml = (item.originalPrice && item.price < item.originalPrice)
-              ? `<span style="text-decoration: line-through; opacity: 0.55; margin-right: 4px; font-size: 0.85em;">+£${origTotal}</span>`
-              : '';
             html += `
               <div class="gimmie-build-box__selected-addon-row">
                 <span>${item.quantity} × ${item.title}</span>
                 <span style="display: flex; align-items: center; gap: 4px; font-weight: 800;">
-                  ${compareHtml}<span>+£${itemPrice}</span>
+                  <span>£${itemPrice}</span>
                   ${removeHtml}
                 </span>
               </div>
