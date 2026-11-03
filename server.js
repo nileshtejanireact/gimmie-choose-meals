@@ -254,6 +254,8 @@ async function handleAppProxy(req, res) {
         month: 'short'
       });
 
+      const tagDisc = subscriptionService.extractDiscountFromTags(custDetails?.tags);
+
       subscription = {
         id: `gid://shopify/SubscriptionContract/cust_${customerId}`,
         contractId: `${customerId}`,
@@ -264,9 +266,11 @@ async function handleAppProxy(req, res) {
           id: `gid://shopify/Customer/${customerId}`,
           firstName: custDetails?.firstName || '',
           lastName: custDetails?.lastName || '',
-          email: custDetails?.email || ''
+          email: custDetails?.email || '',
+          tags: custDetails?.tags || []
         },
-        currentLines: []
+        currentLines: [],
+        discount: tagDisc || null
       };
     }
 
@@ -276,9 +280,18 @@ async function handleAppProxy(req, res) {
     console.log(`🍽️ Rendering meal picker with ${meals.length} dishes and ${addons.length} add-ons for ${subscription.mealQuota} meals quota.`);
 
     // 5. Render the interactive meal builder
-    const customerObj = subscription.customer || { firstName: '', lastName: '', email: '' };
+    const customerObj = subscription.customer || { firstName: '', lastName: '', email: '', tags: [] };
     const customerName = `${customerObj.firstName || ''} ${customerObj.lastName || ''}`.trim();
     const customerEmail = customerObj.email || '';
+
+    // Check for customer tag discount (e.g. discount-5, discount-10, discount-15, discount-20, discount-25, discount-30)
+    let activeDiscount = req.query.discount || subscription.discount || null;
+    if (customerObj && customerObj.tags) {
+      const tagDisc = subscriptionService.extractDiscountFromTags(customerObj.tags);
+      if (tagDisc) {
+        activeDiscount = tagDisc;
+      }
+    }
 
     // Prevent proxy/browser caching so real-time updates reflect immediately
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
@@ -296,7 +309,7 @@ async function handleAppProxy(req, res) {
       meals: meals,
       addons: addons,
       isDuplicateTheme: isDuplicateTheme,
-      discount: req.query.discount || subscription.discount || null
+      discount: activeDiscount
     });
 
   } catch (error) {

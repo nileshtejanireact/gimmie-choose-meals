@@ -1236,7 +1236,7 @@
               <strong style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--gimmie-muted);">
                 {{ mealQuota }} Pack Box
               </strong>
-              <span class="gimmie-build-box__box-price" style="font-size: 0.98rem;">
+              <span class="gimmie-build-box__box-price" style="font-size: 0.98rem; text-align: right;">
                 <span id="gimmie-summary-box-compare" class="gimmie-build-box__box-compare" style="text-decoration: line-through; opacity: 0.55; margin-right: 6px; display: none;">£48.00</span>
                 <span id="gimmie-summary-box-current" class="gimmie-build-box__box-current" style="font-weight: 800; color: var(--gimmie-text);">£48.00</span>
               </span>
@@ -1244,12 +1244,18 @@
 
             <!-- Total Price Row (Box + Add-ons) -->
             <div id="gimmie-summary-total-row" style="margin-top: 8px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;">
-              <strong style="font-size: 0.92rem; font-weight: 800; color: var(--gimmie-text);">
-                Total
-              </strong>
-              <strong id="gimmie-summary-grand-total" style="font-size: 1.05rem; font-weight: 800; color: var(--gimmie-text);">
-                £48.00
-              </strong>
+              <div>
+                <strong style="font-size: 0.92rem; font-weight: 800; color: var(--gimmie-text); display: block;">
+                  Total
+                </strong>
+                <span id="gimmie-summary-discount-badge" style="display: none; font-size: 0.72rem; font-weight: 800; color: #1E6B24; background: #E8F5E9; padding: 2px 8px; border-radius: 999px; margin-top: 2px;"></span>
+              </div>
+              <div style="text-align: right;">
+                <span id="gimmie-summary-grand-total-compare" style="text-decoration: line-through; opacity: 0.55; margin-right: 6px; font-size: 0.95rem; font-weight: 600; display: none;"></span>
+                <strong id="gimmie-summary-grand-total" style="font-size: 1.05rem; font-weight: 800; color: var(--gimmie-text);">
+                  £48.00
+                </strong>
+              </div>
             </div>
 
             
@@ -1312,6 +1318,8 @@
     {
       "customerEmail": "{% raw %}{{ customer.email }}{% endraw %}",
       "customerName": "{% raw %}{{ customer.first_name | default: customer.name | default: 'Subscriber' }} {{ customer.last_name }}{% endraw %}",
+      "customerTags": {% raw %}{{ customer.tags | json }}{% endraw %},
+      "customerDiscountTag": "{% raw %}{% assign c_dt = '' %}{% for t in customer.tags %}{% assign dt = t | downcase | strip %}{% if dt contains 'discount-' or dt contains 'discount_' or dt contains 'discount' %}{% assign c_dt = dt %}{% endif %}{% endfor %}{{ c_dt }}{% endraw %}",
       "mealQuota": {{ mealQuota | json }},
       "contractId": {{ contractId | json }},
       "formattedDeliveryDate": "{% raw %}{{ active_delivery_date | default: 'Upcoming Monday' }}{% endraw %}",
@@ -1480,6 +1488,14 @@
           if (nameEl) nameEl.textContent = customerName;
           if (emailEl) emailEl.textContent = customerEmail ? `(${customerEmail})` : '';
           if (eyebrow) eyebrow.textContent = `Active Subscription • ${customerName}`;
+
+          // Also check for dynamic discount tags on freshly fetched customer profile
+          if (d.customer.tags && (!state.activeDiscount || !state.activeDiscount.valid)) {
+            const liveTagDisc = extractDiscountFromTags(d.customer.tags);
+            if (liveTagDisc && liveTagDisc.valid) {
+              applyDynamicBoxDiscount(liveTagDisc);
+            }
+          }
         }
       })
       .catch(() => {});
@@ -1490,7 +1506,9 @@
       addonSelections: {},
       totalAddons: 0,
       totalAddonsPrice: 0,
-      addonsEnabled: true
+      totalAddonsOriginalPrice: 0,
+      addonsEnabled: true,
+      activeDiscount: null
     };
 
     // Filter selections to only include dishes present in current rotation
@@ -1610,13 +1628,16 @@
       // 2. Calculate Add-ons Total & Price
       let totalAddonsCount = 0;
       let totalAddonsPrice = 0;
+      let totalAddonsOriginalPrice = 0;
       Object.values(state.addonSelections).forEach(item => {
         const q = item.quantity || 0;
         totalAddonsCount += q;
         totalAddonsPrice += q * (parseFloat(item.price) || 0);
+        totalAddonsOriginalPrice += q * (parseFloat(item.originalPrice || item.price) || 0);
       });
       state.totalAddons = totalAddonsCount;
       state.totalAddonsPrice = totalAddonsPrice;
+      state.totalAddonsOriginalPrice = totalAddonsOriginalPrice;
 
       // Update Step 2 meal counts
       const step2Count = document.getElementById('gimmie-step2-count');
@@ -1724,13 +1745,40 @@
       const quota = parseInt(config.mealQuota || 6, 10);
       const baseInfo = boxPricingTable[quota] || { original: quota * 8.00, formatted: '£' + (quota * 8.00).toFixed(2) };
       let activeBoxPrice = baseInfo.original;
+      let hasDiscount = false;
+      let percent = 0;
+
       if (state.activeDiscount && state.activeDiscount.valid) {
-        const percent = parseFloat(state.activeDiscount.percent) || 0;
+        percent = parseFloat(state.activeDiscount.percent) || 0;
         activeBoxPrice = baseInfo.original * Math.max(0, (100 - percent) / 100);
+        hasDiscount = percent > 0;
       }
+
+      const grandTotalCompareEl = document.getElementById('gimmie-summary-grand-total-compare');
       const grandTotalEl = document.getElementById('gimmie-summary-grand-total');
+      const discountBadgeEl = document.getElementById('gimmie-summary-discount-badge');
+
+      const origGrandTotal = baseInfo.original + (state.totalAddonsOriginalPrice || state.totalAddonsPrice || 0);
+      const finalGrandTotal = activeBoxPrice + (state.totalAddonsPrice || 0);
+
+      if (grandTotalCompareEl) {
+        if (hasDiscount && origGrandTotal > finalGrandTotal) {
+          grandTotalCompareEl.textContent = '£' + origGrandTotal.toFixed(2);
+          grandTotalCompareEl.style.display = 'inline';
+        } else {
+          grandTotalCompareEl.style.display = 'none';
+        }
+      }
       if (grandTotalEl) {
-        grandTotalEl.textContent = '£' + (activeBoxPrice + (state.totalAddonsPrice || 0)).toFixed(2);
+        grandTotalEl.textContent = '£' + finalGrandTotal.toFixed(2);
+      }
+      if (discountBadgeEl) {
+        if (hasDiscount) {
+          discountBadgeEl.textContent = `${percent}% OFF APPLIED`;
+          discountBadgeEl.style.display = 'inline-block';
+        } else {
+          discountBadgeEl.style.display = 'none';
+        }
       }
 
       // Update Save Button State & Wording
@@ -1826,7 +1874,15 @@
 
       // 2. Render Selected Add-ons in Sidebar
       if (summaryAddonsTotalEl) {
-        summaryAddonsTotalEl.textContent = state.totalAddonsPrice > 0 ? `+£${state.totalAddonsPrice.toFixed(2)}` : '£0.00';
+        if (state.totalAddonsPrice > 0) {
+          if (state.totalAddonsOriginalPrice && state.totalAddonsPrice < state.totalAddonsOriginalPrice) {
+            summaryAddonsTotalEl.innerHTML = `<span style="text-decoration: line-through; opacity: 0.55; margin-right: 6px; font-weight: 600;">+£${state.totalAddonsOriginalPrice.toFixed(2)}</span><span>+£${state.totalAddonsPrice.toFixed(2)}</span>`;
+          } else {
+            summaryAddonsTotalEl.textContent = `+£${state.totalAddonsPrice.toFixed(2)}`;
+          }
+        } else {
+          summaryAddonsTotalEl.textContent = '£0.00';
+        }
       }
 
       if (selectedAddonsListEl) {
@@ -2496,13 +2552,53 @@
       updateUI();
     }
 
+    function extractDiscountFromTags(tags) {
+      if (!tags) return null;
+      let tagList = [];
+      if (Array.isArray(tags)) {
+        tagList = tags;
+      } else if (typeof tags === 'string') {
+        tagList = tags.split(',').map(t => t.trim());
+      }
+      
+      for (const rawTag of tagList) {
+        const t = String(rawTag).trim();
+        // Match discount-5, discount-10, discount-15, discount-20, discount-25, discount-30, discount-X, discount_X, X%-off
+        const match = t.match(/discount[-_]?(\d+)/i) || t.match(/^(\d+)%[-_]?off$/i);
+        if (match) {
+          const p = parseInt(match[1], 10);
+          if (p > 0 && p <= 90) {
+            return {
+              code: t,
+              percent: p,
+              title: `${p}% OFF`,
+              valid: true
+            };
+          }
+        }
+      }
+
+      for (const rawTag of tagList) {
+        const u = String(rawTag).trim().toUpperCase();
+        if (u === 'GIMMIEAGO') return { code: 'GIMMIEAGO', percent: 15, title: '15% OFF', valid: true };
+        if (u === 'HOY25') return { code: 'HOY25', percent: 25, title: '25% OFF', valid: true };
+        if (u === 'WELCOME15') return { code: 'WELCOME15', percent: 15, title: '15% OFF', valid: true };
+        if (u === 'VIP20') return { code: 'VIP20', percent: 20, title: '20% OFF', valid: true };
+        if (u === 'SAVE10') return { code: 'SAVE10', percent: 10, title: '10% OFF', valid: true };
+      }
+
+      return null;
+    }
+
     function applyDynamicBoxDiscount(discountData) {
       const quota = parseInt(config.mealQuota || 6, 10);
       const baseInfo = boxPricingTable[quota] || { original: quota * 8.00, formatted: '£' + (quota * 8.00).toFixed(2) };
       
       const boxCompareEl = document.getElementById('gimmie-summary-box-compare');
       const boxCurrentEl = document.getElementById('gimmie-summary-box-current');
+      const grandTotalCompareEl = document.getElementById('gimmie-summary-grand-total-compare');
       const grandTotalEl = document.getElementById('gimmie-summary-grand-total');
+      const discountBadgeEl = document.getElementById('gimmie-summary-discount-badge');
 
       if (!boxCurrentEl) return;
 
@@ -2511,6 +2607,8 @@
         state.activeDiscount = null;
         if (boxCompareEl) boxCompareEl.style.display = 'none';
         boxCurrentEl.textContent = baseInfo.formatted;
+        if (grandTotalCompareEl) grandTotalCompareEl.style.display = 'none';
+        if (discountBadgeEl) discountBadgeEl.style.display = 'none';
         applyAddonDiscounts(null);
         if (grandTotalEl) grandTotalEl.textContent = '£' + (baseInfo.original + (state.totalAddonsPrice || 0)).toFixed(2);
         return;
@@ -2533,8 +2631,24 @@
       // Auto-apply subscriber discount to add-ons
       applyAddonDiscounts(discountData);
 
+      // Update Grand Total with compare-at price
+      const origGrandTotal = baseInfo.original + (state.totalAddonsOriginalPrice || state.totalAddonsPrice || 0);
+      const finalGrandTotal = finalPrice + (state.totalAddonsPrice || 0);
+
+      if (grandTotalCompareEl) {
+        if (origGrandTotal > finalGrandTotal) {
+          grandTotalCompareEl.textContent = '£' + origGrandTotal.toFixed(2);
+          grandTotalCompareEl.style.display = 'inline';
+        } else {
+          grandTotalCompareEl.style.display = 'none';
+        }
+      }
       if (grandTotalEl) {
-        grandTotalEl.textContent = '£' + (finalPrice + (state.totalAddonsPrice || 0)).toFixed(2);
+        grandTotalEl.textContent = '£' + finalGrandTotal.toFixed(2);
+      }
+      if (discountBadgeEl) {
+        discountBadgeEl.textContent = `${percent}% OFF APPLIED`;
+        discountBadgeEl.style.display = 'inline-block';
       }
     }
 
@@ -2545,35 +2659,42 @@
       let percent = 0;
 
       if (typeof rawCode === 'object') {
-        code = String(rawCode.title || rawCode.code || rawCode.name || '').toUpperCase().trim();
+        if (rawCode.valid && rawCode.percent) return rawCode;
+        code = String(rawCode.title || rawCode.code || rawCode.name || '').trim();
         percent = parseFloat(rawCode.percent || rawCode.value || rawCode.percentage || 0);
       } else {
-        code = String(rawCode).replace(/\s+/g, '').toUpperCase().trim();
+        code = String(rawCode).replace(/\s+/g, '').trim();
       }
 
-      // If code is GIMMIEAGO: 30% off 1st order + 15% off next 3 recurring orders
+      // Check discount-5, discount-10, discount-15, discount-20, discount-25, discount-30, etc.
+      const match = code.match(/discount[-_]?(\d+)/i) || code.match(/^(\d+)%[-_]?off$/i);
+      if (match) {
+        percent = parseInt(match[1], 10);
+      }
+
       if (!percent || isNaN(percent) || percent <= 0) {
-        if (code === 'GIMMIEAGO') {
+        const uCode = code.toUpperCase();
+        if (uCode === 'GIMMIEAGO') {
           percent = 15; // Recurring subscriber discount for weekly meal picker
-        } else if (code === 'HOY25') {
+        } else if (uCode === 'HOY25') {
           percent = 25;
-        } else if (code === 'WELCOME15') {
+        } else if (uCode === 'WELCOME15') {
           percent = 15;
-        } else if (code === 'VIP20') {
+        } else if (uCode === 'VIP20') {
           percent = 20;
-        } else if (code === 'SAVE10') {
+        } else if (uCode === 'SAVE10') {
           percent = 10;
         } else {
           const numMatch = code.match(/(\d{1,2})/);
           if (numMatch) {
             const p = parseInt(numMatch[1], 10);
-            if (p >= 5 && p <= 50) percent = p;
+            if (p >= 1 && p <= 90) percent = p;
           }
         }
       }
 
       if (percent > 0) {
-        return { valid: true, code: code || `${percent}% OFF`, percent: percent };
+        return { valid: true, code: code || `${percent}% OFF`, percent: percent, title: `${percent}% OFF` };
       }
 
       return { valid: false, code: code };
@@ -2583,18 +2704,32 @@
       const urlParams = new URLSearchParams(window.location.search);
       const discountParam = urlParams.get('discount') || urlParams.get('code') || urlParams.get('discount_code');
 
+      // 1. URL parameter override
       if (discountParam) {
         evaluateDiscountCode(discountParam).then(result => {
           applyDynamicBoxDiscount(result);
         });
-      } else if (config.discount) {
+        return;
+      }
+
+      // 2. Customer tag discount from Shopify storefront liquid config (e.g. discount-5, discount-10, discount-15, discount-20, discount-25, discount-30)
+      const tagDiscount = extractDiscountFromTags(config.customerTags || config.customerDiscountTag);
+      if (tagDiscount && tagDiscount.valid) {
+        applyDynamicBoxDiscount(tagDiscount);
+        return;
+      }
+
+      // 3. Discount passed from backend subscription contract / Appstle / Shopify Admin
+      if (config.discount) {
         evaluateDiscountCode(config.discount).then(result => {
           applyDynamicBoxDiscount(result);
         });
-      } else {
-        // No discount returned by the App/contract: render native catalog prices
-        applyDynamicBoxDiscount(null);
+        return;
       }
+
+      // 4. Default: No discount
+      applyDynamicBoxDiscount(null);
+    }
     }
 
     function init() {

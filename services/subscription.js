@@ -111,6 +111,8 @@ class SubscriptionService {
                 firstName
                 lastName
                 email
+                numberOfOrders
+                tags
               }
               lines(first: 50) {
                 edges {
@@ -297,6 +299,14 @@ class SubscriptionService {
       );
       if (discAttr) {
         contractDiscount = { title: discAttr.value, value: discAttr.value };
+      }
+    }
+
+    // Auto-detect customer tags for dynamic percentage discounts (e.g. discount-5, discount-10, discount-15, discount-20, discount-25, discount-30, etc.)
+    if (customer && customer.tags) {
+      const tagDiscount = this.extractDiscountFromTags(customer.tags);
+      if (tagDiscount) {
+        contractDiscount = tagDiscount;
       }
     }
 
@@ -1127,6 +1137,8 @@ class SubscriptionService {
                 firstName
                 lastName
                 email
+                numberOfOrders
+                tags
               }
               lines(first: 50) {
                 edges {
@@ -1194,7 +1206,7 @@ class SubscriptionService {
   }
 
   /**
-   * Get basic profile info for customer (firstName, lastName, email)
+   * Get basic profile info for customer (firstName, lastName, email, tags)
    */
   async getCustomerDetails(customerId) {
     const customerNumericId = String(customerId).replace(/^gid:\/\/shopify\/Customer\//, '');
@@ -1205,6 +1217,8 @@ class SubscriptionService {
           firstName
           lastName
           email
+          numberOfOrders
+          tags
         }
       }
     `;
@@ -1214,6 +1228,44 @@ class SubscriptionService {
     } catch (e) {
       return null;
     }
+  }
+
+  /**
+   * Parse customer tags for dynamic percentage discounts (e.g. discount-5, discount-10, discount-15, discount-20, discount-25, discount-30, etc.)
+   */
+  extractDiscountFromTags(tags) {
+    if (!tags) return null;
+    const tagList = Array.isArray(tags) ? tags : String(tags).split(',').map(t => t.trim());
+    
+    // Check for customer tag discounts: discount-5, discount-10, discount-15, discount-20, discount-25, discount-30, etc.
+    for (const rawTag of tagList) {
+      const t = String(rawTag).trim();
+      const match = t.match(/^discount[-_]?(\d+)$/i) || t.match(/^(\d+)%[-_]?off$/i);
+      if (match) {
+        const p = parseInt(match[1], 10);
+        if (p > 0 && p <= 90) {
+          return {
+            title: `${p}% OFF`,
+            code: t.toLowerCase(),
+            percent: p,
+            value: p,
+            valid: true
+          };
+        }
+      }
+    }
+
+    // Check known promotional codes in tags
+    for (const rawTag of tagList) {
+      const u = String(rawTag).trim().toUpperCase();
+      if (u === 'GIMMIEAGO') return { code: 'GIMMIEAGO', percent: 15, title: '15% OFF', valid: true };
+      if (u === 'HOY25') return { code: 'HOY25', percent: 25, title: '25% OFF', valid: true };
+      if (u === 'WELCOME15') return { code: 'WELCOME15', percent: 15, title: '15% OFF', valid: true };
+      if (u === 'VIP20') return { code: 'VIP20', percent: 20, title: '20% OFF', valid: true };
+      if (u === 'SAVE10') return { code: 'SAVE10', percent: 10, title: '10% OFF', valid: true };
+    }
+
+    return null;
   }
 }
 
