@@ -19,6 +19,7 @@
   {% else %}
     {% assign is_subscriber = false %}
     {% assign is_paused = false %}
+    {% assign customer_discount_tag = '' %}
 
     {% for tag in customer.tags %}
       {% assign down_tag = tag | downcase | strip %}
@@ -27,6 +28,9 @@
       {% endif %}
       {% if down_tag == 'active-subscriber' or down_tag == 'active_subscriber' or down_tag == 'active subscriber' or down_tag contains 'active-subscriber' or down_tag contains 'active_subscriber' or down_tag contains 'active subscriber' %}
         {% assign is_subscriber = true %}
+      {% endif %}
+      {% if down_tag contains 'discount-' or down_tag contains 'discount_' %}
+        {% assign customer_discount_tag = down_tag %}
       {% endif %}
     {% endfor %}
 
@@ -1313,13 +1317,19 @@
     </div>
   </div>
 
+  <!-- Safe DOM carrier for customer tags & discount -->
+  <div id="gimmie-customer-tag-data" 
+       data-tags="{% raw %}{{ customer.tags | join: ',' | escape }}{% endraw %}" 
+       data-discount-tag="{% raw %}{{ customer_discount_tag | escape }}{% endraw %}" 
+       style="display:none;"></div>
+
   <!-- State configuration passed to Client JS -->
   <script id="gimmie-config" type="application/json">
     {
       "customerEmail": "{% raw %}{{ customer.email }}{% endraw %}",
       "customerName": "{% raw %}{{ customer.first_name | default: customer.name | default: 'Subscriber' }} {{ customer.last_name }}{% endraw %}",
-      "customerTags": {% raw %}{{ customer.tags | json }}{% endraw %},
-      "customerDiscountTag": "{% raw %}{% assign c_dt = '' %}{% for t in customer.tags %}{% assign dt = t | downcase | strip %}{% if dt contains 'discount-' or dt contains 'discount_' or dt contains 'discount' %}{% assign c_dt = dt %}{% endif %}{% endfor %}{{ c_dt }}{% endraw %}",
+      "customerTags": {% raw %}{{ customer.tags | json | default: '[]' }}{% endraw %},
+      "customerDiscountTag": "{% raw %}{{ customer_discount_tag | strip }}{% endraw %}",
       "mealQuota": {{ mealQuota | json }},
       "contractId": {{ contractId | json }},
       "formattedDeliveryDate": "{% raw %}{{ active_delivery_date | default: 'Upcoming Monday' }}{% endraw %}",
@@ -1343,7 +1353,18 @@
     const configEl = document.getElementById('gimmie-config');
     if (!configEl) return;
 
-    const config = JSON.parse(configEl.textContent || '{}');
+    let config = {};
+    try {
+      config = JSON.parse(configEl.textContent || '{}');
+    } catch (err) {
+      console.warn('Config JSON parse warning, attempting sanitized parse:', err);
+      try {
+        config = JSON.parse((configEl.textContent || '{}').replace(/[\r\n\t]+/g, ' '));
+      } catch (e2) {
+        console.error('Failed to parse gimmie-config JSON:', e2);
+        config = {};
+      }
+    }
     const mealQuota = parseInt(config.mealQuota || 6, 10);
     const contractId = config.contractId || '';
     const isCutoffPassed = config.isCutoffPassed === true || 
@@ -2712,8 +2733,16 @@
         return;
       }
 
-      // 2. Customer tag discount from Shopify storefront liquid config (e.g. discount-5, discount-10, discount-15, discount-20, discount-25, discount-30)
-      const tagDiscount = extractDiscountFromTags(config.customerTags || config.customerDiscountTag);
+      // Read fallback from DOM if config tags missing
+      const domDataEl = document.getElementById('gimmie-customer-tag-data');
+      const domDiscountTag = domDataEl ? domDataEl.getAttribute('data-discount-tag') : '';
+      const domTags = domDataEl ? (domDataEl.getAttribute('data-tags') || '').split(',') : [];
+
+      // 2. Customer tag discount from Shopify storefront liquid config or DOM (e.g. discount-5, discount-10, discount-15, discount-20, discount-25, discount-30)
+      const tagDiscount = extractDiscountFromTags(
+        (Array.isArray(config.customerTags) && config.customerTags.length > 0) ? config.customerTags : 
+        (config.customerDiscountTag || domDiscountTag || domTags)
+      );
       if (tagDiscount && tagDiscount.valid) {
         applyDynamicBoxDiscount(tagDiscount);
         return;
@@ -2729,7 +2758,6 @@
 
       // 4. Default: No discount
       applyDynamicBoxDiscount(null);
-    }
     }
 
     function init() {

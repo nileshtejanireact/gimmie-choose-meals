@@ -91,6 +91,18 @@ assert.strictEqual(hannahAddons.toFixed(2), '15.00');
 assert.strictEqual(hannahGrandTotal.toFixed(2), '51.00');
 console.log('[Check 7] Hannah Conway screenshot case matches exactly: Box £48->£36, Addons £20->£15, Total £68->£51: ✓ PASS');
 
+// 8. Script syntax test: ensure client JS parses cleanly without SyntaxError
+const scriptMatch = liquid.match(/<script>([\s\S]*?)<\/script>\s*<\/section>/);
+assert(scriptMatch, 'Client-side script tag must exist');
+new Function(scriptMatch[1]);
+console.log('[Check 8] Client JS script syntax check: ✓ PASS (0 syntax errors)');
+
+// 9. Config JSON sanitization check: ensure no unescaped Liquid newlines in JSON tags
+const configBlock = liquid.match(/<script id="gimmie-config" type="application\/json">([\s\S]*?)<\/script>/);
+assert(configBlock, 'gimmie-config must exist');
+assert(!configBlock[1].includes('{% for'), 'Config JSON must never contain multiline Liquid loops inside JSON string');
+console.log('[Check 9] Config JSON sanitization check: ✓ PASS (safe from JSON parse breaks)');
+
 console.log('\n=============================================');
 console.log('Overall Result: ✓ 100% PASS');
 console.log('=============================================');
