@@ -317,30 +317,35 @@
 .gimmie-build-box__qty-button {
   width: 40px;
   height: 40px;
-  border: 2px solid var(--gimmie-border);
+  border: 2px solid var(--gimmie-border, #102B10) !important;
   border-radius: 999px;
-  background: var(--gimmie-accent);
-  color: var(--gimmie-text);
+  background: transparent !important;
+  color: var(--gimmie-text, #102B10) !important;
   font-size: 1.5rem;
   font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 2px 2px 0 var(--gimmie-border);
+  box-shadow: 2px 2px 0 var(--gimmie-border, #102B10);
   transition: transform 120ms ease, box-shadow 120ms ease;
   user-select: none;
+  line-height: 1;
 }
 
 .gimmie-build-box__qty-button:not(:disabled):hover {
   transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0 var(--gimmie-border);
+  box-shadow: 1px 1px 0 var(--gimmie-border, #102B10);
+  background: transparent !important;
 }
 
 .gimmie-build-box__qty-button:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  box-shadow: none;
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: var(--gimmie-text, #102B10) !important;
+  border-color: var(--gimmie-border, #102B10) !important;
 }
 
 .gimmie-build-box__qty-value {
@@ -1233,31 +1238,60 @@ div#s4t1 .gimmie-build-box__qty,
   text-align: center !important;
 }
 
-div#s4t1 .gimmie-build-box__qty-button {
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 2px solid currentColor;
-  border-radius: 999px;
-  background: transparent;
-  color: inherit;
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+div#s4t1 .gimmie-build-box__qty-button,
+.gimmie-addon-track .gimmie-build-box__qty-button,
+.gimmie-build-box__addon-item .gimmie-build-box__qty-button,
+[data-gimmie-addonmeal] .gimmie-build-box__qty-button {
+  width: 40px !important;
+  height: 40px !important;
+  border: 2px solid var(--gimmie-border, #102B10) !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--gimmie-text, #102B10) !important;
+  font-size: 1.5rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 2px 2px 0 var(--gimmie-border, #102B10) !important;
+  transition: transform 120ms ease, box-shadow 120ms ease !important;
+  user-select: none !important;
+  padding: 0 !important;
 }
 
-div#s4t1 .gimmie-build-box__qty-button:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
+div#s4t1 .gimmie-build-box__qty-button:not(:disabled):hover,
+.gimmie-addon-track .gimmie-build-box__qty-button:not(:disabled):hover,
+.gimmie-build-box__addon-item .gimmie-build-box__qty-button:not(:disabled):hover,
+[data-gimmie-addonmeal] .gimmie-build-box__qty-button:not(:disabled):hover {
+  transform: translate(1px, 1px) !important;
+  box-shadow: 1px 1px 0 var(--gimmie-border, #102B10) !important;
+  background: transparent !important;
 }
 
-div#s4t1 .gimmie-build-box__qty-value {
-  min-width: 1.5rem;
-  text-align: center;
-  font-size: 1.25rem;
-  font-weight: 800;
+div#s4t1 .gimmie-build-box__qty-button:disabled,
+.gimmie-addon-track .gimmie-build-box__qty-button:disabled,
+.gimmie-build-box__addon-item .gimmie-build-box__qty-button:disabled,
+[data-gimmie-addonmeal] .gimmie-build-box__qty-button:disabled {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: var(--gimmie-text, #102B10) !important;
+  border: 2px solid var(--gimmie-border, #102B10) !important;
+}
+
+div#s4t1 .gimmie-build-box__qty-value,
+.gimmie-addon-track .gimmie-build-box__qty-value,
+.gimmie-build-box__addon-item .gimmie-build-box__qty-value,
+[data-gimmie-addonmeal] .gimmie-build-box__qty-value {
+  min-width: 28px !important;
+  text-align: center !important;
+  font-family: var(--gimmie-heading-font) !important;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  color: var(--gimmie-text, #102B10) !important;
 }
 
 @media (max-width: 767px) {
@@ -1316,10 +1350,17 @@ div#s4t1 .gimmie-build-box__qty-value {
     margin: auto auto 0 auto !important;
     text-align: center !important;
   }
-  div#s4t1 .gimmie-build-box__qty-button {
-    width: 2.4rem !important;
-    height: 2.4rem !important;
+  div#s4t1 .gimmie-build-box__qty-button,
+  .gimmie-addon-track .gimmie-build-box__qty-button,
+  .gimmie-build-box__addon-item .gimmie-build-box__qty-button,
+  [data-gimmie-addonmeal] .gimmie-build-box__qty-button {
+    width: 38px !important;
+    height: 38px !important;
     font-size: 1.4rem !important;
+    color: var(--gimmie-text, #102B10) !important;
+    border: 2px solid var(--gimmie-border, #102B10) !important;
+    background: transparent !important;
+    box-shadow: 2px 2px 0 var(--gimmie-border, #102B10) !important;
   }
 }
 

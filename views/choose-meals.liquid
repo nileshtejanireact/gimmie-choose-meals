@@ -689,13 +689,13 @@
                           </div>
                           <div class="gimmie-build-box__qty" style="display: flex !important; align-items: center !important; justify-content: center !important; gap: 14px !important; width: 100% !important; margin: auto auto 0 auto !important; text-align: center !important;">
                             {% if is_cutoff_passed %}
-                              <button type="button" class="gimmie-build-box__qty-button is-locked" data-action="minus" data-variant-id="{{ m_variant_id }}" aria-label="Decrease quantity" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">−</button>
+                              <button type="button" class="gimmie-build-box__qty-button is-locked" data-action="minus" data-variant-id="{{ m_variant_id }}" aria-label="Decrease quantity" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important; background: transparent !important; color: #102B10 !important; border: 2px solid #102B10 !important;">−</button>
                               <span class="gimmie-build-box__qty-value" data-meal-qty="{{ m_variant_id }}">0</span>
-                              <button type="button" class="gimmie-build-box__qty-button is-locked" data-action="plus" data-variant-id="{{ m_variant_id }}" aria-label="Increase quantity" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important;">+</button>
+                              <button type="button" class="gimmie-build-box__qty-button is-locked" data-action="plus" data-variant-id="{{ m_variant_id }}" aria-label="Increase quantity" disabled style="opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important; background: transparent !important; color: #102B10 !important; border: 2px solid #102B10 !important;">+</button>
                             {% else %}
-                              <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ m_variant_id }}" aria-label="Decrease quantity" disabled>−</button>
+                              <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ m_variant_id }}" aria-label="Decrease quantity" disabled style="background: transparent !important; color: #102B10 !important; border: 2px solid #102B10 !important;">−</button>
                               <span class="gimmie-build-box__qty-value" data-meal-qty="{{ m_variant_id }}">0</span>
-                              <button type="button" class="gimmie-build-box__qty-button" data-action="plus" data-variant-id="{{ m_variant_id }}" aria-label="Increase quantity">+</button>
+                              <button type="button" class="gimmie-build-box__qty-button" data-action="plus" data-variant-id="{{ m_variant_id }}" aria-label="Increase quantity" style="background: transparent !important; color: #102B10 !important; border: 2px solid #102B10 !important;">+</button>
                             {% endif %}
                           </div>
                         </div>
@@ -725,9 +725,9 @@
                             <span class="gimmie-macro-bubble">{{ fb_m_prot_display }}</span>
                           </div>
                           <div class="gimmie-build-box__qty" style="display: flex !important; align-items: center !important; justify-content: center !important; gap: 14px !important; width: 100% !important; margin: auto auto 0 auto !important; text-align: center !important;">
-                            <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ meal.variantId }}" aria-label="Decrease quantity" disabled>−</button>
+                            <button type="button" class="gimmie-build-box__qty-button" data-action="minus" data-variant-id="{{ meal.variantId }}" aria-label="Decrease quantity" disabled style="background: transparent !important; color: #102B10 !important; border: 2px solid #102B10 !important;">−</button>
                             <span class="gimmie-build-box__qty-value" data-meal-qty="{{ meal.variantId }}">0</span>
-                            <button type="button" class="gimmie-build-box__qty-button" data-action="plus" data-variant-id="{{ meal.variantId }}" aria-label="Increase quantity">+</button>
+                            <button type="button" class="gimmie-build-box__qty-button" data-action="plus" data-variant-id="{{ meal.variantId }}" aria-label="Increase quantity" style="background: transparent !important; color: #102B10 !important; border: 2px solid #102B10 !important;">+</button>
                           </div>
                         </div>
                       </article>
@@ -1006,47 +1006,51 @@
                             {% if is_cutoff_passed %}
                               <button
                                 type="button"
-                                class="gimmie-build-box__qty-button font-heading"
+                                class="gimmie-build-box__qty-button"
                                 data-addon-action="minus"
                                 data-addon-id="{{ a_variant_id }}"
                                 aria-label="Remove meal"
                                 disabled
+                                style="color: #102B10 !important; border: 2px solid #102B10 !important; background: transparent !important;"
                               >
                                 −
                               </button>
-                              <span class="gimmie-build-box__qty-value font-heading" data-addon-qty="{{ a_variant_id }}">
+                              <span class="gimmie-build-box__qty-value" data-addon-qty="{{ a_variant_id }}" style="color: #102B10 !important;">
                                 0
                               </span>
                               <button
                                 type="button"
-                                class="gimmie-build-box__qty-button font-heading"
+                                class="gimmie-build-box__qty-button"
                                 data-addon-action="plus"
                                 data-addon-id="{{ a_variant_id }}"
                                 aria-label="Add meal"
                                 disabled
+                                style="color: #102B10 !important; border: 2px solid #102B10 !important; background: transparent !important;"
                               >
                                 +
                               </button>
                             {% else %}
                               <button
                                 type="button"
-                                class="gimmie-build-box__qty-button font-heading"
+                                class="gimmie-build-box__qty-button"
                                 data-addon-action="minus"
                                 data-addon-id="{{ a_variant_id }}"
                                 aria-label="Remove meal"
                                 disabled
+                                style="color: #102B10 !important; border: 2px solid #102B10 !important; background: transparent !important;"
                               >
                                 −
                               </button>
-                              <span class="gimmie-build-box__qty-value font-heading" data-addon-qty="{{ a_variant_id }}">
+                              <span class="gimmie-build-box__qty-value" data-addon-qty="{{ a_variant_id }}" style="color: #102B10 !important;">
                                 0
                               </span>
                               <button
                                 type="button"
-                                class="gimmie-build-box__qty-button font-heading"
+                                class="gimmie-build-box__qty-button"
                                 data-addon-action="plus"
                                 data-addon-id="{{ a_variant_id }}"
                                 aria-label="Add meal"
+                                style="color: #102B10 !important; border: 2px solid #102B10 !important; background: transparent !important;"
                               >
                                 +
                               </button>
@@ -1123,47 +1127,51 @@
                           {% if is_cutoff_passed %}
                             <button
                               type="button"
-                              class="gimmie-build-box__qty-button font-heading"
+                              class="gimmie-build-box__qty-button"
                               data-addon-action="minus"
                               data-addon-id="{{ addon.variantId }}"
                               aria-label="Remove meal"
                               disabled
+                              style="color: #102B10 !important; border: 2px solid #102B10 !important; background: transparent !important;"
                             >
                               −
                             </button>
-                            <span class="gimmie-build-box__qty-value font-heading" data-addon-qty="{{ addon.variantId }}">
+                            <span class="gimmie-build-box__qty-value" data-addon-qty="{{ addon.variantId }}" style="color: #102B10 !important;">
                               0
                             </span>
                             <button
                               type="button"
-                              class="gimmie-build-box__qty-button font-heading"
+                              class="gimmie-build-box__qty-button"
                               data-addon-action="plus"
                               data-addon-id="{{ addon.variantId }}"
                               aria-label="Add meal"
                               disabled
+                              style="color: #102B10 !important; border: 2px solid #102B10 !important; background: transparent !important;"
                             >
                               +
                             </button>
                           {% else %}
                             <button
                               type="button"
-                              class="gimmie-build-box__qty-button font-heading"
+                              class="gimmie-build-box__qty-button"
                               data-addon-action="minus"
                               data-addon-id="{{ addon.variantId }}"
                               aria-label="Remove meal"
                               disabled
+                              style="color: #102B10 !important; border: 2px solid #102B10 !important; background: transparent !important;"
                             >
                               −
                             </button>
-                            <span class="gimmie-build-box__qty-value font-heading" data-addon-qty="{{ addon.variantId }}">
+                            <span class="gimmie-build-box__qty-value" data-addon-qty="{{ addon.variantId }}" style="color: #102B10 !important;">
                               0
                             </span>
                             <button
                               type="button"
-                              class="gimmie-build-box__qty-button font-heading"
+                              class="gimmie-build-box__qty-button"
                               data-addon-action="plus"
                               data-addon-id="{{ addon.variantId }}"
                               aria-label="Add meal"
+                              style="color: #102B10 !important; border: 2px solid #102B10 !important; background: transparent !important;"
                             >
                               +
                             </button>
