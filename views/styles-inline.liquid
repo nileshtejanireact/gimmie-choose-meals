@@ -1404,15 +1404,43 @@ div#s4t1 .gimmie-build-box__qty-value,
   color: var(--gimmie-text) !important;
 }
 
-/* Slashed Compare Price for Discounted Add-on Items */
+/* Slashed Compare Price for Discounted Add-on Items & Summary (100% Prominent Cross) */
 .price-item--compare,
-.gimmie-addon-price-compare {
-  text-decoration: line-through !important;
-  opacity: 0.55 !important;
-  margin-right: 6px !important;
+.gimmie-addon-price-compare,
+.gimmie-build-box__box-compare,
+#gimmie-summary-box-compare,
+#gimmie-summary-grand-total-compare,
+.gimmie-compare-slashed {
+  position: relative !important;
+  display: inline-block !important;
+  color: #767676 !important;
+  opacity: 1 !important;
+  margin-right: 8px !important;
   font-weight: 600 !important;
   font-size: 0.95em !important;
-  display: inline-block !important;
+  text-decoration: line-through !important;
+  text-decoration-thickness: 2.5px !important;
+  text-decoration-color: #102B10 !important;
+  -webkit-text-decoration-color: #102B10 !important;
+}
+
+/* 100% visible, bold strike-through cross bar for high-contrast Serifs/custom fonts */
+.price-item--compare::after,
+.gimmie-addon-price-compare::after,
+.gimmie-build-box__box-compare::after,
+#gimmie-summary-box-compare::after,
+#gimmie-summary-grand-total-compare::after,
+.gimmie-compare-slashed::after {
+  content: "" !important;
+  position: absolute !important;
+  left: -2px !important;
+  right: -2px !important;
+  top: 50% !important;
+  height: 2.5px !important;
+  background: #102B10 !important;
+  transform: translateY(-50%) !important;
+  pointer-events: none !important;
+  border-radius: 1px !important;
 }
 
 .price-item--discount-badge {

@@ -1241,7 +1241,7 @@
                 {{ mealQuota }} Pack Box
               </strong>
               <span class="gimmie-build-box__box-price" style="font-size: 0.98rem; text-align: right;">
-                <span id="gimmie-summary-box-compare" class="gimmie-build-box__box-compare" style="text-decoration: line-through; opacity: 0.55; margin-right: 6px; display: none;">£48.00</span>
+                <span id="gimmie-summary-box-compare" class="gimmie-build-box__box-compare gimmie-compare-slashed" style="margin-right: 6px; display: none;">£48.00</span>
                 <span id="gimmie-summary-box-current" class="gimmie-build-box__box-current" style="font-weight: 800; color: var(--gimmie-text);">£48.00</span>
               </span>
             </div>
@@ -1255,7 +1255,7 @@
                 <span id="gimmie-summary-discount-badge" style="display: none; font-size: 0.72rem; font-weight: 800; color: #1E6B24; background: #E8F5E9; padding: 2px 8px; border-radius: 999px; margin-top: 2px;"></span>
               </div>
               <div style="text-align: right;">
-                <span id="gimmie-summary-grand-total-compare" style="text-decoration: line-through; opacity: 0.55; margin-right: 6px; font-size: 0.95rem; font-weight: 600; display: none;"></span>
+                <span id="gimmie-summary-grand-total-compare" class="gimmie-compare-slashed" style="margin-right: 6px; font-size: 0.95rem; font-weight: 600; display: none;"></span>
                 <strong id="gimmie-summary-grand-total" style="font-size: 1.05rem; font-weight: 800; color: var(--gimmie-text);">
                   £48.00
                 </strong>
@@ -1785,7 +1785,7 @@
       if (grandTotalCompareEl) {
         if (hasDiscount && origGrandTotal > finalGrandTotal) {
           grandTotalCompareEl.textContent = '£' + origGrandTotal.toFixed(2);
-          grandTotalCompareEl.style.display = 'inline';
+          grandTotalCompareEl.style.display = 'inline-block';
         } else {
           grandTotalCompareEl.style.display = 'none';
         }
@@ -1897,7 +1897,7 @@
       if (summaryAddonsTotalEl) {
         if (state.totalAddonsPrice > 0) {
           if (state.totalAddonsOriginalPrice && state.totalAddonsPrice < state.totalAddonsOriginalPrice) {
-            summaryAddonsTotalEl.innerHTML = `<span style="text-decoration: line-through; opacity: 0.55; margin-right: 6px; font-weight: 600;">+£${state.totalAddonsOriginalPrice.toFixed(2)}</span><span>+£${state.totalAddonsPrice.toFixed(2)}</span>`;
+            summaryAddonsTotalEl.innerHTML = `<span class="gimmie-compare-slashed" style="margin-right: 6px;">+£${state.totalAddonsOriginalPrice.toFixed(2)}</span><span>+£${state.totalAddonsPrice.toFixed(2)}</span>`;
           } else {
             summaryAddonsTotalEl.textContent = `+£${state.totalAddonsPrice.toFixed(2)}`;
           }
@@ -2499,10 +2499,6 @@
         if (!compareEl && priceContainer) {
           compareEl = document.createElement('span');
           compareEl.className = 'price-item price-item--compare font-heading uppercase';
-          compareEl.style.textDecoration = 'line-through';
-          compareEl.style.opacity = '0.55';
-          compareEl.style.marginRight = '6px';
-          compareEl.style.fontWeight = '600';
           if (currentEl) {
             priceContainer.insertBefore(compareEl, currentEl);
           } else {
@@ -2520,7 +2516,7 @@
           // Discount returned by App/contract: show slashed original price and discounted rate
           if (compareEl) {
             compareEl.textContent = '£' + originalPrice.toFixed(2);
-            compareEl.style.display = 'inline';
+            compareEl.style.display = 'inline-block';
           }
           if (currentEl) {
             currentEl.textContent = '£' + discountedPrice.toFixed(2);
@@ -2633,7 +2629,7 @@
       // Strike out the original box price with slash, show new discounted price
       if (boxCompareEl) {
         boxCompareEl.textContent = baseInfo.formatted;
-        boxCompareEl.style.display = 'inline';
+        boxCompareEl.style.display = 'inline-block';
       }
       boxCurrentEl.textContent = '£' + finalPrice.toFixed(2);
 
@@ -2647,7 +2643,7 @@
       if (grandTotalCompareEl) {
         if (origGrandTotal > finalGrandTotal) {
           grandTotalCompareEl.textContent = '£' + origGrandTotal.toFixed(2);
-          grandTotalCompareEl.style.display = 'inline';
+          grandTotalCompareEl.style.display = 'inline-block';
         } else {
           grandTotalCompareEl.style.display = 'none';
         }
