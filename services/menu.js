@@ -343,6 +343,126 @@ class MenuService {
   getFallbackAddons() {
     return [
       {
+        id: 'gid://shopify/Product/addon_blueberry_lemon_oats',
+        variantId: 'gid://shopify/ProductVariant/addon_var_blueberry_oats',
+        title: 'BLUEBERRY & LEMON PROTEIN OATS',
+        handle: 'blueberry-lemon-protein-oats',
+        price: '4.95',
+        image: 'https://images.unsplash.com/photo-1584985314300-8806c9e0d16a?auto=format&fit=crop&w=800&q=80',
+        description: 'Creamy overnight oats blended with premium whey protein, Greek yoghurt and chia seeds. Loaded with blueberries and lemon zest.',
+        badges: ['ADD-ON', 'PROTEIN BREAKFAST'],
+        macros: {
+          calories: '426 kcal',
+          protein: '32g Protein',
+          carbs: '40.7g Carbs',
+          fat: '10.6g Fat'
+        },
+        nutrition: {
+          serving: 'Per Pot (300g)',
+          energyKj: '1782 kJ',
+          energyKcal: '426 kcal',
+          fat: '10.6g',
+          saturates: '2.8g',
+          carbs: '40.7g',
+          sugars: '20.7g',
+          fibre: '5.5g',
+          protein: '32g',
+          salt: '0.30g'
+        },
+        allergens: 'Oats, Milk, Soya',
+        ingredients: 'Porridge <strong>Oats</strong>, Whey Protein (<strong>Milk, Soya</strong>), 0% Fat Greek Yoghurt (<strong>Milk</strong>), Semi Skimmed <strong>Milk</strong>, Chia Seeds, Blueberries, Lemon Zest.<br><br>May contain: <strong>Peanuts, Nuts, Sesame</strong>.'
+      },
+      {
+        id: 'gid://shopify/Product/addon_biscoff_biscuit_oats',
+        variantId: 'gid://shopify/ProductVariant/addon_var_biscoff_oats',
+        title: 'BISCOFF BISCUIT PROTEIN OATS',
+        handle: 'biscoff-biscuit-protein-oats',
+        price: '4.95',
+        image: 'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=800&q=80',
+        description: 'Rich, creamy overnight oats infused with Lotus Biscoff spread, layered with vanilla whey protein and topped with crushed caramelized Biscoff biscuit crumbs.',
+        badges: ['ADD-ON', 'HIGH PROTEIN'],
+        macros: {
+          calories: '445 kcal',
+          protein: '31g Protein',
+          carbs: '58g Carbs',
+          fat: '10.5g Fat'
+        },
+        nutrition: {
+          serving: 'Per Pot (300g)',
+          energyKj: '1870 kJ',
+          energyKcal: '445 kcal',
+          fat: '10.5g',
+          saturates: '3.2g',
+          carbs: '58.0g',
+          sugars: '16.0g',
+          fibre: '5.5g',
+          protein: '31g',
+          salt: '0.38g'
+        },
+        allergens: 'Milk, Gluten (Wheat, Oats), Soya',
+        ingredients: 'Rolled Oats (Gluten) (38%), Skimmed Milk (24%), Greek Style Yoghurt (Milk) (14%), Whey Protein Concentrate (Milk, Soy Lecithin) (10%), Lotus Biscoff Spread (8%) (Caramelised Biscuits (Wheat Flour, Sugar, Vegetable Oils, Candy Sugar Syrup, Raising Agent, Soya Flour, Salt, Cinnamon), Rapeseed Oil, Sugar, Emulsifier (Soya Lecithin), Acid (Citric Acid)), Chia Seeds, Crushed Biscoff Biscuit (Wheat, Soya).'
+      },
+      {
+        id: 'gid://shopify/Product/addon_raspberry_white_choc_oats',
+        variantId: 'gid://shopify/ProductVariant/addon_var_raspberry_oats',
+        title: 'RASPBERRY & WHITE CHOC PROTEIN OATS',
+        handle: 'raspberry-white-choc-protein-oats',
+        price: '4.95',
+        image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+        description: 'Creamy protein overnight oats folded with juicy tart raspberries, vanilla whey protein, and delicate Belgian white chocolate curls.',
+        badges: ['ADD-ON', 'SWEET & HEALTHY'],
+        macros: {
+          calories: '410 kcal',
+          protein: '32g Protein',
+          carbs: '52g Carbs',
+          fat: '8.8g Fat'
+        },
+        nutrition: {
+          serving: 'Per Pot (300g)',
+          energyKj: '1725 kJ',
+          energyKcal: '410 kcal',
+          fat: '8.8g',
+          saturates: '3.0g',
+          carbs: '52.0g',
+          sugars: '13.0g',
+          fibre: '6.2g',
+          protein: '32g',
+          salt: '0.28g'
+        },
+        allergens: 'Milk, Gluten (Oats), Soya',
+        ingredients: 'Rolled Oats (Gluten) (40%), Skimmed Milk (24%), Greek Style Yoghurt (Milk) (14%), Whey Protein Concentrate (Milk, Soy Lecithin) (10%), Fresh Raspberries (7%), White Chocolate Curls (Milk, Soya, Sugar, Cocoa Butter, Whole Milk Powder) (3%), Chia Seeds (2%).'
+      },
+      {
+        id: 'gid://shopify/Product/addon_sweet_potato_cottage_pie',
+        variantId: 'gid://shopify/ProductVariant/addon_var_cottage_pie',
+        title: 'SWEET POTATO COTTAGE PIE',
+        handle: 'sweet-potato-cottage-pie',
+        price: '4.95',
+        image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
+        description: 'Slow-simmered lean British minced beef and sweet garden carrots in a rich, herbed red wine and beef gravy, topped with velvety sweet potato mash.',
+        badges: ['ADD-ON', 'HIGH PROTEIN'],
+        macros: {
+          calories: '567 kcal',
+          protein: '46g Protein',
+          carbs: '54g Carbs',
+          fat: '14.5g Fat'
+        },
+        nutrition: {
+          serving: 'Per Serving (450g)',
+          energyKj: '2372 kJ',
+          energyKcal: '567 kcal',
+          fat: '14.5g',
+          saturates: '4.8g',
+          carbs: '54.0g',
+          sugars: '9.2g',
+          fibre: '6.0g',
+          protein: '46g',
+          salt: '1.20g'
+        },
+        allergens: 'Milk, Celery, Fish, Barley',
+        ingredients: 'British Minced Beef (38%), Sweet Potato Mash (35%) (Sweet Potato, Unsalted Butter (Milk), Salt, White Pepper), Diced Carrots (12%), Chopped Tomatoes, Beef Stock (Celery), Onions, Tomato Purée, Worcestershire Sauce (Fish, Barley), Garlic, Fresh Thyme, Sea Salt, Black Pepper.'
+      },
+      {
         id: 'gid://shopify/Product/addon_cajun_chicken_penne',
         variantId: 'gid://shopify/ProductVariant/addon_var_cajun',
         title: 'CAJUN CHICKEN PENNE',

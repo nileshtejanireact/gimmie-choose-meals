@@ -500,64 +500,118 @@
   margin-bottom: 16px;
 }
 
-.gimmie-modal__title {
+.gimmie-modal__title,
+.gimmie-build-box__meal-modal-title {
   margin: 0 0 8px;
   font-family: var(--gimmie-heading-font);
   font-size: 1.5rem;
-  font-weight: 900;
+  font-weight: 800;
+  line-height: 1.15;
   text-transform: uppercase;
-  color: var(--gimmie-text);
+  color: #102B10;
 }
 
-.gimmie-modal__desc {
-  margin: 0;
-  color: var(--gimmie-muted);
-  font-size: 0.92rem;
-  line-height: 1.5;
+.gimmie-modal__desc,
+.gimmie-build-box__meal-modal-description {
+  margin: 0 0 1.25rem 0;
+  color: #102B10;
+  font-size: 0.95rem;
+  line-height: 1.45;
 }
 
-.gimmie-modal__section-title {
+.gimmie-build-box__meal-modal-section {
+  margin-top: 1.25rem;
+}
+
+.gimmie-modal__section-title,
+.gimmie-build-box__meal-modal-section-title {
   font-family: var(--gimmie-heading-font);
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 800;
   text-transform: uppercase;
-  margin: 20px 0 8px;
-  color: var(--gimmie-text);
-  border-bottom: 1.5px solid var(--gimmie-border);
-  padding-bottom: 4px;
+  letter-spacing: -0.01em;
+  margin: 1.25rem 0 0.75rem 0;
+  color: #102B10;
+}
+
+.gimmie-build-box__nutrition-table-wrap {
+  overflow: hidden;
+  border: 2px solid #8FAF8F;
+  border-radius: 1rem;
+  background: #fffaf0;
+  margin-top: 8px;
+}
+
+.gimmie-modal__table,
+.gimmie-build-box__nutrition-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.gimmie-modal__table th,
+.gimmie-modal__table td,
+.gimmie-build-box__nutrition-table th,
+.gimmie-build-box__nutrition-table td {
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid rgba(143, 175, 143, 0.45);
+  text-align: left;
+  vertical-align: top;
+  color: #102B10;
+}
+
+.gimmie-modal__table tr:last-child th,
+.gimmie-modal__table tr:last-child td,
+.gimmie-build-box__nutrition-table tr:last-child th,
+.gimmie-build-box__nutrition-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.gimmie-modal__table th,
+.gimmie-build-box__nutrition-table th {
+  width: 58%;
+  font-weight: 700;
+}
+
+.gimmie-modal__table td,
+.gimmie-build-box__nutrition-table td {
+  text-align: right;
+  font-weight: 700;
+}
+
+.gimmie-build-box__nutrition-child-row th {
+  padding-left: 1.65rem !important;
+  font-weight: 500 !important;
+  opacity: 0.85;
+}
+
+.gimmie-build-box__meal-modal-text,
+.gimmie-build-box__meal-modal-alert {
+  border: 2px solid #8FAF8F;
+  border-radius: 1rem;
+  background: #fffaf0;
+  padding: 0.9rem 1rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: #102B10;
+}
+
+.gimmie-build-box__meal-modal-alert {
+  font-weight: 700;
+  color: #102B10;
 }
 
 .gimmie-modal__ingredients {
-  font-size: 0.88rem;
-  line-height: 1.55;
-  color: #333333;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: #102B10;
 }
 
 .gimmie-modal__ingredients strong {
   color: var(--gimmie-text);
   text-decoration: underline;
-}
-
-.gimmie-modal__table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 8px;
-  font-size: 0.9rem;
-}
-
-.gimmie-modal__table td {
-  padding: 8px 4px;
-  border-bottom: 1px solid rgba(16, 43, 16, 0.12);
-  color: var(--gimmie-text);
-}
-
-.gimmie-modal__table td:first-child {
-  font-weight: 400;
-}
-
-.gimmie-modal__table td:last-child {
-  text-align: right;
-  font-weight: 400;
 }
 
 @media (max-width: 900px) {
