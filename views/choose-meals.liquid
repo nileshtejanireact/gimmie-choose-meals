@@ -1556,6 +1556,87 @@
   (function () {
     'use strict';
 
+    function cleanRichIngredients(raw) {
+      if (!raw) return '';
+      let text = String(raw).trim();
+      if (text.startsWith('{') && (text.includes('"root"') || text.includes('"children"'))) {
+        try {
+          const parsed = JSON.parse(text);
+          const extractHtml = (node) => {
+            if (!node) return '';
+            if (node.type === 'text') {
+              let t = node.value || '';
+              if (node.bold) t = '<strong>' + t + '</strong>';
+              if (node.italic) t = '<em>' + t + '</em>';
+              return t;
+            }
+            if (node.children) {
+              const inner = node.children.map(extractHtml).join('');
+              if (node.type === 'paragraph') return '<p>' + inner + '</p>';
+              if (node.type === 'list-item') return '<li>' + inner + '</li>';
+              if (node.type === 'list') return '<ul>' + inner + '</ul>';
+              return inner;
+            }
+            return '';
+          };
+          text = extractHtml(parsed.root);
+        } catch (e) {
+          text = text.replace(/\\n/g, '<br>');
+        }
+      }
+      return text;
+    }
+
+    function cleanIngredients(raw) {
+      if (!raw) return '';
+      let text = raw;
+      if (typeof raw === 'string' && (raw.includes('value') || raw.includes('root') || raw.includes('children') || raw.includes('=>') || raw.includes('{'))) {
+        try {
+          const parsed = JSON.parse(raw);
+          const parts = [];
+          function traverse(obj) {
+            if (!obj) return;
+            if (typeof obj === 'string') {
+              parts.push(obj);
+              return;
+            }
+            if (Array.isArray(obj)) {
+              obj.forEach(traverse);
+              return;
+            }
+            if (typeof obj === 'object') {
+              if (obj.value && typeof obj.value === 'string') parts.push(obj.value);
+              if (obj.children) traverse(obj.children);
+            }
+          }
+          traverse(parsed);
+          if (parts.length > 0) text = parts.join(' ');
+        } catch (e) {
+          try {
+            const parts = [];
+            const regex = /"value"\s*(?:=>|:)\s*"([^"]*)"/g;
+            let m;
+            while ((m = regex.exec(raw)) !== null) {
+              if (m[1]) parts.push(m[1]);
+            }
+            if (parts.length > 0) text = parts.join(' ');
+          } catch (e2) {}
+        }
+      }
+      if (typeof text === 'string') {
+        text = text
+          .replace(/<[^>]*>/g, ' ')
+          .replace(/\\n/g, ' ')
+          .replace(/\\r/g, '')
+          .replace(/\\t/g, ' ')
+          .replace(/\n+/g, ' ')
+          .replace(/\r+/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+      return text;
+    }
+
     const configEl = document.getElementById('gimmie-config');
     if (!configEl) return;
 
@@ -1691,11 +1772,11 @@
         }
       });
     });
-    const hasAddonsOnPage = config.hasAddons && activeAddonList.length > 0;
-    const addons = (config.isDuplicateTheme ? (hasAddonsOnPage ? activeAddonList : (config.hasAddons ? (config.addons || []) : [])) : []);
+    const hasAddonsOnPage = activeAddonList.length > 0;
+    const addons = (hasAddonsOnPage ? activeAddonList : (config.addons || []));
 
     // Unified lookup list for the nutrition modal (works for both meals & add-ons)
-    const allModalItems = [...meals, ...addons];
+    const allModalItems = [...meals, ...activeAddonList, ...(config.addons || [])];
 
     let customerEmail = config.customerEmail || '';
     let customerName = config.customerName || 'Subscriber';
@@ -2292,14 +2373,67 @@
       return text;
     }
 
-    function openModal(itemId) {
-      const card = document.querySelector(`[data-meal-id="${itemId}"], [data-addon-id="${itemId}"], [data-addonmeal-id="${itemId}"]`);
-      const item = allModalItems.find(m => 
+    function openModal(itemId, triggerEl) {
+      if (!modalEl) modalEl = document.getElementById('gimmie-nutrition-modal');
+      if (!modalEl) return;
+
+      let card = null;
+      if (triggerEl && triggerEl.closest) {
+        card = triggerEl.closest('.gimmie-build-box__meal, .gimmie-build-box__addon-item');
+      }
+      if (!card && itemId) {
+        const allCards = document.querySelectorAll('.gimmie-build-box__meal, .gimmie-build-box__addon-item');
+        for (const c of allCards) {
+          if (c.getAttribute('data-meal-id') === String(itemId) || 
+              c.getAttribute('data-addon-id') === String(itemId) || 
+              c.getAttribute('data-addonmeal-id') === String(itemId) ||
+              (c.getAttribute('data-title') && c.getAttribute('data-title').toLowerCase().trim() === String(itemId).toLowerCase().trim())) {
+            card = c;
+            break;
+          }
+        }
+      }
+
+      let item = allModalItems.find(m => 
         String(m.id) === String(itemId) || 
         String(m.variantId) === String(itemId) || 
         (m.title && itemId && m.title.toLowerCase().trim() === String(itemId).toLowerCase().trim())
       );
-      if (!item || !modalEl) return;
+
+      if (!item && card) {
+        const titleEl = card.querySelector('.gimmie-build-box__meal-title');
+        const imgEl = card.querySelector('.gimmie-build-box__meal-image');
+        const descEl = card.querySelector('.gimmie-build-box__meal-description');
+        item = {
+          id: card.getAttribute('data-meal-id') || card.getAttribute('data-addon-id') || itemId,
+          variantId: card.getAttribute('data-addonmeal-id') || card.getAttribute('data-meal-id') || itemId,
+          title: card.getAttribute('data-title') || (titleEl ? titleEl.textContent.trim() : 'Dish'),
+          image: card.getAttribute('data-image') || (imgEl ? imgEl.src : ''),
+          description: card.getAttribute('data-desc') || (descEl ? descEl.textContent.trim() : ''),
+          ingredients: card.getAttribute('data-ingredients') || '',
+          allergens: card.getAttribute('data-allergens') || '',
+          macros: {
+            calories: card.getAttribute('data-cals') || '',
+            protein: card.getAttribute('data-prot') || '',
+            carbs: card.getAttribute('data-carbs') || '',
+            fat: card.getAttribute('data-fat') || ''
+          },
+          nutrition: {
+            serving: card.getAttribute('data-serving') || 'Per Serving',
+            energyKj: card.getAttribute('data-kj') || '',
+            energyKcal: card.getAttribute('data-cals') || '',
+            protein: card.getAttribute('data-prot') || '',
+            fat: card.getAttribute('data-fat') || '',
+            saturates: card.getAttribute('data-saturates') || '',
+            carbs: card.getAttribute('data-carbs') || '',
+            sugars: card.getAttribute('data-sugars') || '',
+            fibre: card.getAttribute('data-fibre') || '',
+            salt: card.getAttribute('data-salt') || ''
+          }
+        };
+      }
+
+      if (!item) return;
 
       // Populate Image
       const modalImg = document.getElementById('gimmie-modal-image');
@@ -2649,6 +2783,8 @@
 
       modalEl.removeAttribute('hidden');
       modalEl.classList.add('is-open');
+      modalEl.style.display = 'flex';
+      modalEl.style.zIndex = '9999999';
       document.body.classList.add('gimmie-build-box-modal-open');
     }
 
@@ -2656,6 +2792,7 @@
       if (modalEl) {
         modalEl.setAttribute('hidden', '');
         modalEl.classList.remove('is-open');
+        modalEl.style.display = 'none';
         document.body.classList.remove('gimmie-build-box-modal-open');
       }
     }
@@ -2875,16 +3012,34 @@
         setTimeout(updateSliderArrows, 300);
       }
 
-      // Modal trigger for meals and add-ons
+      // Modal trigger for meals and add-ons (direct listeners)
       document.querySelectorAll('[data-open-modal]').forEach(el => {
-        el.addEventListener('click', () => {
+        el.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
           const id = el.getAttribute('data-open-modal');
-          openModal(id);
+          openModal(id, el);
         });
+      });
+
+      // Global delegation backup: clicking any [data-open-modal] or its child (svg, text)
+      document.addEventListener('click', (e) => {
+        const trigger = e.target.closest('[data-open-modal]');
+        if (trigger) {
+          e.preventDefault();
+          e.stopPropagation();
+          const id = trigger.getAttribute('data-open-modal');
+          openModal(id, trigger);
+        }
       });
 
       if (modalBackdrop) modalBackdrop.addEventListener('click', closeModal);
       if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('#gimmie-modal-close, [data-gimmie-build-meal-close], #gimmie-modal-backdrop')) {
+          closeModal();
+        }
+      });
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeModal();
       });
