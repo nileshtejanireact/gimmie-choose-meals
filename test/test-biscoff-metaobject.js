@@ -36,7 +36,8 @@ async function testBiscoffMetaobject() {
   assert(rendered.includes('data-carbs="46.4g"'), 'Biscoff data-carbs must be 46.4g');
   assert(rendered.includes('data-sugars="20.7g"'), 'Biscoff data-sugars must be 20.7g');
   assert(rendered.includes('data-fibre="8.8g"'), 'Biscoff data-fibre must be 8.8g');
-  assert(rendered.includes('data-salt="0.38g"'), 'Biscoff data-salt must be 0.38g');
+  assert(rendered.includes('data-salt="0.76g"'), 'Biscoff data-salt must be 0.76g');
+  assert(rendered.includes('data-prot="39.0g"') || rendered.includes('data-prot="39g"'), 'Biscoff data-prot must be 39.0g or 39g');
   assert(rendered.includes('data-allergens="Oats, Milk, Soya, Wheat"'), 'Biscoff data-allergens must include Wheat');
   assert(rendered.includes('Lotus Biscoff Biscuit &amp; Spread') || rendered.includes('Lotus Biscoff Biscuit & Spread'), 'Biscoff ingredients must include Lotus Biscoff');
   console.log('✓ Biscoff Oats Card DOM attributes match Shopify Admin Metaobject 100%');
@@ -71,7 +72,8 @@ async function testBiscoffMetaobject() {
   assert(liquid.includes("carbs: '46.4g'"), 'Biscoff JS fallback carbs must be 46.4g');
   assert(liquid.includes("sugars: '20.7g'"), 'Biscoff JS fallback sugars must be 20.7g');
   assert(liquid.includes("fibre: '8.8g'"), 'Biscoff JS fallback fibre must be 8.8g');
-  assert(liquid.includes("salt: '0.38g'"), 'Biscoff JS fallback salt must be 0.38g');
+  assert(liquid.includes("protein: '39.0g'"), 'Biscoff JS fallback protein must be 39.0g');
+  assert(liquid.includes("salt: '0.76g'"), 'Biscoff JS fallback salt must be 0.76g');
   assert(liquid.includes("allergens: 'Oats, Milk, Soya, Wheat'"), 'Biscoff JS fallback allergens must be Oats, Milk, Soya, Wheat');
   console.log('✓ Client JS openModal Biscoff definition matches Shopify Admin Metaobject 100%');
 

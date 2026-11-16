@@ -558,7 +558,7 @@ class MenuService {
         badges: ['ADD-ON', 'HIGH PROTEIN'],
         macros: {
           calories: '493 kcal',
-          protein: '31g Protein',
+          protein: '39g Protein',
           carbs: '46.4g Carbs',
           fat: '15.3g Fat'
         },
@@ -571,8 +571,8 @@ class MenuService {
           carbs: '46.4g',
           sugars: '20.7g',
           fibre: '8.8g',
-          protein: '31.0g',
-          salt: '0.38g'
+          protein: '39.0g',
+          salt: '0.76g'
         },
         allergens: 'Oats, Milk, Soya, Wheat',
         ingredients: 'Porridge Oats, Whey Protein (Milk, Soya), 0% Fat Greek Yoghurt (Milk), Semi Skimmed Milk, Chia Seeds, Lotus Biscoff Biscuit & Spread [Wheat Flour, Sugar, Vegetable Oils (Palm Oil, Rapeseed Oil), Soya Flour, Emulsifier (Soya Lecithin), Salt, Cinnamon], Chia Seeds.'

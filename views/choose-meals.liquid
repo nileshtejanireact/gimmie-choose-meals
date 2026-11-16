@@ -349,6 +349,8 @@
                           {% assign direct_meal = shop.metaobjects.meal['bolognese-gnocchi'] %}
                         {% elsif down_check contains 'fajita' %}
                           {% assign direct_meal = shop.metaobjects.meal['chicken-fajita-bowl'] | default: shop.metaobjects.meal['chicken-fajita'] %}
+                        {% elsif down_check contains 'white wine' or down_check contains 'creamy white wine' %}
+                          {% assign direct_meal = shop.metaobjects.meal['creamy-white-wine-chicken'] | default: shop.metaobjects.meal['white-wine-chicken'] | default: shop.metaobjects.meal['creamy-white-wine'] %}
                         {% endif %}
                       {% endif %}
 
@@ -368,22 +370,42 @@
                       {% comment %} Extract via field iterator for direct metaobject Drops {% endcomment %}
                       {% if meal_raw.fields %}
                         {% for field in meal_raw.fields %}
-                          {% if field.key == 'description' and field.value != blank %}{% assign m_desc = field.value %}{% endif %}
-                          {% if field.key == 'energy' and field.value != blank %}{% assign m_energy = field.value %}{% endif %}
-                          {% if field.key == 'protein' and field.value != blank %}{% assign m_prot = field.value %}{% endif %}
-                          {% if field.key == 'fat' and field.value != blank %}{% assign m_fat = field.value %}{% endif %}
-                          {% if field.key == 'of_which_saturates' or field.key == 'saturates' and field.value != blank %}{% assign m_saturates = field.value %}{% endif %}
-                          {% if field.key == 'carbohydrates' or field.key == 'carbs' and field.value != blank %}{% assign m_carbs = field.value %}{% endif %}
-                          {% if field.key == 'of_which_sugars' or field.key == 'sugars' and field.value != blank %}{% assign m_sugars = field.value %}{% endif %}
-                          {% if field.key == 'fibre' or field.key == 'fiber' and field.value != blank %}{% assign m_fibre = field.value %}{% endif %}
-                          {% if field.key == 'salt' and field.value != blank %}{% assign m_salt = field.value %}{% endif %}
-                          {% if field.key == 'serving_size' and field.value != blank %}{% assign m_serving = field.value %}{% endif %}
-                          {% if field.key == 'allergens' and field.value != blank %}{% assign m_aller = field.value %}{% endif %}
-                          {% if field.key == 'ingredients' and field.value != blank %}{% assign m_ingr = field.value %}{% endif %}
+                          {% if field.value != blank %}
+                            {% if field.key == 'description' %}{% assign m_desc = field.value %}{% endif %}
+                            {% if field.key == 'energy' or field.key == 'calories' %}{% assign m_energy = field.value %}{% endif %}
+                            {% if field.key == 'protein' or field.key == 'proteins' %}{% assign m_prot = field.value %}{% endif %}
+                            {% if field.key == 'fat' %}{% assign m_fat = field.value %}{% endif %}
+                            {% if field.key == 'of_which_saturates' or field.key == 'saturates' %}{% assign m_saturates = field.value %}{% endif %}
+                            {% if field.key == 'carbohydrates' or field.key == 'carbs' %}{% assign m_carbs = field.value %}{% endif %}
+                            {% if field.key == 'of_which_sugars' or field.key == 'sugars' %}{% assign m_sugars = field.value %}{% endif %}
+                            {% if field.key == 'fibre' or field.key == 'fiber' %}{% assign m_fibre = field.value %}{% endif %}
+                            {% if field.key == 'salt' or field.key == 'sodium' %}{% assign m_salt = field.value %}{% endif %}
+                            {% if field.key == 'serving_size' or field.key == 'serving' %}{% assign m_serving = field.value %}{% endif %}
+                            {% if field.key == 'allergens' %}{% assign m_aller = field.value %}{% endif %}
+                            {% if field.key == 'ingredients' %}{% assign m_ingr = field.value %}{% endif %}
+                          {% endif %}
                         {% endfor %}
                       {% endif %}
 
                       {% if direct_meal %}
+                        {% if direct_meal.fields %}
+                          {% for field in direct_meal.fields %}
+                            {% if field.value != blank %}
+                              {% if m_desc == blank and field.key == 'description' %}{% assign m_desc = field.value %}{% endif %}
+                              {% if m_energy == blank %}{% if field.key == 'energy' or field.key == 'calories' %}{% assign m_energy = field.value %}{% endif %}{% endif %}
+                              {% if m_prot == blank %}{% if field.key == 'protein' or field.key == 'proteins' %}{% assign m_prot = field.value %}{% endif %}{% endif %}
+                              {% if m_fat == blank and field.key == 'fat' %}{% assign m_fat = field.value %}{% endif %}
+                              {% if m_saturates == blank %}{% if field.key == 'of_which_saturates' or field.key == 'saturates' %}{% assign m_saturates = field.value %}{% endif %}{% endif %}
+                              {% if m_carbs == blank %}{% if field.key == 'carbohydrates' or field.key == 'carbs' %}{% assign m_carbs = field.value %}{% endif %}{% endif %}
+                              {% if m_sugars == blank %}{% if field.key == 'of_which_sugars' or field.key == 'sugars' %}{% assign m_sugars = field.value %}{% endif %}{% endif %}
+                              {% if m_fibre == blank %}{% if field.key == 'fibre' or field.key == 'fiber' %}{% assign m_fibre = field.value %}{% endif %}{% endif %}
+                              {% if m_salt == blank %}{% if field.key == 'salt' or field.key == 'sodium' %}{% assign m_salt = field.value %}{% endif %}{% endif %}
+                              {% if m_serving == blank %}{% if field.key == 'serving_size' or field.key == 'serving' %}{% assign m_serving = field.value %}{% endif %}{% endif %}
+                              {% if m_aller == blank and field.key == 'allergens' %}{% assign m_aller = field.value %}{% endif %}
+                              {% if m_ingr == blank and field.key == 'ingredients' %}{% assign m_ingr = field.value %}{% endif %}
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
                         {% if m_desc == blank %}{% assign m_desc = direct_meal.description.value | default: direct_meal.description %}{% endif %}
                         {% if m_energy == blank %}{% assign m_energy = direct_meal.energy.value | default: direct_meal.energy %}{% endif %}
                         {% if m_prot == blank %}{% assign m_prot = direct_meal.protein.value | default: direct_meal.protein %}{% endif %}
@@ -401,29 +423,39 @@
                         {% endif %}
                       {% endif %}
 
+                      {% assign m_prod = meal_obj.product.value | default: meal_obj.product | default: meal_raw.product.value | default: meal_raw.product %}
+                      {% if m_prod == blank or m_prod.title == blank %}
+                        {% if meal_handle != blank %}
+                          {% assign m_prod = all_products[meal_handle] %}
+                        {% endif %}
+                      {% endif %}
+                      {% if m_prod == blank or m_prod.title == blank %}
+                        {% assign m_prod = meal_obj %}
+                      {% endif %}
+
                       {% if m_energy == blank %}
-                        {% assign m_energy = meal_raw.energy.value | default: meal_raw.energy | default: meal_obj.energy.value | default: meal_obj.energy | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_raw.calories %}
+                        {% assign m_energy = meal_raw.energy.value | default: meal_raw.energy | default: meal_obj.energy.value | default: meal_obj.energy | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_raw.calories | default: m_prod.metafields.custom.energy.value | default: m_prod.metafields.custom.energy | default: m_prod.metafields.custom.calories.value | default: m_prod.metafields.custom.calories %}
                       {% endif %}
                       {% if m_prot == blank %}
-                        {% assign m_prot = meal_raw.protein.value | default: meal_raw.protein | default: meal_obj.protein.value | default: meal_obj.protein %}
+                        {% assign m_prot = meal_raw.protein.value | default: meal_raw.protein | default: meal_obj.protein.value | default: meal_obj.protein | default: m_prod.metafields.custom.protein.value | default: m_prod.metafields.custom.protein | default: m_prod.metafields.nutrition.protein.value | default: m_prod.metafields.nutrition.protein | default: m_prod.metafields.food.protein.value | default: m_prod.metafields.food.protein | default: m_prod.metafields.shopify.protein.value | default: m_prod.metafields.shopify.protein %}
                       {% endif %}
                       {% if m_fat == blank %}
-                        {% assign m_fat = meal_raw.fat.value | default: meal_raw.fat | default: meal_obj.fat.value | default: meal_obj.fat %}
+                        {% assign m_fat = meal_raw.fat.value | default: meal_raw.fat | default: meal_obj.fat.value | default: meal_obj.fat | default: m_prod.metafields.custom.fat.value | default: m_prod.metafields.custom.fat | default: m_prod.metafields.nutrition.fat.value | default: m_prod.metafields.food.fat.value %}
                       {% endif %}
                       {% if m_saturates == blank %}
-                        {% assign m_saturates = meal_raw.of_which_saturates.value | default: meal_raw.of_which_saturates | default: meal_raw.saturates.value | default: meal_raw.saturates | default: meal_obj.of_which_saturates.value | default: meal_obj.of_which_saturates | default: meal_obj.saturates.value | default: meal_obj.saturates %}
+                        {% assign m_saturates = meal_raw.of_which_saturates.value | default: meal_raw.of_which_saturates | default: meal_raw.saturates.value | default: meal_raw.saturates | default: meal_obj.of_which_saturates.value | default: meal_obj.of_which_saturates | default: meal_obj.saturates.value | default: meal_obj.saturates | default: m_prod.metafields.custom.of_which_saturates.value | default: m_prod.metafields.custom.of_which_saturates | default: m_prod.metafields.custom.saturates.value | default: m_prod.metafields.custom.saturates | default: m_prod.metafields.nutrition.saturates.value %}
                       {% endif %}
                       {% if m_carbs == blank %}
-                        {% assign m_carbs = meal_raw.carbohydrates.value | default: meal_raw.carbohydrates | default: meal_raw.carbs.value | default: meal_raw.carbs | default: meal_obj.carbohydrates.value | default: meal_obj.carbohydrates | default: meal_obj.carbs.value | default: meal_obj.carbs %}
+                        {% assign m_carbs = meal_raw.carbohydrates.value | default: meal_raw.carbohydrates | default: meal_raw.carbs.value | default: meal_raw.carbs | default: meal_obj.carbohydrates.value | default: meal_obj.carbohydrates | default: meal_obj.carbs.value | default: meal_obj.carbs | default: m_prod.metafields.custom.carbohydrates.value | default: m_prod.metafields.custom.carbohydrates | default: m_prod.metafields.custom.carbs.value | default: m_prod.metafields.custom.carbs | default: m_prod.metafields.nutrition.carbohydrates.value %}
                       {% endif %}
                       {% if m_sugars == blank %}
-                        {% assign m_sugars = meal_raw.of_which_sugars.value | default: meal_raw.of_which_sugars | default: meal_raw.sugars.value | default: meal_raw.sugars | default: meal_obj.of_which_sugars.value | default: meal_obj.of_which_sugars | default: meal_obj.sugars.value | default: meal_obj.sugars %}
+                        {% assign m_sugars = meal_raw.of_which_sugars.value | default: meal_raw.of_which_sugars | default: meal_raw.sugars.value | default: meal_raw.sugars | default: meal_obj.of_which_sugars.value | default: meal_obj.of_which_sugars | default: meal_obj.sugars.value | default: meal_obj.sugars | default: m_prod.metafields.custom.of_which_sugars.value | default: m_prod.metafields.custom.of_which_sugars | default: m_prod.metafields.custom.sugars.value | default: m_prod.metafields.custom.sugars | default: m_prod.metafields.nutrition.sugars.value %}
                       {% endif %}
                       {% if m_fibre == blank %}
-                        {% assign m_fibre = meal_raw.fibre.value | default: meal_raw.fibre | default: meal_raw.fiber.value | default: meal_raw.fiber | default: meal_obj.fibre.value | default: meal_obj.fibre | default: meal_obj.fiber.value | default: meal_obj.fiber %}
+                        {% assign m_fibre = meal_raw.fibre.value | default: meal_raw.fibre | default: meal_raw.fiber.value | default: meal_raw.fiber | default: meal_obj.fibre.value | default: meal_obj.fibre | default: meal_obj.fiber.value | default: meal_obj.fiber | default: m_prod.metafields.custom.fibre.value | default: m_prod.metafields.custom.fibre | default: m_prod.metafields.custom.fiber.value | default: m_prod.metafields.custom.fiber | default: m_prod.metafields.nutrition.fibre.value | default: m_prod.metafields.nutrition.fibre | default: m_prod.metafields.nutrition.fiber.value | default: m_prod.metafields.food.fibre.value | default: m_prod.metafields.shopify.fibre.value %}
                       {% endif %}
                       {% if m_salt == blank %}
-                        {% assign m_salt = meal_raw.salt.value | default: meal_raw.salt | default: meal_obj.salt.value | default: meal_obj.salt %}
+                        {% assign m_salt = meal_raw.salt.value | default: meal_raw.salt | default: meal_obj.salt.value | default: meal_obj.salt | default: m_prod.metafields.custom.salt.value | default: m_prod.metafields.custom.salt | default: m_prod.metafields.custom.sodium.value | default: m_prod.metafields.nutrition.salt.value | default: m_prod.metafields.nutrition.salt | default: m_prod.metafields.food.salt.value | default: m_prod.metafields.shopify.salt.value %}
                       {% endif %}
                       {% if m_serving == blank %}
                         {% assign m_serving = meal_raw.serving_size.value | default: meal_raw.serving_size | default: meal_obj.serving_size.value | default: meal_obj.serving_size | default: 'Per Serving (420g)' %}
@@ -502,6 +534,18 @@
                         {% if m_salt == blank %}{% assign m_salt = '0.81' %}{% endif %}
                         {% if m_aller == blank %}{% assign m_aller = 'Milk, Mustard, Sulphites' %}{% endif %}
                         {% if m_ingr == blank %}{% assign m_ingr = 'Chicken Breast, Baby Potato, White Mushroom, Asparagus, Shallot, Light Creme Fraiche (Milk), Wholegrain Mustard (Mustard), White Wine Reduction (Sulphites), Fresh Tarragon, Garlic, Olive Oil, Sea Salt, Cracked Black Pepper.' %}{% endif %}
+                      {% elsif down_t contains 'white wine' or down_t contains 'creamy white wine' %}
+                        {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'French-style chicken and leeks in a white wine mustard sauce, topped with fresh chives. Served with mash and tenderstem broccoli.' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '2071 kj / 495 kcal' %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = '14.0' %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = '3.5' %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = '43.4' %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = '6.0' %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = '5.0' %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = '42.0' %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = '1.20' %}{% endif %}
+                        {% if m_aller == blank %}{% assign m_aller = 'Milk, Mustard, Sulphites' %}{% endif %}
+                        {% if m_ingr == blank %}{% assign m_ingr = 'Chicken Breast, Mash Potato (Potatoes, Butter (Milk), Salt, Pepper), Tenderstem Broccoli, Leeks, White Wine Mustard Sauce (White Wine Reduction (Sulphites), Wholegrain Mustard (Mustard), Light Creme Fraiche (Milk), Chicken Stock, Garlic, Shallot, Chives, Olive Oil, Salt, Black Pepper).' %}{% endif %}
                       {% elsif down_t contains 'hoisin' or down_t contains 'hoisin beef' %}
                         {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Sticky beef in a hoisin-soy glaze over fluffy basmati rice with a side of fresh cucumber ribbons. Finished with red chillies, spring onion and sesame seeds.' %}{% endif %}
                         {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '1740 kj / 416 kcal' %}{% endif %}
@@ -692,43 +736,71 @@
                       {% endif %}
 
                       {% assign m_prot_raw = m_prot | strip_html | strip %}
-                      {% if m_prot_raw contains 'Protein' or m_prot_raw contains 'PROTEIN' %}
-                        {% assign m_prot_display = m_prot_raw %}
-                      {% elsif m_prot_raw contains 'g' or m_prot_raw contains 'G' %}
-                        {% assign m_prot_display = m_prot_raw | append: ' Protein' %}
+                      {% if m_prot_raw != blank and m_prot_raw != '' %}
+                        {% if m_prot_raw contains 'Protein' or m_prot_raw contains 'PROTEIN' %}
+                          {% assign m_prot_display = m_prot_raw %}
+                        {% elsif m_prot_raw contains 'g' or m_prot_raw contains 'G' %}
+                          {% assign m_prot_display = m_prot_raw | append: ' Protein' %}
+                        {% else %}
+                          {% assign m_prot_display = m_prot_raw | append: 'g Protein' %}
+                        {% endif %}
                       {% else %}
-                        {% assign m_prot_display = m_prot_raw | append: 'g Protein' %}
+                        {% assign m_prot_display = '' %}
                       {% endif %}
 
-                      {% assign m_fat_display = m_fat %}
-                      {% unless m_fat_display contains 'g' %}
-                        {% assign m_fat_display = m_fat | append: 'g' %}
-                      {% endunless %}
+                      {% if m_fat != blank and m_fat != '' %}
+                        {% assign m_fat_display = m_fat %}
+                        {% unless m_fat_display contains 'g' %}
+                          {% assign m_fat_display = m_fat | append: 'g' %}
+                        {% endunless %}
+                      {% else %}
+                        {% assign m_fat_display = '' %}
+                      {% endif %}
 
-                      {% assign m_sat_display = m_saturates %}
-                      {% unless m_sat_display contains 'g' %}
-                        {% assign m_sat_display = m_saturates | append: 'g' %}
-                      {% endunless %}
+                      {% if m_saturates != blank and m_saturates != '' %}
+                        {% assign m_sat_display = m_saturates %}
+                        {% unless m_sat_display contains 'g' %}
+                          {% assign m_sat_display = m_saturates | append: 'g' %}
+                        {% endunless %}
+                      {% else %}
+                        {% assign m_sat_display = '' %}
+                      {% endif %}
 
-                      {% assign m_carbs_display = m_carbs %}
-                      {% unless m_carbs_display contains 'g' %}
-                        {% assign m_carbs_display = m_carbs | append: 'g' %}
-                      {% endunless %}
+                      {% if m_carbs != blank and m_carbs != '' %}
+                        {% assign m_carbs_display = m_carbs %}
+                        {% unless m_carbs_display contains 'g' %}
+                          {% assign m_carbs_display = m_carbs | append: 'g' %}
+                        {% endunless %}
+                      {% else %}
+                        {% assign m_carbs_display = '' %}
+                      {% endif %}
 
-                      {% assign m_sug_display = m_sugars %}
-                      {% unless m_sug_display contains 'g' %}
-                        {% assign m_sug_display = m_sugars | append: 'g' %}
-                      {% endunless %}
+                      {% if m_sugars != blank and m_sugars != '' %}
+                        {% assign m_sug_display = m_sugars %}
+                        {% unless m_sug_display contains 'g' %}
+                          {% assign m_sug_display = m_sugars | append: 'g' %}
+                        {% endunless %}
+                      {% else %}
+                        {% assign m_sug_display = '' %}
+                      {% endif %}
 
-                      {% assign m_fib_display = m_fibre %}
-                      {% unless m_fib_display contains 'g' %}
-                        {% assign m_fib_display = m_fibre | append: 'g' %}
-                      {% endunless %}
+                      {% if m_fibre != blank and m_fibre != '' %}
+                        {% assign m_fib_display = m_fibre %}
+                        {% unless m_fib_display contains 'g' %}
+                          {% assign m_fib_display = m_fibre | append: 'g' %}
+                        {% endunless %}
+                      {% else %}
+                        {% assign m_fib_display = '' %}
+                      {% endif %}
 
-                      {% assign m_salt_display = m_salt %}
-                      {% unless m_salt_display contains 'g' %}
-                        {% assign m_salt_display = m_salt | append: 'g' %}
-                      {% endunless %}
+                      {% if m_salt != blank and m_salt != '' %}
+                        {% assign m_salt_display = m_salt %}
+                        {% unless m_salt_display contains 'g' %}
+                          {% assign m_salt_display = m_salt | append: 'g' %}
+                        {% endunless %}
+                      {% else %}
+                        {% assign m_salt_display = '' %}
+                      {% endif %}
 
                       {% if m_ingr == blank %}
                         {% assign m_ingr = 'Fresh natural ingredients prepared by Gimmie chefs.' %}
@@ -1132,30 +1204,63 @@
                       {% comment %} Extract via field iterator for direct metaobject Drops {% endcomment %}
                       {% if addon_raw.fields %}
                         {% for field in addon_raw.fields %}
-                          {% if field.key == 'energy' and field.value != blank %}
-                            {% assign f_energy = field.value | strip %}
-                            {% if f_energy contains '/' %}
-                              {% assign f_e_parts = f_energy | split: '/' %}
-                              {% if a_kj == blank %}{% assign a_kj = f_e_parts[0] | strip %}{% endif %}
-                              {% if a_cals == blank %}{% assign a_cals = f_e_parts[1] | strip %}{% endif %}
-                            {% elsif f_energy contains 'kcal' %}
-                              {% if a_cals == blank %}{% assign a_cals = f_energy %}{% endif %}
-                            {% else %}
-                              {% if a_kj == blank %}{% assign a_kj = f_energy %}{% endif %}
+                          {% if field.value != blank %}
+                            {% if field.key == 'energy' %}
+                              {% assign f_energy = field.value | strip %}
+                              {% if f_energy contains '/' %}
+                                {% assign f_e_parts = f_energy | split: '/' %}
+                                {% if a_kj == blank %}{% assign a_kj = f_e_parts[0] | strip %}{% endif %}
+                                {% if a_cals == blank %}{% assign a_cals = f_e_parts[1] | strip %}{% endif %}
+                              {% elsif f_energy contains 'kcal' %}
+                                {% if a_cals == blank %}{% assign a_cals = f_energy %}{% endif %}
+                              {% else %}
+                                {% if a_kj == blank %}{% assign a_kj = f_energy %}{% endif %}
+                              {% endif %}
                             {% endif %}
+                            {% if field.key == 'calories' and a_cals == blank %}{% assign a_cals = field.value %}{% endif %}
+                            {% if field.key == 'protein' and a_prot == blank %}{% assign a_prot = field.value %}{% endif %}
+                            {% if field.key == 'fat' and a_fat == blank %}{% assign a_fat = field.value %}{% endif %}
+                            {% if field.key == 'of_which_saturates' or field.key == 'saturates' %}{% if a_sat == blank %}{% assign a_sat = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'carbohydrates' or field.key == 'carbs' %}{% if a_carbs == blank %}{% assign a_carbs = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'of_which_sugars' or field.key == 'sugars' %}{% if a_sug == blank %}{% assign a_sug = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'fibre' or field.key == 'fiber' %}{% if a_fib == blank %}{% assign a_fib = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'salt' or field.key == 'sodium' %}{% if a_salt == blank %}{% assign a_salt = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'serving_size' or field.key == 'serving' %}{% if a_serv == blank %}{% assign a_serv = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'allergens' and a_aller == blank %}{% assign a_aller = field.value %}{% endif %}
+                            {% if field.key == 'ingredients' and a_ingr == blank %}{% assign a_ingr = field.value %}{% endif %}
+                            {% if field.key == 'description' and a_desc == blank %}{% assign a_desc = field.value %}{% endif %}
                           {% endif %}
-                          {% if field.key == 'calories' and field.value != blank and a_cals == blank %}{% assign a_cals = field.value %}{% endif %}
-                          {% if field.key == 'protein' and field.value != blank and a_prot == blank %}{% assign a_prot = field.value %}{% endif %}
-                          {% if field.key == 'fat' and field.value != blank and a_fat == blank %}{% assign a_fat = field.value %}{% endif %}
-                          {% if field.key == 'of_which_saturates' or field.key == 'saturates' and field.value != blank and a_sat == blank %}{% assign a_sat = field.value %}{% endif %}
-                          {% if field.key == 'carbohydrates' or field.key == 'carbs' and field.value != blank and a_carbs == blank %}{% assign a_carbs = field.value %}{% endif %}
-                          {% if field.key == 'of_which_sugars' or field.key == 'sugars' and field.value != blank and a_sug == blank %}{% assign a_sug = field.value %}{% endif %}
-                          {% if field.key == 'fibre' or field.key == 'fiber' and field.value != blank and a_fib == blank %}{% assign a_fib = field.value %}{% endif %}
-                          {% if field.key == 'salt' and field.value != blank and a_salt == blank %}{% assign a_salt = field.value %}{% endif %}
-                          {% if field.key == 'serving_size' and field.value != blank and a_serv == blank %}{% assign a_serv = field.value %}{% endif %}
-                          {% if field.key == 'allergens' and field.value != blank and a_aller == blank %}{% assign a_aller = field.value %}{% endif %}
-                          {% if field.key == 'ingredients' and field.value != blank and a_ingr == blank %}{% assign a_ingr = field.value %}{% endif %}
-                          {% if field.key == 'description' and field.value != blank and a_desc == blank %}{% assign a_desc = field.value %}{% endif %}
+                        {% endfor %}
+                      {% endif %}
+
+                      {% if direct_addon and direct_addon.fields %}
+                        {% for field in direct_addon.fields %}
+                          {% if field.value != blank %}
+                            {% if field.key == 'energy' and a_cals == blank and a_kj == blank %}
+                              {% assign f_energy = field.value | strip %}
+                              {% if f_energy contains '/' %}
+                                {% assign f_e_parts = f_energy | split: '/' %}
+                                {% assign a_kj = f_e_parts[0] | strip %}
+                                {% assign a_cals = f_e_parts[1] | strip %}
+                              {% elsif f_energy contains 'kcal' %}
+                                {% assign a_cals = f_energy %}
+                              {% else %}
+                                {% assign a_kj = f_energy %}
+                              {% endif %}
+                            {% endif %}
+                            {% if field.key == 'calories' and a_cals == blank %}{% assign a_cals = field.value %}{% endif %}
+                            {% if field.key == 'protein' and a_prot == blank %}{% assign a_prot = field.value %}{% endif %}
+                            {% if field.key == 'fat' and a_fat == blank %}{% assign a_fat = field.value %}{% endif %}
+                            {% if field.key == 'of_which_saturates' or field.key == 'saturates' %}{% if a_sat == blank %}{% assign a_sat = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'carbohydrates' or field.key == 'carbs' %}{% if a_carbs == blank %}{% assign a_carbs = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'of_which_sugars' or field.key == 'sugars' %}{% if a_sug == blank %}{% assign a_sug = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'fibre' or field.key == 'fiber' %}{% if a_fib == blank %}{% assign a_fib = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'salt' or field.key == 'sodium' %}{% if a_salt == blank %}{% assign a_salt = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'serving_size' or field.key == 'serving' %}{% if a_serv == blank %}{% assign a_serv = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'allergens' and a_aller == blank %}{% assign a_aller = field.value %}{% endif %}
+                            {% if field.key == 'ingredients' and a_ingr == blank %}{% assign a_ingr = field.value %}{% endif %}
+                            {% if field.key == 'description' and a_desc == blank %}{% assign a_desc = field.value %}{% endif %}
+                          {% endif %}
                         {% endfor %}
                       {% endif %}
 
@@ -1180,13 +1285,13 @@
                         {% if a_ingr == blank %}{% assign a_ingr = 'Porridge Oats, Whey Protein (Milk, Soya), 0% Fat Greek Yoghurt (Milk), Semi Skimmed Milk, Chia Seeds, Lotus Biscoff Biscuit & Spread [Wheat Flour, Sugar, Vegetable Oils (Palm Oil, Rapeseed Oil), Soya Flour, Emulsifier (Soya Lecithin), Salt, Cinnamon], Chia Seeds.' %}{% endif %}
                         {% if a_aller == blank %}{% assign a_aller = 'Oats, Milk, Soya, Wheat' %}{% endif %}
                         {% if a_cals == blank %}{% assign a_cals = '493 kcal' %}{% endif %}
-                        {% if a_prot == blank %}{% assign a_prot = '31g' %}{% endif %}
+                        {% if a_prot == blank %}{% assign a_prot = '39.0g' %}{% endif %}
                         {% if a_fat == blank %}{% assign a_fat = '15.3g' %}{% endif %}
                         {% if a_sat == blank %}{% assign a_sat = '4.2g' %}{% endif %}
                         {% if a_carbs == blank %}{% assign a_carbs = '46.4g' %}{% endif %}
                         {% if a_sug == blank %}{% assign a_sug = '20.7g' %}{% endif %}
                         {% if a_fib == blank %}{% assign a_fib = '8.8g' %}{% endif %}
-                        {% if a_salt == blank %}{% assign a_salt = '0.38g' %}{% endif %}
+                        {% if a_salt == blank %}{% assign a_salt = '0.76g' %}{% endif %}
                         {% if a_serv == blank %}{% assign a_serv = 'Per Pot (300g)' %}{% endif %}
                         {% if a_kj == blank %}{% assign a_kj = '2062 kJ' %}{% endif %}
                       {% elsif down_at contains 'raspberry' %}
@@ -2686,6 +2791,24 @@
             salt: '0.81g'
           }
         };
+      } else if (titleLower.includes('white wine') || titleLower.includes('creamy white wine')) {
+        fallbackDish = {
+          desc: 'French-style chicken and leeks in a white wine mustard sauce, topped with fresh chives. Served with mash and tenderstem broccoli.',
+          ingredients: 'Chicken Breast, Mash Potato (Potatoes, Butter (Milk), Salt, Pepper), Tenderstem Broccoli, Leeks, White Wine Mustard Sauce (White Wine Reduction (Sulphites), Wholegrain Mustard (Mustard), Light Creme Fraiche (Milk), Chicken Stock, Garlic, Shallot, Chives, Olive Oil, Salt, Black Pepper).',
+          allergens: 'Milk, Mustard, Sulphites',
+          nutrition: {
+            serving: 'Per Serving (450g)',
+            energyKj: '2071 kJ',
+            energyKcal: '495 kcal',
+            fat: '14.0g',
+            saturates: '3.5g',
+            carbs: '43.4g',
+            sugars: '6.0g',
+            fibre: '5.0g',
+            protein: '42.0g',
+            salt: '1.20g'
+          }
+        };
       } else if (titleLower.includes('hoisin')) {
         fallbackDish = {
           desc: 'Sticky beef in a hoisin-soy glaze over fluffy basmati rice with a side of fresh cucumber ribbons. Finished with red chillies, spring onion and sesame seeds.',
@@ -2754,8 +2877,8 @@
             carbs: '46.4g',
             sugars: '20.7g',
             fibre: '8.8g',
-            protein: '31.0g',
-            salt: '0.38g'
+            protein: '39.0g',
+            salt: '0.76g'
           }
         };
       } else if (titleLower.includes('blueberry') && (titleLower.includes('oats') || titleLower.includes('lemon'))) {
@@ -2904,7 +3027,14 @@
       // 4. Nutritional facts: Check if item has dynamic nutrition attributes from Shopify Metafield
       const rawNutr = item.nutrition || {};
       const c = card;
-      const cardVal = (attr) => (c ? c.getAttribute(attr) : '') || '';
+      const cardVal = (attr) => {
+        if (!c) return '';
+        const v = c.getAttribute(attr);
+        if (!v || v === 'null' || v === 'undefined' || v === '-' || v.trim() === '' || v.trim().toLowerCase() === 'g' || v.trim().toLowerCase() === 'g protein') {
+          return '';
+        }
+        return v.trim();
+      };
 
       const rawKj = cardVal('data-kj') || rawNutr.energyKj || rawNutr.kj || '';
       const rawCals = cardVal('data-cals') || rawNutr.energyKcal || rawNutr.calories || (item.macros && item.macros.calories) || '';
@@ -2963,6 +3093,7 @@
           str = str.replace(new RegExp(wordToRemove, 'i'), '').trim();
         }
         str = str.replace(/g$/i, '').trim();
+        if (str === '' || isNaN(parseFloat(str))) return '-';
         if (!isNaN(parseFloat(str)) && isFinite(str)) {
           return str + 'g';
         }
