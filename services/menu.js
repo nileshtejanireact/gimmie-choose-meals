@@ -36,7 +36,7 @@ class MenuService {
                   }
                 }
               }
-              metafields(first: 20) {
+              metafields(first: 50) {
                 edges {
                   node {
                     namespace
@@ -102,14 +102,30 @@ class MenuService {
       badges.push(product.tags[0]);
     }
 
-    // Extract macros from metafields or description
-    const calories = metafields['calories'] || metafields['custom.calories'] || this.extractRegex(product.description, /(\d+)\s*kcal/i, '520 kcal');
-    const protein = metafields['protein'] || metafields['custom.protein'] || this.extractRegex(product.description, /(\d+g?)\s*protein/i, '42g');
-    const carbs = metafields['carbs'] || metafields['custom.carbs'] || this.extractRegex(product.description, /(\d+g?)\s*carbs/i, '38g');
-    const fat = metafields['fat'] || metafields['custom.fat'] || this.extractRegex(product.description, /(\d+g?)\s*fat/i, '14g');
+    // Extract macros & full nutritional facts dynamically from metafields or description
+    const energy = metafields['custom.energy'] || metafields['nutrition.energy'] || metafields['energy'] || metafields['custom.calories'] || metafields['nutrition.calories'] || metafields['calories'] || this.extractRegex(product.description, /(\d+\s*kj\s*\/\s*\d+\s*kcal|\d+\s*kcal)/i, '520 kcal');
+    let calories = energy;
+    let energyKj = metafields['custom.energy_kj'] || metafields['nutrition.energy_kj'] || metafields['energy_kj'] || '';
+    if (energy.includes('/')) {
+      const parts = energy.split('/');
+      energyKj = parts[0].trim();
+      calories = parts[1].trim();
+    } else if (energy.toLowerCase().includes('kcal')) {
+      calories = energy.trim();
+    }
 
-    const allergens = metafields['allergens'] || metafields['custom.allergens'] || 'None';
-    const ingredients = metafields['ingredients'] || metafields['custom.ingredients'] || product.description;
+    const protein = metafields['custom.protein'] || metafields['nutrition.protein'] || metafields['food.protein'] || metafields['protein'] || metafields['custom.proteins'] || metafields['proteins'] || this.extractRegex(product.description, /(\d+(?:\.\d+)?\s*g?)\s*protein/i, '42g');
+    const carbs = metafields['custom.carbohydrates'] || metafields['custom.carbs'] || metafields['nutrition.carbohydrates'] || metafields['nutrition.carbs'] || metafields['carbohydrates'] || metafields['carbs'] || this.extractRegex(product.description, /(\d+(?:\.\d+)?\s*g?)\s*carbs/i, '38g');
+    const fat = metafields['custom.fat'] || metafields['nutrition.fat'] || metafields['food.fat'] || metafields['fat'] || this.extractRegex(product.description, /(\d+(?:\.\d+)?\s*g?)\s*fat/i, '14g');
+    const saturates = metafields['custom.of_which_saturates'] || metafields['custom.saturates'] || metafields['nutrition.saturates'] || metafields['of_which_saturates'] || metafields['saturates'] || '3.5g';
+    const sugars = metafields['custom.of_which_sugars'] || metafields['custom.sugars'] || metafields['nutrition.sugars'] || metafields['of_which_sugars'] || metafields['sugars'] || '4.2g';
+    const fibre = metafields['custom.fibre'] || metafields['custom.fiber'] || metafields['nutrition.fibre'] || metafields['nutrition.fiber'] || metafields['fibre'] || metafields['fiber'] || '6.8g';
+    const salt = metafields['custom.salt'] || metafields['custom.sodium'] || metafields['nutrition.salt'] || metafields['nutrition.sodium'] || metafields['salt'] || metafields['sodium'] || '1.1g';
+    const serving = metafields['custom.serving_size'] || metafields['custom.serving'] || metafields['nutrition.serving_size'] || metafields['serving_size'] || metafields['serving'] || 'Per Serving (450g)';
+
+    const allergens = metafields['custom.allergens'] || metafields['food.allergens'] || metafields['nutrition.allergens'] || metafields['allergens'] || 'None';
+    const ingredients = metafields['custom.ingredients'] || metafields['food.ingredients'] || metafields['nutrition.ingredients'] || metafields['ingredients'] || product.description;
+    const shortDesc = metafields['custom.short_description'] || metafields['custom.summary'] || metafields['custom.description'] || product.description || 'Delicious, chef-prepared meal balanced for peak performance.';
 
     return {
       id: product.id,
@@ -117,7 +133,7 @@ class MenuService {
       handle: product.handle,
       variantId: defaultVariant?.id,
       image: product.featuredImage?.url || 'https://via.placeholder.com/600x450?text=Gimmie+Meal',
-      description: product.description || 'Delicious, chef-prepared meal balanced for peak performance.',
+      description: shortDesc,
       badges: badges.length > 0 ? badges : ['CHEF PICK'],
       macros: {
         calories: calories.includes('kcal') ? calories : `${calories} kcal`,
@@ -126,16 +142,16 @@ class MenuService {
         fat: fat.endsWith('g') ? fat : `${fat}g Fat`
       },
       nutrition: {
-        serving: 'Per Serving (450g)',
-        energyKj: metafields['energy_kj'] || '2180 kJ',
-        energyKcal: calories,
-        fat: fat,
-        saturates: metafields['saturates'] || '3.5g',
-        carbs: carbs,
-        sugars: metafields['sugars'] || '4.2g',
-        fibre: metafields['fibre'] || '6.8g',
-        protein: protein,
-        salt: metafields['salt'] || '1.1g'
+        serving: serving,
+        energyKj: energyKj || `${Math.round(parseFloat(calories) * 4.184 || 2180)} kJ`,
+        energyKcal: calories.includes('kcal') ? calories : `${calories} kcal`,
+        fat: fat.endsWith('g') ? fat : `${fat}g`,
+        saturates: saturates.endsWith('g') ? saturates : `${saturates}g`,
+        carbs: carbs.endsWith('g') ? carbs : `${carbs}g`,
+        sugars: sugars.endsWith('g') ? sugars : `${sugars}g`,
+        fibre: fibre.endsWith('g') ? fibre : `${fibre}g`,
+        protein: protein.endsWith('g') ? protein : `${protein}g`,
+        salt: salt.endsWith('g') ? salt : `${salt}g`
       },
       allergens: allergens,
       ingredients: ingredients

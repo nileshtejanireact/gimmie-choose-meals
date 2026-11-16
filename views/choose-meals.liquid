@@ -146,7 +146,20 @@
           {% assign is_cutoff_passed = true %}
         {% endif %}
 
-        {% assign active_meta_meals = next_week_menu.meals.value | default: next_week_menu.meals | default: next_week_menu.products.value | default: next_week_menu.products | default: next_week_menu.dishes.value %}
+        {% assign active_meta_meals = next_week_menu.meals.value | default: next_week_menu.meals | default: next_week_menu.products.value | default: next_week_menu.products | default: next_week_menu.dishes.value | default: next_week_menu.meal_items.value | default: next_week_menu.meal_items | default: next_week_menu.menu_items.value | default: next_week_menu.menu_items | default: next_week_menu.items.value | default: next_week_menu.items %}
+        {% if active_meta_meals == blank or active_meta_meals.size == 0 %}
+          {% if next_week_menu.fields %}
+            {% for f in next_week_menu.fields %}
+              {% assign f_key = f.key | downcase %}
+              {% if f_key == 'meals' or f_key == 'products' or f_key == 'dishes' or f_key == 'items' or f_key == 'menu_items' or f_key == 'meal_items' %}
+                {% if f.value != blank %}
+                  {% assign active_meta_meals = f.value %}
+                  {% break %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endif %}
         {% assign active_meta_addons = next_week_menu['add_on_products'].value | default: next_week_menu['add_on_products'] | default: next_week_menu.add_on_products.value | default: next_week_menu.add_on_products | default: next_week_menu['addon_meals'].value | default: next_week_menu['addon_meals'] | default: next_week_menu.addon_meals.value | default: next_week_menu.addon_meals | default: next_week_menu['addon_products'].value | default: next_week_menu['addon_products'] | default: next_week_menu.addon_products.value | default: next_week_menu.addon_products | default: next_week_menu['addons'].value | default: next_week_menu['addons'] | default: next_week_menu.addons.value | default: next_week_menu.addons | default: next_week_menu.add_ons.value | default: next_week_menu.add_ons | default: next_week_menu.featured_addons.value | default: next_week_menu.featured_addons | default: next_week_menu.featured_add_ons.value | default: next_week_menu.featured_add_ons | default: next_week_menu.addon_items.value | default: next_week_menu.addon_items | default: next_week_menu.addon_product.value | default: next_week_menu.addon_product | default: next_week_menu.extra_products.value | default: next_week_menu.extra_products | default: next_week_menu.extras.value | default: next_week_menu.extras | default: next_week_menu.step_3_products.value | default: next_week_menu.step_3_products %}
         {% if active_meta_addons == blank or active_meta_addons.size == 0 %}
           {% if next_week_menu.fields %}
@@ -280,26 +293,43 @@
                 {% raw %}
                   {% if active_meta_meals and active_meta_meals.size > 0 %}
                     {% for meal_raw in active_meta_meals %}
-                      {% assign meal_obj = meal_raw.product | default: meal_raw %}
-                      {% assign m_title = meal_obj.title.value | default: meal_obj.title | default: meal_raw.title | default: meal_raw.name.value | default: meal_raw.name %}
+                      {% assign current_meal = meal_raw.value | default: meal_raw %}
+                      {% assign meal_obj = current_meal.product.value | default: current_meal.product | default: current_meal %}
+                      {% assign m_title = meal_obj.title.value | default: meal_obj.title | default: current_meal.title.value | default: current_meal.title | default: current_meal.name.value | default: current_meal.name %}
                       
                       {% assign m_img = nil %}
-                      {% if meal_obj.image.value %}
-                        {% assign m_img = meal_obj.image.value | image_url: width: 800 %}
-                      {% elsif meal_obj.image %}
-                        {% assign m_img = meal_obj.image | image_url: width: 800 %}
-                      {% elsif meal_obj.photo.value %}
-                        {% assign m_img = meal_obj.photo.value | image_url: width: 800 %}
-                      {% elsif meal_obj.photo %}
-                        {% assign m_img = meal_obj.photo | image_url: width: 800 %}
-                      {% elsif meal_obj.featured_image.value %}
-                        {% assign m_img = meal_obj.featured_image.value | image_url: width: 800 %}
-                      {% elsif meal_obj.featured_image %}
-                        {% assign m_img = meal_obj.featured_image | image_url: width: 800 %}
+                      {% if current_meal.meal_image.value %}
+                        {% assign m_img = current_meal.meal_image.value | image_url: width: 800 %}
+                      {% elsif current_meal.meal_image %}
+                        {% assign m_img = current_meal.meal_image | image_url: width: 800 %}
                       {% elsif meal_obj.meal_image.value %}
                         {% assign m_img = meal_obj.meal_image.value | image_url: width: 800 %}
                       {% elsif meal_obj.meal_image %}
                         {% assign m_img = meal_obj.meal_image | image_url: width: 800 %}
+                      {% elsif meal_obj.featured_image.value %}
+                        {% assign m_img = meal_obj.featured_image.value | image_url: width: 800 %}
+                      {% elsif meal_obj.featured_image %}
+                        {% assign m_img = meal_obj.featured_image | image_url: width: 800 %}
+                      {% elsif meal_obj.featured_media.value %}
+                        {% assign m_img = meal_obj.featured_media.value | image_url: width: 800 %}
+                      {% elsif meal_obj.featured_media %}
+                        {% assign m_img = meal_obj.featured_media | image_url: width: 800 %}
+                      {% elsif meal_obj.image.value %}
+                        {% assign m_img = meal_obj.image.value | image_url: width: 800 %}
+                      {% elsif meal_obj.image %}
+                        {% assign m_img = meal_obj.image | image_url: width: 800 %}
+                      {% elsif current_meal.image.value %}
+                        {% assign m_img = current_meal.image.value | image_url: width: 800 %}
+                      {% elsif current_meal.image %}
+                        {% assign m_img = current_meal.image | image_url: width: 800 %}
+                      {% elsif current_meal.photo.value %}
+                        {% assign m_img = current_meal.photo.value | image_url: width: 800 %}
+                      {% elsif current_meal.photo %}
+                        {% assign m_img = current_meal.photo | image_url: width: 800 %}
+                      {% elsif meal_obj.photo.value %}
+                        {% assign m_img = meal_obj.photo.value | image_url: width: 800 %}
+                      {% elsif meal_obj.photo %}
+                        {% assign m_img = meal_obj.photo | image_url: width: 800 %}
                       {% elsif meal_obj.picture.value %}
                         {% assign m_img = meal_obj.picture.value | image_url: width: 800 %}
                       {% elsif meal_obj.picture %}
@@ -368,8 +398,8 @@
                       {% assign m_aller = nil %}
 
                       {% comment %} Extract via field iterator for direct metaobject Drops {% endcomment %}
-                      {% if meal_raw.fields %}
-                        {% for field in meal_raw.fields %}
+                      {% if current_meal.fields %}
+                        {% for field in current_meal.fields %}
                           {% if field.value != blank %}
                             {% if field.key == 'description' %}{% assign m_desc = field.value %}{% endif %}
                             {% if field.key == 'energy' or field.key == 'calories' %}{% assign m_energy = field.value %}{% endif %}
@@ -460,39 +490,76 @@
                       {% if m_serving == blank %}
                         {% assign m_serving = meal_raw.serving_size.value | default: meal_raw.serving_size | default: meal_obj.serving_size.value | default: meal_obj.serving_size | default: 'Per Serving (420g)' %}
                       {% endif %}
+                      {% comment %} 1. DYNAMIC INGREDIENTS FROM METAFIELD / METAOBJECT / PRODUCT {% endcomment %}
                       {% if m_ingr == blank %}
-                        {% assign m_ingr = meal_raw.ingredients.value | default: meal_raw.ingredients | default: meal_obj.ingredients.value | default: meal_obj.ingredients %}
+                        {% assign m_ingr = current_meal.ingredients.value | default: current_meal.ingredients | default: direct_meal.ingredients.value | default: direct_meal.ingredients | default: meal_obj.ingredients.value | default: meal_obj.ingredients | default: m_prod.metafields.custom.ingredients.value | default: m_prod.metafields.custom.ingredients | default: m_prod.metafields.shopify.ingredients.value | default: m_prod.metafields.shopify.ingredients | default: m_prod.metafields.food.ingredients.value | default: m_prod.metafields.food.ingredients | default: m_prod.metafields.nutrition.ingredients.value | default: m_prod.metafields.nutrition.ingredients | default: m_prod.metafields.details.ingredients.value | default: m_prod.metafields.details.ingredients | default: m_prod.metafields.my_fields.ingredients.value | default: m_prod.metafields.my_fields.ingredients %}
                       {% endif %}
                       {% if m_ingr contains 'root' or m_ingr contains 'children' or m_ingr contains '=>' %}
-                        {% assign meta_ingr_tag = meal_raw.ingredients | default: meal_obj.ingredients | metafield_tag %}
+                        {% assign meta_ingr_tag = current_meal.ingredients | default: direct_meal.ingredients | default: meal_obj.ingredients | default: m_prod.metafields.custom.ingredients | metafield_tag %}
                         {% if meta_ingr_tag != blank and meta_ingr_tag != '' %}
                           {% assign m_ingr = meta_ingr_tag %}
                         {% endif %}
                       {% endif %}
+                      {% if m_ingr == blank or m_ingr contains 'wholesome' or m_ingr contains 'root' %}
+                        {% assign raw_m_desc = m_prod.description | default: m_prod.content | default: meal_obj.description %}
+                        {% if raw_m_desc contains 'Ingredients:' %}
+                          {% assign ingr_extracted = raw_m_desc | split: 'Ingredients:' | last | split: 'Allergens:' | first | split: 'Nutrition' | first | split: '</p>' | first | strip_html | strip %}
+                          {% if ingr_extracted != blank and ingr_extracted.size > 5 %}{% assign m_ingr = ingr_extracted %}{% endif %}
+                        {% elsif raw_m_desc contains 'ingredients:' %}
+                          {% assign ingr_extracted = raw_m_desc | split: 'ingredients:' | last | split: 'allergens:' | first | split: 'nutrition' | first | split: '</p>' | first | strip_html | strip %}
+                          {% if ingr_extracted != blank and ingr_extracted.size > 5 %}{% assign m_ingr = ingr_extracted %}{% endif %}
+                        {% endif %}
+                      {% endif %}
 
+                      {% comment %} 2. DYNAMIC ALLERGENS FROM METAFIELD / METAOBJECT / PRODUCT {% endcomment %}
                       {% if m_aller == blank %}
-                        {% assign m_aller = meal_raw.allergens.value | default: meal_raw.allergens | default: meal_obj.allergens.value | default: meal_obj.allergens %}
+                        {% assign m_aller = current_meal.allergens.value | default: current_meal.allergens | default: direct_meal.allergens.value | default: direct_meal.allergens | default: meal_obj.allergens.value | default: meal_obj.allergens | default: m_prod.metafields.custom.allergens.value | default: m_prod.metafields.custom.allergens | default: m_prod.metafields.food.allergens.value | default: m_prod.metafields.food.allergens | default: m_prod.metafields.nutrition.allergens.value | default: m_prod.metafields.nutrition.allergens | default: m_prod.metafields.shopify.allergens.value | default: m_prod.metafields.shopify.allergens | default: m_prod.metafields.details.allergens.value | default: m_prod.metafields.details.allergens | default: m_prod.metafields.my_fields.allergens.value | default: m_prod.metafields.my_fields.allergens %}
                       {% endif %}
                       {% if m_aller contains 'root' or m_aller contains 'children' or m_aller contains '=>' %}
-                        {% assign meta_aller_tag = meal_raw.allergens | default: meal_obj.allergens | metafield_tag | strip_html | strip %}
+                        {% assign meta_aller_tag = current_meal.allergens | default: direct_meal.allergens | default: meal_obj.allergens | default: m_prod.metafields.custom.allergens | metafield_tag | strip_html | strip %}
                         {% if meta_aller_tag != blank and meta_aller_tag != '' %}
                           {% assign m_aller = meta_aller_tag %}
                         {% endif %}
                       {% endif %}
-
-                      {% if m_desc == blank %}
-                        {% assign m_desc = meal_obj.description.value | default: meal_obj.description | default: meal_obj.body_html | default: meal_obj.content | default: meal_raw.description.value | default: meal_raw.description | default: meal_raw.meal_description.value | default: meal_raw.meal_description | default: meal_raw.summary.value | default: meal_raw.summary | default: meal_raw.short_description.value | default: meal_raw.short_description | default: meal_raw.product.value.description | default: meal_raw.product.value.body_html | default: meal_raw.product.description %}
+                      {% if m_aller == blank or m_aller == 'None' or m_aller contains 'root' %}
+                        {% assign raw_m_desc = m_prod.description | default: m_prod.content | default: meal_obj.description %}
+                        {% if raw_m_desc contains 'Allergens:' %}
+                          {% assign aller_extracted = raw_m_desc | split: 'Allergens:' | last | split: '</p>' | first | split: '<br' | first | strip_html | strip %}
+                          {% if aller_extracted != blank and aller_extracted.size > 1 %}{% assign m_aller = aller_extracted %}{% endif %}
+                        {% elsif raw_m_desc contains 'allergens:' %}
+                          {% assign aller_extracted = raw_m_desc | split: 'allergens:' | last | split: '</p>' | first | split: '<br' | first | strip_html | strip %}
+                          {% if aller_extracted != blank and aller_extracted.size > 1 %}{% assign m_aller = aller_extracted %}{% endif %}
+                        {% endif %}
                       {% endif %}
 
-                      {% comment %} Extract clean text from rich text metafield drops if present {% endcomment %}
+                      {% comment %} 3. DYNAMIC SHORT DESCRIPTION FROM METAFIELD / PRODUCT {% endcomment %}
+                      {% if m_desc == blank %}
+                        {% assign m_desc = direct_meal.description.value | default: direct_meal.description | default: current_meal.description.value | default: current_meal.description | default: current_meal.summary.value | default: current_meal.summary | default: current_meal.short_description.value | default: current_meal.short_description | default: m_prod.metafields.custom.short_description.value | default: m_prod.metafields.custom.short_description | default: m_prod.metafields.custom.summary.value | default: m_prod.metafields.custom.summary | default: m_prod.metafields.custom.description.value | default: m_prod.metafields.custom.description | default: meal_obj.description.value | default: meal_obj.description | default: meal_obj.body_html | default: meal_obj.content %}
+                      {% endif %}
+
                       {% if m_desc contains 'root' or m_desc contains 'children' %}
-                        {% assign meta_desc_tag = meal_raw.description | metafield_tag | strip_html | strip %}
+                        {% assign meta_desc_tag = current_meal.description | default: direct_meal.description | default: m_prod.metafields.custom.short_description | default: m_prod.metafields.custom.description | metafield_tag | strip_html | strip %}
                         {% if meta_desc_tag != blank and meta_desc_tag != '' %}
                           {% assign m_desc = meta_desc_tag %}
                         {% else %}
                           {% assign meta_desc_tag2 = meal_obj.description | metafield_tag | strip_html | strip %}
                           {% if meta_desc_tag2 != blank and meta_desc_tag2 != '' %}
                             {% assign m_desc = meta_desc_tag2 %}
+                          {% endif %}
+                        {% endif %}
+                      {% endif %}
+
+                      {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}
+                        {% assign raw_m_desc = m_prod.description | default: m_prod.content | default: meal_obj.description %}
+                        {% if raw_m_desc != blank %}
+                          {% if raw_m_desc contains 'Ingredients:' %}
+                            {% assign m_desc = raw_m_desc | split: 'Ingredients:' | first | strip_html | strip %}
+                          {% elsif raw_m_desc contains 'ingredients:' %}
+                            {% assign m_desc = raw_m_desc | split: 'ingredients:' | first | strip_html | strip %}
+                          {% elsif raw_m_desc contains '<p>' %}
+                            {% assign m_desc = raw_m_desc | split: '</p>' | first | strip_html | strip %}
+                          {% else %}
+                            {% assign m_desc = raw_m_desc | strip_html | strip %}
                           {% endif %}
                         {% endif %}
                       {% endif %}
@@ -811,7 +878,7 @@
 
                       {% assign m_title_clean = m_title | strip_html | strip_newlines | escape %}
                       {% assign m_desc_clean = m_desc | strip_html | strip_newlines | escape %}
-                      {% assign m_ingr_clean = m_ingr | strip_html | strip_newlines | escape %}
+                      {% assign m_ingr_clean = m_ingr | strip_newlines | escape %}
                       {% assign m_aller_clean = m_aller | strip_html | strip_newlines | escape %}
                       {% assign m_cals_clean = m_cals | strip_html | strip_newlines | escape %}
                       {% assign m_prot_clean = m_prot_display | strip_html | strip_newlines | escape %}
@@ -2968,15 +3035,17 @@
       }
 
       // Dynamic regex extraction from product description for custom/new store products
-      if (!fallbackDish && item.description) {
-        const rawDesc = item.description;
-        const ingMatch = rawDesc.match(/ingredients?:?\s*([^.\n<]+(?:\.[^.\n<]+)*)/i);
-        const allerMatch = rawDesc.match(/allergens?:?\s*([^.\n<]+)/i);
-        if (ingMatch && ingMatch[1] && ingMatch[1].trim().length > 5) {
-          item.ingredients = ingMatch[1].trim();
+      const descToParse = (card ? card.getAttribute('data-desc') : '') || item.description || '';
+      if (descToParse) {
+        const ingMatch = descToParse.match(/ingredients?:?\s*([^.\n<]+(?:\.[^.\n<]+)*)/i);
+        const allerMatch = descToParse.match(/allergens?:?\s*([^.\n<]+)/i);
+        if ((!cleanIng || cleanIng.length < 5 || cleanIng.includes('wholesome')) && ingMatch && ingMatch[1] && ingMatch[1].trim().length > 5) {
+          cleanIng = ingMatch[1].trim();
+          item.ingredients = cleanIng;
         }
-        if (allerMatch && allerMatch[1] && allerMatch[1].trim().length > 2) {
-          item.allergens = allerMatch[1].trim();
+        if ((!cleanAller || cleanAller === 'None' || cleanAller === '') && allerMatch && allerMatch[1] && allerMatch[1].trim().length > 1) {
+          cleanAller = allerMatch[1].trim();
+          item.allergens = cleanAller;
         }
       }
 
@@ -3036,15 +3105,23 @@
         return v.trim();
       };
 
+      // Also dynamically regex-extract macros from description text if missing
+      const descCals = descToParse ? (descToParse.match(/(\d+)\s*kcal/i) || [])[1] : null;
+      const descProt = descToParse ? (descToParse.match(/(\d+(?:\.\d+)?)\s*g?\s*protein/i) || [])[1] : null;
+      const descFat = descToParse ? (descToParse.match(/(\d+(?:\.\d+)?)\s*g?\s*fat/i) || [])[1] : null;
+      const descCarbs = descToParse ? (descToParse.match(/(\d+(?:\.\d+)?)\s*g?\s*carbs/i) || [])[1] : null;
+      const descFib = descToParse ? (descToParse.match(/(\d+(?:\.\d+)?)\s*g?\s*(?:fibre|fiber)/i) || [])[1] : null;
+      const descSalt = descToParse ? (descToParse.match(/(\d+(?:\.\d+)?)\s*g?\s*salt/i) || [])[1] : null;
+
       const rawKj = cardVal('data-kj') || rawNutr.energyKj || rawNutr.kj || '';
-      const rawCals = cardVal('data-cals') || rawNutr.energyKcal || rawNutr.calories || (item.macros && item.macros.calories) || '';
-      const rawFat = cardVal('data-fat') || rawNutr.fat || (item.macros && item.macros.fat) || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.fat) || '';
+      const rawCals = cardVal('data-cals') || rawNutr.energyKcal || rawNutr.calories || (item.macros && item.macros.calories) || (descCals ? `${descCals} kcal` : '') || '';
+      const rawFat = cardVal('data-fat') || rawNutr.fat || (item.macros && item.macros.fat) || (descFat ? `${descFat}g` : '') || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.fat) || '';
       const rawSat = cardVal('data-saturates') || rawNutr.saturates || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.saturates) || '';
-      const rawCarbs = cardVal('data-carbs') || rawNutr.carbs || (item.macros && item.macros.carbs) || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.carbs) || '';
+      const rawCarbs = cardVal('data-carbs') || rawNutr.carbs || (item.macros && item.macros.carbs) || (descCarbs ? `${descCarbs}g` : '') || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.carbs) || '';
       const rawSug = cardVal('data-sugars') || rawNutr.sugars || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.sugars) || '';
-      const rawFib = cardVal('data-fibre') || rawNutr.fibre || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.fibre) || '';
-      const rawProt = cardVal('data-prot') || rawNutr.protein || (item.macros && item.macros.protein) || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.protein) || '';
-      const rawSalt = cardVal('data-salt') || rawNutr.salt || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.salt) || '';
+      const rawFib = cardVal('data-fibre') || rawNutr.fibre || (descFib ? `${descFib}g` : '') || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.fibre) || '';
+      const rawProt = cardVal('data-prot') || rawNutr.protein || (item.macros && item.macros.protein) || (descProt ? `${descProt}g` : '') || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.protein) || '';
+      const rawSalt = cardVal('data-salt') || rawNutr.salt || (descSalt ? `${descSalt}g` : '') || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.salt) || '';
 
       let energyDisplay = '';
       const combinedEnergy = (rawKj && rawKj.includes('/')) ? rawKj : ((rawCals && rawCals.includes('/')) ? rawCals : '');
