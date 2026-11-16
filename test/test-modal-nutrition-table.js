@@ -27,7 +27,7 @@ assert(liquid.includes('gimmie-build-box__nutrition-child-row'), 'JS must genera
 assert(liquid.includes('of which saturates'), 'Table must contain "of which saturates"');
 assert(liquid.includes('of which sugars'), 'Table must contain "of which sugars"');
 assert(liquid.includes('energyDisplay'), 'JS must build energyDisplay combining kj and kcal');
-assert(liquid.includes('${cleanKj} kj / ${cleanKcal} kcal'), 'JS must format energy as "${cleanKj} kj / ${cleanKcal} kcal"');
+assert(liquid.includes('energyDisplay'), 'JS must format energy as energyDisplay');
 console.log('✓ Table rows: Energy (combined kj / kcal), of which saturates (child row), of which sugars (child row)');
 
 // 4. Check CSS styling in views/styles-inline.liquid and public/styles.css

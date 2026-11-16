@@ -154,6 +154,181 @@ class MenuService {
   getFallbackMenu() {
     return [
       {
+        id: 'gid://shopify/Product/live_thai_red_curry',
+        variantId: 'gid://shopify/ProductVariant/live_var_thai_red_curry',
+        title: 'THAI RED CHICKEN CURRY',
+        handle: 'thai-red-chicken-curry',
+        image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+        description: 'Aromatic Thai red coconut chicken curry with fresh red peppers and mangetout. Served alongside fluffy jasmine rice.',
+        badges: ['HIGH PROTEIN', 'GLUTEN FREE'],
+        macros: {
+          calories: '598 kcal',
+          protein: '60.0g Protein',
+          carbs: '53.3g Carbs',
+          fat: '17.8g Fat'
+        },
+        nutrition: {
+          serving: 'Per Serving (450g)',
+          energyKj: '2502 kJ',
+          energyKcal: '598 kcal',
+          fat: '17.8g',
+          saturates: '11.7g',
+          carbs: '53.3g',
+          sugars: '8.7g',
+          fibre: '3.3g',
+          protein: '60.0g',
+          salt: '1.67g'
+        },
+        allergens: 'Crustaceans',
+        ingredients: 'Chicken Breast, Jasmine Rice, Reduced Fat Coconut Milk, Mangetout, Red Pepper, Onion, Red Curry Paste (Dried Red Chilli, Garlic, Shrimp Paste (Crustaceans), Galangal, Lemongrass, Shallot, Lime), Olive Oil, Fresh Coriander, Salt, Black Pepper.'
+      },
+      {
+        id: 'gid://shopify/Product/live_sausage_ragu',
+        variantId: 'gid://shopify/ProductVariant/live_var_sausage_ragu',
+        title: 'SAUSAGE RAGU RIGATONI',
+        handle: 'sausage-ragu-rigatoni',
+        image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80',
+        description: 'Slow-cooked sausage ragu in a rich tomato sauce, infused with rosemary and thyme. Served with rigatoni, fresh basil and a dusting of parmesan.',
+        badges: ['HIGH PROTEIN', 'CHEF PICK'],
+        macros: {
+          calories: '609 kcal',
+          protein: '28.0g Protein',
+          carbs: '60.9g Carbs',
+          fat: '27.3g Fat'
+        },
+        nutrition: {
+          serving: 'Per Serving (450g)',
+          energyKj: '2548 kJ',
+          energyKcal: '609 kcal',
+          fat: '27.3g',
+          saturates: '9.1g',
+          carbs: '60.9g',
+          sugars: '10.2g',
+          fibre: '5.0g',
+          protein: '28.0g',
+          salt: '2.01g'
+        },
+        allergens: 'Wheat, Milk, Celery, Sulphites',
+        ingredients: 'Rigatoni Pasta (Wheat), Lincolnshire Sausage (Sulphites), Chopped Tomatoes, Tomato Purée, Beef Stock (Celery), Onions, Garlic, Extra Virgin Olive Oil, Fresh Rosemary, Fresh Thyme, Fresh Basil, Parmesan Cheese (Milk), Sea Salt, Black Pepper.'
+      },
+      {
+        id: 'gid://shopify/Product/live_tarragon_chicken',
+        variantId: 'gid://shopify/ProductVariant/live_var_tarragon_chicken',
+        title: 'TARRAGON CHICKEN',
+        handle: 'tarragon-chicken',
+        image: 'https://images.unsplash.com/photo-1547496502-affa22d38842?auto=format&fit=crop&w=800&q=80',
+        description: 'Oven-roasted tarragon chicken breast with crispy Hasselback baby potatoes and tender asparagus, served in a creamy garlic mushroom sauce.',
+        badges: ['HIGH PROTEIN', 'LOW CARB'],
+        macros: {
+          calories: '414 kcal',
+          protein: '56.0g Protein',
+          carbs: '31.3g Carbs',
+          fat: '8.0g Fat'
+        },
+        nutrition: {
+          serving: 'Per Serving (450g)',
+          energyKj: '1732 kJ',
+          energyKcal: '414 kcal',
+          fat: '8.0g',
+          saturates: '1.7g',
+          carbs: '31.3g',
+          sugars: '4.9g',
+          fibre: '4.8g',
+          protein: '56.0g',
+          salt: '0.81g'
+        },
+        allergens: 'Milk, Mustard, Sulphites',
+        ingredients: 'Chicken Breast, Baby Potato, White Mushroom, Asparagus, Shallot, Light Creme Fraiche (Milk), Wholegrain Mustard (Mustard), White Wine Reduction (Sulphites), Fresh Tarragon, Garlic, Olive Oil, Sea Salt, Cracked Black Pepper.'
+      },
+      {
+        id: 'gid://shopify/Product/live_hoisin_beef_bowl',
+        variantId: 'gid://shopify/ProductVariant/live_var_hoisin_beef',
+        title: 'HOISIN BEEF BOWL',
+        handle: 'hoisin-beef-bowl',
+        image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80',
+        description: 'Sticky beef in a hoisin-soy glaze over fluffy basmati rice with a side of fresh cucumber ribbons. Finished with red chillies, spring onion and sesame seeds.',
+        badges: ['HIGH PROTEIN', 'CHEF PICK'],
+        macros: {
+          calories: '416 kcal',
+          protein: '42.0g Protein',
+          carbs: '42.8g Carbs',
+          fat: '10.4g Fat'
+        },
+        nutrition: {
+          serving: 'Per Serving (430g)',
+          energyKj: '1740 kJ',
+          energyKcal: '416 kcal',
+          fat: '10.4g',
+          saturates: '3.8g',
+          carbs: '42.8g',
+          sugars: '6.9g',
+          fibre: '1.5g',
+          protein: '42.0g',
+          salt: '3.23g'
+        },
+        allergens: 'Soya, Sesame, Wheat',
+        ingredients: 'Lean Beef Mince (5% fat), Basmati Rice, Cucumber, Spring Onion, Red Chilli Pepper, Hoisin Sauce (Soya, Sesame, Wheat), Tamari Soy Sauce (Soya), Sesame Seeds, Garlic, Ginger, Pure Honey, Black Pepper.'
+      },
+      {
+        id: 'gid://shopify/Product/live_bolognese_gnocchi',
+        variantId: 'gid://shopify/ProductVariant/live_var_bolognese_gnocchi',
+        title: 'BOLOGNESE GNOCCHI',
+        handle: 'bolognese-gnocchi',
+        image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80',
+        description: 'Fluffy potato gnocchi tossed in a rich, slow-simmered beef Bolognese sauce, topped with parmesan and fresh parsley.',
+        badges: ['HIGH PROTEIN', 'COMFORT FOOD'],
+        macros: {
+          calories: '389 kcal',
+          protein: '36.0g Protein',
+          carbs: '36.5g Carbs',
+          fat: '10.2g Fat'
+        },
+        nutrition: {
+          serving: 'Per Serving (420g)',
+          energyKj: '1627 kJ',
+          energyKcal: '389 kcal',
+          fat: '10.2g',
+          saturates: '4.1g',
+          carbs: '36.5g',
+          sugars: '11.1g',
+          fibre: '5.4g',
+          protein: '36.0g',
+          salt: '2.01g'
+        },
+        allergens: 'Wheat, Milk, Celery, Fish, Barley',
+        ingredients: 'Lean Beef Mince (5% fat), Gnocchi (Fresh Potatoes, Wheat Flour, Salt, Sunflower Oil), Chopped Tomatoes, Onion, Parmesan Cheese (Milk), Beef Stock (Celery), Tomato Purée, Worcestershire Sauce (Fish, Barley), Garlic, Olive Oil, Fresh Parsley, Oregano, Black Pepper.'
+      },
+      {
+        id: 'gid://shopify/Product/live_chicken_fajita_bowl',
+        variantId: 'gid://shopify/ProductVariant/live_var_chicken_fajita',
+        title: 'CHICKEN FAJITA BOWL',
+        handle: 'chicken-fajita-bowl',
+        image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=800&q=80',
+        description: 'Juicy chicken breast, mixed peppers and onions tossed in smoky Mexican spices. Served over zesty coriander and lime rice and a side of slow-simmered black beans.',
+        badges: ['HIGH PROTEIN', 'MEXICAN SPICE'],
+        macros: {
+          calories: '417 kcal',
+          protein: '46.0g Protein',
+          carbs: '45.5g Carbs',
+          fat: '6.6g Fat'
+        },
+        nutrition: {
+          serving: 'Per Serving (450g)',
+          energyKj: '1744 kJ',
+          energyKcal: '417 kcal',
+          fat: '6.6g',
+          saturates: '1.4g',
+          carbs: '45.5g',
+          sugars: '7.4g',
+          fibre: '4.6g',
+          protein: '46.0g',
+          salt: '0.33g'
+        },
+        allergens: 'None',
+        ingredients: 'Chicken Breast, Basmati Rice, Pepper, Onion, Black Beans, Chopped Tomatoes, Lime, Olive Oil, Fresh Coriander, Sea Salt, Fajita Seasoning.'
+      },
+
+      {
         id: 'gid://shopify/Product/101',
         variantId: 'gid://shopify/ProductVariant/201',
         title: 'LEMON & HERB CHICKEN',
@@ -376,31 +551,31 @@ class MenuService {
         id: 'gid://shopify/Product/addon_biscoff_biscuit_oats',
         variantId: 'gid://shopify/ProductVariant/addon_var_biscoff_oats',
         title: 'BISCOFF BISCUIT PROTEIN OATS',
-        handle: 'biscoff-biscuit-protein-oats',
+        handle: 'biscoff-protein-oats',
         price: '4.95',
         image: 'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=800&q=80',
-        description: 'Rich, creamy overnight oats infused with Lotus Biscoff spread, layered with vanilla whey protein and topped with crushed caramelized Biscoff biscuit crumbs.',
+        description: 'Creamy overnight oats blended with premium whey protein, Greek yoghurt and chia seeds. Topped with a drizzle of Biscoff spread and biscuit crumb.',
         badges: ['ADD-ON', 'HIGH PROTEIN'],
         macros: {
-          calories: '445 kcal',
+          calories: '493 kcal',
           protein: '31g Protein',
-          carbs: '58g Carbs',
-          fat: '10.5g Fat'
+          carbs: '46.4g Carbs',
+          fat: '15.3g Fat'
         },
         nutrition: {
           serving: 'Per Pot (300g)',
-          energyKj: '1870 kJ',
-          energyKcal: '445 kcal',
-          fat: '10.5g',
-          saturates: '3.2g',
-          carbs: '58.0g',
-          sugars: '16.0g',
-          fibre: '5.5g',
-          protein: '31g',
+          energyKj: '2062 kJ',
+          energyKcal: '493 kcal',
+          fat: '15.3g',
+          saturates: '4.2g',
+          carbs: '46.4g',
+          sugars: '20.7g',
+          fibre: '8.8g',
+          protein: '31.0g',
           salt: '0.38g'
         },
-        allergens: 'Milk, Gluten (Wheat, Oats), Soya',
-        ingredients: 'Rolled Oats (Gluten) (38%), Skimmed Milk (24%), Greek Style Yoghurt (Milk) (14%), Whey Protein Concentrate (Milk, Soy Lecithin) (10%), Lotus Biscoff Spread (8%) (Caramelised Biscuits (Wheat Flour, Sugar, Vegetable Oils, Candy Sugar Syrup, Raising Agent, Soya Flour, Salt, Cinnamon), Rapeseed Oil, Sugar, Emulsifier (Soya Lecithin), Acid (Citric Acid)), Chia Seeds, Crushed Biscoff Biscuit (Wheat, Soya).'
+        allergens: 'Oats, Milk, Soya, Wheat',
+        ingredients: 'Porridge Oats, Whey Protein (Milk, Soya), 0% Fat Greek Yoghurt (Milk), Semi Skimmed Milk, Chia Seeds, Lotus Biscoff Biscuit & Spread [Wheat Flour, Sugar, Vegetable Oils (Palm Oil, Rapeseed Oil), Soya Flour, Emulsifier (Soya Lecithin), Salt, Cinnamon], Chia Seeds.'
       },
       {
         id: 'gid://shopify/Product/addon_raspberry_white_choc_oats',

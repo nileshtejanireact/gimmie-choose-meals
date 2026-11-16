@@ -335,6 +335,22 @@
                         {% assign handle_alt = m_title | downcase | replace: ' ', '-' | replace: '&', 'and' | replace: "'", "" %}
                         {% assign direct_meal = shop.metaobjects.meal[handle_alt] %}
                       {% endif %}
+                      {% if direct_meal == blank %}
+                        {% assign down_check = m_title | downcase %}
+                        {% if down_check contains 'thai' and down_check contains 'curry' %}
+                          {% assign direct_meal = shop.metaobjects.meal['thai-red-chicken-curry'] %}
+                        {% elsif down_check contains 'sausage' or down_check contains 'ragu' or down_check contains 'rigatoni' %}
+                          {% assign direct_meal = shop.metaobjects.meal['sausage-ragu-rigatoni'] | default: shop.metaobjects.meal['sausage-ragu'] %}
+                        {% elsif down_check contains 'tarragon' %}
+                          {% assign direct_meal = shop.metaobjects.meal['tarragon-chicken'] %}
+                        {% elsif down_check contains 'hoisin' %}
+                          {% assign direct_meal = shop.metaobjects.meal['hoisin-beef-bowl'] | default: shop.metaobjects.meal['hoisin-beef'] %}
+                        {% elsif down_check contains 'gnocchi' or down_check contains 'bolognese' %}
+                          {% assign direct_meal = shop.metaobjects.meal['bolognese-gnocchi'] %}
+                        {% elsif down_check contains 'fajita' %}
+                          {% assign direct_meal = shop.metaobjects.meal['chicken-fajita-bowl'] | default: shop.metaobjects.meal['chicken-fajita'] %}
+                        {% endif %}
+                      {% endif %}
 
                       {% assign m_desc = nil %}
                       {% assign m_energy = nil %}
@@ -385,6 +401,40 @@
                         {% endif %}
                       {% endif %}
 
+                      {% if m_energy == blank %}
+                        {% assign m_energy = meal_raw.energy.value | default: meal_raw.energy | default: meal_obj.energy.value | default: meal_obj.energy | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_raw.calories %}
+                      {% endif %}
+                      {% if m_prot == blank %}
+                        {% assign m_prot = meal_raw.protein.value | default: meal_raw.protein | default: meal_obj.protein.value | default: meal_obj.protein %}
+                      {% endif %}
+                      {% if m_fat == blank %}
+                        {% assign m_fat = meal_raw.fat.value | default: meal_raw.fat | default: meal_obj.fat.value | default: meal_obj.fat %}
+                      {% endif %}
+                      {% if m_saturates == blank %}
+                        {% assign m_saturates = meal_raw.of_which_saturates.value | default: meal_raw.of_which_saturates | default: meal_raw.saturates.value | default: meal_raw.saturates | default: meal_obj.of_which_saturates.value | default: meal_obj.of_which_saturates | default: meal_obj.saturates.value | default: meal_obj.saturates %}
+                      {% endif %}
+                      {% if m_carbs == blank %}
+                        {% assign m_carbs = meal_raw.carbohydrates.value | default: meal_raw.carbohydrates | default: meal_raw.carbs.value | default: meal_raw.carbs | default: meal_obj.carbohydrates.value | default: meal_obj.carbohydrates | default: meal_obj.carbs.value | default: meal_obj.carbs %}
+                      {% endif %}
+                      {% if m_sugars == blank %}
+                        {% assign m_sugars = meal_raw.of_which_sugars.value | default: meal_raw.of_which_sugars | default: meal_raw.sugars.value | default: meal_raw.sugars | default: meal_obj.of_which_sugars.value | default: meal_obj.of_which_sugars | default: meal_obj.sugars.value | default: meal_obj.sugars %}
+                      {% endif %}
+                      {% if m_fibre == blank %}
+                        {% assign m_fibre = meal_raw.fibre.value | default: meal_raw.fibre | default: meal_raw.fiber.value | default: meal_raw.fiber | default: meal_obj.fibre.value | default: meal_obj.fibre | default: meal_obj.fiber.value | default: meal_obj.fiber %}
+                      {% endif %}
+                      {% if m_salt == blank %}
+                        {% assign m_salt = meal_raw.salt.value | default: meal_raw.salt | default: meal_obj.salt.value | default: meal_obj.salt %}
+                      {% endif %}
+                      {% if m_serving == blank %}
+                        {% assign m_serving = meal_raw.serving_size.value | default: meal_raw.serving_size | default: meal_obj.serving_size.value | default: meal_obj.serving_size | default: 'Per Serving (420g)' %}
+                      {% endif %}
+                      {% if m_ingr == blank %}
+                        {% assign m_ingr = meal_raw.ingredients.value | default: meal_raw.ingredients | default: meal_obj.ingredients.value | default: meal_obj.ingredients %}
+                      {% endif %}
+                      {% if m_aller == blank %}
+                        {% assign m_aller = meal_raw.allergens.value | default: meal_raw.allergens | default: meal_obj.allergens.value | default: meal_obj.allergens %}
+                      {% endif %}
+
                       {% if m_desc == blank %}
                         {% assign m_desc = meal_obj.description.value | default: meal_obj.description | default: meal_obj.body_html | default: meal_obj.content | default: meal_raw.description.value | default: meal_raw.description | default: meal_raw.meal_description.value | default: meal_raw.meal_description | default: meal_raw.summary.value | default: meal_raw.summary | default: meal_raw.short_description.value | default: meal_raw.short_description | default: meal_raw.product.value.description | default: meal_raw.product.value.body_html | default: meal_raw.product.description %}
                       {% endif %}
@@ -401,53 +451,80 @@
                           {% endif %}
                         {% endif %}
                       {% endif %}
-                      {% if m_energy == blank %}
-                        {% assign m_energy = meal_obj.energy.value | default: meal_obj.energy | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_raw.calories | default: meal_raw.energy.value | default: meal_raw.energy %}
-                      {% endif %}
-                      {% if m_prot == blank %}
-                        {% assign m_prot = meal_obj.protein.value | default: meal_obj.protein | default: meal_raw.protein.value | default: meal_raw.protein %}
-                      {% endif %}
-                      {% if m_fat == blank %}
-                        {% assign m_fat = meal_obj.fat.value | default: meal_obj.fat | default: meal_raw.fat.value | default: meal_raw.fat %}
-                      {% endif %}
-                      {% if m_saturates == blank %}
-                        {% assign m_saturates = meal_obj.of_which_saturates.value | default: meal_obj.of_which_saturates | default: meal_obj.saturates.value | default: meal_obj.saturates | default: meal_raw.of_which_saturates.value | default: meal_raw.of_which_saturates | default: meal_raw.saturates.value | default: meal_raw.saturates %}
-                      {% endif %}
-                      {% if m_carbs == blank %}
-                        {% assign m_carbs = meal_obj.carbohydrates.value | default: meal_obj.carbohydrates | default: meal_obj.carbs.value | default: meal_obj.carbs | default: meal_raw.carbohydrates.value | default: meal_raw.carbohydrates | default: meal_raw.carbs.value | default: meal_raw.carbs %}
-                      {% endif %}
-                      {% if m_sugars == blank %}
-                        {% assign m_sugars = meal_obj.of_which_sugars.value | default: meal_obj.of_which_sugars | default: meal_obj.sugars.value | default: meal_obj.sugars | default: meal_raw.of_which_sugars.value | default: meal_raw.of_which_sugars | default: meal_raw.sugars.value | default: meal_raw.sugars %}
-                      {% endif %}
-                      {% if m_fibre == blank %}
-                        {% assign m_fibre = meal_obj.fibre.value | default: meal_obj.fibre | default: meal_obj.fiber.value | default: meal_obj.fiber | default: meal_raw.fibre.value | default: meal_raw.fibre | default: meal_raw.fiber.value | default: meal_raw.fiber %}
-                      {% endif %}
-                      {% if m_salt == blank %}
-                        {% assign m_salt = meal_obj.salt.value | default: meal_obj.salt | default: meal_raw.salt.value | default: meal_raw.salt %}
-                      {% endif %}
-                      {% if m_serving == blank %}
-                        {% assign m_serving = meal_obj.serving_size.value | default: meal_obj.serving_size | default: meal_raw.serving_size.value | default: meal_raw.serving_size | default: 'Per Serving (420g)' %}
-                      {% endif %}
-                      {% if m_ingr == blank %}
-                        {% assign m_ingr = meal_obj.ingredients.value | default: meal_obj.ingredients | default: meal_raw.ingredients.value | default: meal_raw.ingredients %}
-                      {% endif %}
-                      {% if m_aller == blank %}
-                        {% assign m_aller = meal_obj.allergens.value | default: meal_obj.allergens | default: meal_raw.allergens.value | default: meal_raw.allergens %}
-                      {% endif %}
 
                       {% assign down_t = m_title | downcase %}
-                      {% if down_t contains 'gnocchi' or down_t contains 'bolognese gnocchi' %}
+                      {% if down_t contains 'thai' or down_t contains 'thai red' %}
+                        {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Aromatic Thai red coconut chicken curry with fresh red peppers and mangetout. Served alongside fluffy jasmine rice.' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '2502 kj / 598 kcal' %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = '17.8' %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = '11.7' %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = '53.3' %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = '8.7' %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = '3.3' %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = '60.0' %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = '1.67' %}{% endif %}
+                        {% if m_aller == blank %}{% assign m_aller = 'Crustaceans' %}{% endif %}
+                        {% if m_ingr == blank %}{% assign m_ingr = 'Chicken Breast, Jasmine Rice, Reduced Fat Coconut Milk, Mangetout, Red Pepper, Onion, Red Curry Paste (Dried Red Chilli, Garlic, Shrimp Paste (Crustaceans), Galangal, Lemongrass, Shallot, Lime), Olive Oil, Fresh Coriander, Salt, Black Pepper.' %}{% endif %}
+                      {% elsif down_t contains 'rigatoni' or (down_t contains 'sausage' and down_t contains 'ragu') %}
+                        {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Slow-cooked sausage ragu in a rich tomato sauce, infused with rosemary and thyme. Served with rigatoni, fresh basil and a dusting of parmesan.' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '2548 kj / 609 kcal' %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = '27.3' %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = '9.1' %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = '60.9' %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = '10.2' %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = '5.0' %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = '28.0' %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = '2.01' %}{% endif %}
+                        {% if m_aller == blank %}{% assign m_aller = 'Wheat, Milk, Celery, Sulphites' %}{% endif %}
+                        {% if m_ingr == blank %}{% assign m_ingr = 'Rigatoni Pasta (Wheat), Lincolnshire Sausage (Sulphites), Chopped Tomatoes, Tomato Purée, Beef Stock (Celery), Onions, Garlic, Extra Virgin Olive Oil, Fresh Rosemary, Fresh Thyme, Fresh Basil, Parmesan Cheese (Milk), Sea Salt, Black Pepper.' %}{% endif %}
+                      {% elsif down_t contains 'tarragon' %}
+                        {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Oven-roasted tarragon chicken breast with crispy Hasselback baby potatoes and tender asparagus, served in a creamy garlic mushroom sauce.' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '1732 kj / 414 kcal' %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = '8.0' %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = '1.7' %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = '31.3' %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = '4.9' %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = '4.8' %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = '56.0' %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = '0.81' %}{% endif %}
+                        {% if m_aller == blank %}{% assign m_aller = 'Milk, Mustard, Sulphites' %}{% endif %}
+                        {% if m_ingr == blank %}{% assign m_ingr = 'Chicken Breast, Baby Potato, White Mushroom, Asparagus, Shallot, Light Creme Fraiche (Milk), Wholegrain Mustard (Mustard), White Wine Reduction (Sulphites), Fresh Tarragon, Garlic, Olive Oil, Sea Salt, Cracked Black Pepper.' %}{% endif %}
+                      {% elsif down_t contains 'hoisin' or down_t contains 'hoisin beef' %}
+                        {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Sticky beef in a hoisin-soy glaze over fluffy basmati rice with a side of fresh cucumber ribbons. Finished with red chillies, spring onion and sesame seeds.' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '1740 kj / 416 kcal' %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = '10.4' %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = '3.8' %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = '42.8' %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = '6.9' %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = '1.5' %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = '42.0' %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = '3.23' %}{% endif %}
+                        {% if m_aller == blank %}{% assign m_aller = 'Soya, Sesame, Wheat' %}{% endif %}
+                        {% if m_ingr == blank %}{% assign m_ingr = 'Lean Beef Mince (5% fat), Basmati Rice, Cucumber, Spring Onion, Red Chilli Pepper, Hoisin Sauce (Soya, Sesame, Wheat), Tamari Soy Sauce (Soya), Sesame Seeds, Garlic, Ginger, Pure Honey, Black Pepper.' %}{% endif %}
+                      {% elsif down_t contains 'gnocchi' or down_t contains 'bolognese gnocchi' %}
                         {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Fluffy potato gnocchi tossed in a rich, slow-simmered beef Bolognese sauce, topped with parmesan and fresh parsley.' %}{% endif %}
-                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '1628 kj / 389 kcal' %}{% endif %}
-                        {% if m_fat == blank %}{% assign m_fat = '12.5' %}{% endif %}
-                        {% if m_saturates == blank %}{% assign m_saturates = '4.2' %}{% endif %}
-                        {% if m_carbs == blank %}{% assign m_carbs = '45.0' %}{% endif %}
-                        {% if m_sugars == blank %}{% assign m_sugars = '6.5' %}{% endif %}
-                        {% if m_fibre == blank %}{% assign m_fibre = '4.2' %}{% endif %}
-                        {% if m_prot == blank %}{% assign m_prot = '36' %}{% endif %}
-                        {% if m_salt == blank %}{% assign m_salt = '1.20' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '1627 kj / 389 kcal' %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = '10.2' %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = '4.1' %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = '36.5' %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = '11.1' %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = '5.4' %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = '36.0' %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = '2.01' %}{% endif %}
                         {% if m_aller == blank %}{% assign m_aller = 'Wheat, Milk, Celery, Fish, Barley' %}{% endif %}
                         {% if m_ingr == blank %}{% assign m_ingr = 'Lean Beef Mince (5% fat), Gnocchi (Fresh Potatoes, Wheat Flour, Salt, Sunflower Oil), Chopped Tomatoes, Onion, Parmesan Cheese (Milk), Beef Stock (Celery), Tomato Purée, Worcestershire Sauce (Fish, Barley), Garlic, Olive Oil, Fresh Parsley, Oregano, Black Pepper. May contain: Soy, Mustard.' %}{% endif %}
+                      {% elsif down_t contains 'fajita' or down_t contains 'chicken fajita' %}
+                        {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Juicy chicken breast, mixed peppers and onions tossed in smoky Mexican spices. Served over zesty coriander and lime rice and a side of slow-simmered black beans.' %}{% endif %}
+                        {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '1744 kj / 417 kcal' %}{% endif %}
+                        {% if m_fat == blank %}{% assign m_fat = '6.6' %}{% endif %}
+                        {% if m_saturates == blank %}{% assign m_saturates = '1.4' %}{% endif %}
+                        {% if m_carbs == blank %}{% assign m_carbs = '45.5' %}{% endif %}
+                        {% if m_sugars == blank %}{% assign m_sugars = '7.4' %}{% endif %}
+                        {% if m_fibre == blank %}{% assign m_fibre = '4.6' %}{% endif %}
+                        {% if m_prot == blank %}{% assign m_prot = '46.0' %}{% endif %}
+                        {% if m_salt == blank %}{% assign m_salt = '0.33' %}{% endif %}
+                        {% if m_aller == blank %}{% assign m_aller = 'None' %}{% endif %}
+                        {% if m_ingr == blank %}{% assign m_ingr = 'Chicken Breast, Basmati Rice, Pepper, Onion, Black Beans, Chopped Tomatoes, Lime, Olive Oil, Fresh Coriander, Sea Salt, Fajita Seasoning.' %}{% endif %}
                       {% elsif down_t contains 'fajita' or down_t contains 'chicken fajita' %}
                         {% if m_desc == blank or m_desc contains 'root' or m_desc contains 'chef-prepared' %}{% assign m_desc = 'Spiced grilled chicken breast strips with roasted peppers and onions, served over fluffy rice, black beans and sweetcorn salsa.' %}{% endif %}
                         {% if m_energy == blank or m_energy == '520 kcal' or m_energy contains '520' %}{% assign m_energy = '1745 kj / 417 kcal' %}{% endif %}
@@ -708,7 +785,38 @@
                   {% else %}
                 {% endraw %}
                     {% for meal in meals %}
-                      <article class="gimmie-build-box__meal" data-meal-id="{{ meal.id }}" style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
+                      {% assign fb_m_title = meal.title | escape %}
+                      {% assign fb_m_desc = meal.description | escape %}
+                      {% assign fb_m_ingr = meal.ingredients | escape %}
+                      {% assign fb_m_aller = meal.allergens | escape %}
+                      {% assign fb_m_cals = meal.nutrition.energyKcal | default: meal.macros.calories | escape %}
+                      {% assign fb_m_prot = meal.nutrition.protein | default: meal.macros.protein | escape %}
+                      {% assign fb_m_carbs = meal.nutrition.carbs | default: meal.macros.carbs | escape %}
+                      {% assign fb_m_fat = meal.nutrition.fat | default: meal.macros.fat | escape %}
+                      {% assign fb_m_sat = meal.nutrition.saturates | escape %}
+                      {% assign fb_m_sug = meal.nutrition.sugars | escape %}
+                      {% assign fb_m_fib = meal.nutrition.fibre | escape %}
+                      {% assign fb_m_salt = meal.nutrition.salt | escape %}
+                      {% assign fb_m_serv = meal.nutrition.serving | escape %}
+                      {% assign fb_m_kj = meal.nutrition.energyKj | escape %}
+                      <article class="gimmie-build-box__meal" 
+                               data-meal-id="{{ meal.id }}" 
+                               data-title="{{ fb_m_title }}"
+                               data-image="{{ meal.image | escape }}"
+                               data-desc="{{ fb_m_desc }}"
+                               data-ingredients="{{ fb_m_ingr }}"
+                               data-allergens="{{ fb_m_aller }}"
+                               data-cals="{{ fb_m_cals }}"
+                               data-prot="{{ fb_m_prot }}"
+                               data-carbs="{{ fb_m_carbs }}"
+                               data-fat="{{ fb_m_fat }}"
+                               data-saturates="{{ fb_m_sat }}"
+                               data-sugars="{{ fb_m_sug }}"
+                               data-fibre="{{ fb_m_fib }}"
+                               data-salt="{{ fb_m_salt }}"
+                               data-serving="{{ fb_m_serv }}"
+                               data-kj="{{ fb_m_kj }}"
+                               style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
                         <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ meal.id }}">
                           <img src="{{ meal.image }}" alt="{{ meal.title }}" class="gimmie-build-box__meal-image" loading="lazy">
                           <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ meal.id }}" aria-label="View Nutrition & Ingredients"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 109px; display: block; pointer-events: none;"><path d="M4 0.5H20C21.933 0.5 23.5 2.067 23.5 4V20C23.5 21.933 21.933 23.5 20 23.5H4C2.067 23.5 0.5 21.933 0.5 20V4C0.5 2.067 2.067 0.5 4 0.5Z" fill="white"></path><path d="M4 0.5H20C21.933 0.5 23.5 2.067 23.5 4V20C23.5 21.933 21.933 23.5 20 23.5H4C2.067 23.5 0.5 21.933 0.5 20V4C0.5 2.067 2.067 0.5 4 0.5Z" stroke="white"></path><path d="M12.9928 9.792V18H11.0088V9.792H12.9928ZM13.2648 7.4C13.2648 7.57067 13.2301 7.73067 13.1608 7.88C13.0914 8.02933 12.9981 8.16 12.8808 8.272C12.7688 8.384 12.6354 8.47467 12.4808 8.544C12.3261 8.608 12.1608 8.64 11.9848 8.64C11.8141 8.64 11.6514 8.608 11.4968 8.544C11.3474 8.47467 11.2168 8.384 11.1048 8.272C10.9928 8.16 10.9021 8.02933 10.8328 7.88C10.7688 7.73067 10.7368 7.57067 10.7368 7.4C10.7368 7.224 10.7688 7.05867 10.8328 6.904C10.9021 6.74933 10.9928 6.616 11.1048 6.504C11.2168 6.392 11.3474 6.304 11.4968 6.24C11.6514 6.17067 11.8141 6.136 11.9848 6.136C12.1608 6.136 12.3261 6.17067 12.4808 6.24C12.6354 6.304 12.7688 6.392 12.8808 6.504C12.9981 6.616 13.0914 6.74933 13.1608 6.904C13.2301 7.05867 13.2648 7.224 13.2648 7.4Z" fill="#262421"></path></svg></button>
@@ -875,11 +983,21 @@
                         {% assign a_variant_id = 'addon_' | append: forloop.index %}
                       {% endif %}
 
-                      {% assign a_handle = addon_obj.handle | default: addon_raw.handle %}
+                      {% assign a_handle = addon_raw.system.handle | default: addon_obj.system.handle | default: addon_obj.handle | default: addon_raw.handle %}
                       {% if a_handle == blank or a_handle == '' %}
-                        {% assign a_handle = a_title | downcase | replace: ' ', '-' | replace: '&', 'and' | replace: "'", "" %}
+                        {% assign a_handle = a_title | handleize %}
                       {% endif %}
                       {% assign direct_addon = shop.metaobjects.meal[a_handle] | default: shop.metaobjects.addon[a_handle] | default: shop.metaobjects.add_on[a_handle] | default: shop.metaobjects.addon_product[a_handle] | default: shop.metaobjects.dish[a_handle] %}
+                      {% if direct_addon == blank %}
+                        {% assign a_down = a_title | downcase %}
+                        {% if a_down contains 'biscoff' %}
+                          {% assign direct_addon = shop.metaobjects.meal['biscoff-protein-oats'] | default: shop.metaobjects.meal['biscoff-biscuit-protein-oats'] %}
+                        {% elsif a_down contains 'blueberry' %}
+                          {% assign direct_addon = shop.metaobjects.meal['blueberry-lemon-protein-oats'] | default: shop.metaobjects.meal['blueberry-protein-oats'] %}
+                        {% elsif a_down contains 'raspberry' %}
+                          {% assign direct_addon = shop.metaobjects.meal['raspberry-white-chocolate-protein-oats'] | default: shop.metaobjects.meal['raspberry-protein-oats'] %}
+                        {% endif %}
+                      {% endif %}
 
                       {% comment %} Full Shopify Product Drop Lookup for Metafields {% endcomment %}
                       {% assign a_product = addon_obj.product.value | default: addon_obj.product | default: addon_raw.product.value | default: addon_raw.product %}
@@ -893,11 +1011,11 @@
                       {% endif %}
 
                       {% comment %} 1. DYNAMIC SHORT DESCRIPTION EXTRACTION FROM PRODUCT {% endcomment %}
-                      {% assign a_desc = addon_obj.metafields.custom.short_description.value | default: addon_obj.metafields.custom.short_description | default: addon_obj.metafields.custom.summary.value | default: addon_obj.metafields.custom.summary | default: direct_addon.description.value | default: direct_addon.description | default: direct_addon.summary.value | default: direct_addon.summary | default: addon_obj.metafields.custom.description.value | default: addon_obj.metafields.custom.description | default: addon_raw.description.value | default: addon_raw.description | default: addon_raw.summary %}
+                      {% assign a_desc = direct_addon.description.value | default: direct_addon.description | default: addon_raw.description.value | default: addon_raw.description | default: addon_obj.metafields.custom.short_description.value | default: addon_obj.metafields.custom.short_description | default: addon_obj.metafields.custom.summary.value | default: addon_obj.metafields.custom.summary | default: direct_addon.summary.value | default: direct_addon.summary | default: addon_obj.metafields.custom.description.value | default: addon_obj.metafields.custom.description | default: addon_raw.summary %}
                       
                       {% comment %} If description is rich text JSON, convert cleanly {% endcomment %}
                       {% if a_desc contains 'root' or a_desc contains 'children' %}
-                        {% assign meta_desc_tag = addon_obj.metafields.custom.short_description | default: addon_obj.metafields.custom.description | default: addon_raw.description | metafield_tag | strip_html | strip %}
+                        {% assign meta_desc_tag = direct_addon.description | default: addon_raw.description | default: addon_obj.metafields.custom.short_description | default: addon_obj.metafields.custom.description | metafield_tag | strip_html | strip %}
                         {% if meta_desc_tag != blank %}{% assign a_desc = meta_desc_tag %}{% endif %}
                       {% endif %}
 
@@ -918,10 +1036,10 @@
                       {% endif %}
 
                       {% comment %} 2. DYNAMIC INGREDIENTS EXTRACTION FROM PRODUCT {% endcomment %}
-                      {% assign a_ingr = addon_obj.metafields.custom.ingredients.value | default: addon_obj.metafields.custom.ingredients | default: direct_addon.ingredients.value | default: direct_addon.ingredients | default: addon_obj.metafields.shopify.ingredients.value | default: addon_obj.metafields.shopify.ingredients | default: addon_obj.metafields.food.ingredients.value | default: addon_obj.metafields.food.ingredients | default: addon_obj.metafields.nutrition.ingredients.value | default: addon_obj.metafields.nutrition.ingredients | default: addon_obj.metafields.details.ingredients.value | default: addon_obj.metafields.details.ingredients | default: addon_obj.metafields.my_fields.ingredients.value | default: addon_obj.metafields.my_fields.ingredients | default: addon_raw.ingredients.value | default: addon_raw.ingredients %}
+                      {% assign a_ingr = direct_addon.ingredients.value | default: direct_addon.ingredients | default: addon_raw.ingredients.value | default: addon_raw.ingredients | default: addon_obj.metafields.custom.ingredients.value | default: addon_obj.metafields.custom.ingredients | default: addon_obj.metafields.shopify.ingredients.value | default: addon_obj.metafields.shopify.ingredients | default: addon_obj.metafields.food.ingredients.value | default: addon_obj.metafields.food.ingredients | default: addon_obj.metafields.nutrition.ingredients.value | default: addon_obj.metafields.nutrition.ingredients | default: addon_obj.metafields.details.ingredients.value | default: addon_obj.metafields.details.ingredients | default: addon_obj.metafields.my_fields.ingredients.value | default: addon_obj.metafields.my_fields.ingredients %}
 
                       {% if a_ingr contains 'root' or a_ingr contains 'children' %}
-                        {% assign meta_ingr_tag = addon_obj.metafields.custom.ingredients | default: addon_raw.ingredients | metafield_tag | strip_html | strip %}
+                        {% assign meta_ingr_tag = direct_addon.ingredients | default: addon_raw.ingredients | default: addon_obj.metafields.custom.ingredients | metafield_tag | strip_html | strip %}
                         {% if meta_ingr_tag != blank %}{% assign a_ingr = meta_ingr_tag %}{% endif %}
                       {% endif %}
 
@@ -938,10 +1056,10 @@
                       {% endif %}
 
                       {% comment %} 3. DYNAMIC ALLERGENS EXTRACTION FROM PRODUCT {% endcomment %}
-                      {% assign a_aller = addon_obj.metafields.custom.allergens.value | default: addon_obj.metafields.custom.allergens | default: direct_addon.allergens.value | default: direct_addon.allergens | default: addon_obj.metafields.shopify.allergens.value | default: addon_obj.metafields.shopify.allergens | default: addon_obj.metafields.food.allergens.value | default: addon_obj.metafields.food.allergens | default: addon_obj.metafields.nutrition.allergens.value | default: addon_obj.metafields.nutrition.allergens | default: addon_obj.metafields.details.allergens.value | default: addon_obj.metafields.details.allergens | default: addon_obj.metafields.my_fields.allergens.value | default: addon_obj.metafields.my_fields.allergens | default: addon_raw.allergens.value | default: addon_raw.allergens %}
+                      {% assign a_aller = direct_addon.allergens.value | default: direct_addon.allergens | default: addon_raw.allergens.value | default: addon_raw.allergens | default: addon_obj.metafields.custom.allergens.value | default: addon_obj.metafields.custom.allergens | default: addon_obj.metafields.shopify.allergens.value | default: addon_obj.metafields.shopify.allergens | default: addon_obj.metafields.food.allergens.value | default: addon_obj.metafields.food.allergens | default: addon_obj.metafields.nutrition.allergens.value | default: addon_obj.metafields.nutrition.allergens | default: addon_obj.metafields.details.allergens.value | default: addon_obj.metafields.details.allergens | default: addon_obj.metafields.my_fields.allergens.value | default: addon_obj.metafields.my_fields.allergens %}
 
                       {% if a_aller contains 'root' or a_aller contains 'children' %}
-                        {% assign meta_aller_tag = addon_obj.metafields.custom.allergens | default: addon_raw.allergens | metafield_tag | strip_html | strip %}
+                        {% assign meta_aller_tag = direct_addon.allergens | default: addon_raw.allergens | default: addon_obj.metafields.custom.allergens | metafield_tag | strip_html | strip %}
                         {% if meta_aller_tag != blank %}{% assign a_aller = meta_aller_tag %}{% endif %}
                       {% endif %}
 
@@ -958,23 +1076,49 @@
                       {% endif %}
 
                       {% comment %} 4. DYNAMIC NUTRITIONAL FACTS & MACROS FROM PRODUCT {% endcomment %}
-                      {% assign a_cals = addon_obj.metafields.custom.calories.value | default: addon_obj.metafields.custom.calories | default: direct_addon.calories.value | default: direct_addon.calories | default: direct_addon.energy_kcal.value | default: direct_addon.energy_kcal | default: addon_obj.metafields.nutrition.calories.value | default: addon_obj.metafields.nutrition.calories | default: addon_raw.calories.value | default: addon_raw.calories %}
-                      {% assign a_prot = addon_obj.metafields.custom.protein.value | default: addon_obj.metafields.custom.protein | default: direct_addon.protein.value | default: direct_addon.protein | default: addon_obj.metafields.nutrition.protein.value | default: addon_obj.metafields.nutrition.protein | default: addon_raw.protein.value | default: addon_raw.protein %}
-                      {% assign a_fat = addon_obj.metafields.custom.fat.value | default: addon_obj.metafields.custom.fat | default: direct_addon.fat.value | default: direct_addon.fat | default: addon_raw.fat.value | default: addon_raw.fat %}
-                      {% assign a_sat = addon_obj.metafields.custom.of_which_saturates.value | default: addon_obj.metafields.custom.saturates.value | default: direct_addon.of_which_saturates.value | default: direct_addon.saturates.value | default: addon_raw.saturates.value | default: addon_raw.saturates %}
-                      {% assign a_carbs = addon_obj.metafields.custom.carbohydrates.value | default: addon_obj.metafields.custom.carbs.value | default: direct_addon.carbohydrates.value | default: direct_addon.carbs.value | default: addon_raw.carbs.value | default: addon_raw.carbs %}
-                      {% assign a_sug = addon_obj.metafields.custom.of_which_sugars.value | default: addon_obj.metafields.custom.sugars.value | default: direct_addon.of_which_sugars.value | default: direct_addon.sugars.value | default: addon_raw.sugars.value | default: addon_raw.sugars %}
-                      {% assign a_fib = addon_obj.metafields.custom.fibre.value | default: addon_obj.metafields.custom.fiber.value | default: direct_addon.fibre.value | default: direct_addon.fiber.value | default: addon_raw.fibre.value | default: addon_raw.fibre %}
-                      {% assign a_salt = addon_obj.metafields.custom.salt.value | default: addon_obj.metafields.custom.salt | default: direct_addon.salt.value | default: direct_addon.salt | default: addon_raw.salt.value | default: addon_raw.salt %}
-                      {% assign a_serv = addon_obj.metafields.custom.serving_size.value | default: addon_obj.metafields.custom.serving_size | default: direct_addon.serving_size.value | default: direct_addon.serving_size | default: addon_raw.serving_size.value | default: addon_raw.serving_size %}
-                      {% assign a_kj = addon_obj.metafields.custom.energy.value | default: addon_obj.metafields.custom.energy | default: direct_addon.energy.value | default: direct_addon.energy | default: addon_raw.energy.value | default: addon_raw.energy %}
+                      {% assign a_energy_raw = direct_addon.energy.value | default: direct_addon.energy | default: addon_raw.energy.value | default: addon_raw.energy | default: addon_obj.metafields.custom.energy.value | default: addon_obj.metafields.custom.energy | default: addon_obj.metafields.custom.calories.value | default: addon_obj.metafields.custom.calories %}
+                      {% assign a_cals = nil %}
+                      {% assign a_kj = nil %}
+                      {% if a_energy_raw contains '/' %}
+                        {% assign a_e_parts = a_energy_raw | split: '/' %}
+                        {% assign a_kj = a_e_parts[0] | strip %}
+                        {% assign a_cals = a_e_parts[1] | strip %}
+                      {% elsif a_energy_raw contains 'kcal' %}
+                        {% assign a_cals = a_energy_raw | strip %}
+                      {% elsif a_energy_raw contains 'kj' or a_energy_raw contains 'kJ' %}
+                        {% assign a_kj = a_energy_raw | strip %}
+                      {% endif %}
+
+                      {% if a_cals == blank %}
+                        {% assign a_cals = direct_addon.calories.value | default: direct_addon.calories | default: direct_addon.energy_kcal.value | default: direct_addon.energy_kcal | default: addon_raw.calories.value | default: addon_raw.calories | default: addon_obj.metafields.custom.calories.value | default: addon_obj.metafields.custom.calories %}
+                      {% endif %}
+
+                      {% assign a_prot = direct_addon.protein.value | default: direct_addon.protein | default: addon_raw.protein.value | default: addon_raw.protein | default: addon_obj.metafields.custom.protein.value | default: addon_obj.metafields.custom.protein %}
+                      {% assign a_fat = direct_addon.fat.value | default: direct_addon.fat | default: addon_raw.fat.value | default: addon_raw.fat | default: addon_obj.metafields.custom.fat.value | default: addon_obj.metafields.custom.fat %}
+                      {% assign a_sat = direct_addon.of_which_saturates.value | default: direct_addon.of_which_saturates | default: direct_addon.saturates.value | default: direct_addon.saturates | default: addon_raw.of_which_saturates.value | default: addon_raw.of_which_saturates | default: addon_raw.saturates.value | default: addon_raw.saturates | default: addon_obj.metafields.custom.of_which_saturates.value | default: addon_obj.metafields.custom.saturates.value %}
+                      {% assign a_carbs = direct_addon.carbohydrates.value | default: direct_addon.carbohydrates | default: direct_addon.carbs.value | default: direct_addon.carbs | default: addon_raw.carbohydrates.value | default: addon_raw.carbohydrates | default: addon_raw.carbs.value | default: addon_raw.carbs | default: addon_obj.metafields.custom.carbohydrates.value | default: addon_obj.metafields.custom.carbs.value %}
+                      {% assign a_sug = direct_addon.of_which_sugars.value | default: direct_addon.of_which_sugars | default: direct_addon.sugars.value | default: direct_addon.sugars | default: addon_raw.of_which_sugars.value | default: addon_raw.of_which_sugars | default: addon_raw.sugars.value | default: addon_raw.sugars | default: addon_obj.metafields.custom.of_which_sugars.value | default: addon_obj.metafields.custom.sugars.value %}
+                      {% assign a_fib = direct_addon.fibre.value | default: direct_addon.fibre | default: direct_addon.fiber.value | default: direct_addon.fiber | default: addon_raw.fibre.value | default: addon_raw.fibre | default: addon_raw.fiber.value | default: addon_raw.fiber | default: addon_obj.metafields.custom.fibre.value | default: addon_obj.metafields.custom.fiber.value %}
+                      {% assign a_salt = direct_addon.salt.value | default: direct_addon.salt | default: addon_raw.salt.value | default: addon_raw.salt | default: addon_obj.metafields.custom.salt.value | default: addon_obj.metafields.custom.salt %}
+                      {% assign a_serv = direct_addon.serving_size.value | default: direct_addon.serving_size | default: addon_raw.serving_size.value | default: addon_raw.serving_size | default: addon_obj.metafields.custom.serving_size.value | default: addon_obj.metafields.custom.serving_size %}
 
                       {% comment %} Extract via field iterator for direct metaobject Drops {% endcomment %}
                       {% if addon_raw.fields %}
                         {% for field in addon_raw.fields %}
+                          {% if field.key == 'energy' and field.value != blank %}
+                            {% assign f_energy = field.value | strip %}
+                            {% if f_energy contains '/' %}
+                              {% assign f_e_parts = f_energy | split: '/' %}
+                              {% if a_kj == blank %}{% assign a_kj = f_e_parts[0] | strip %}{% endif %}
+                              {% if a_cals == blank %}{% assign a_cals = f_e_parts[1] | strip %}{% endif %}
+                            {% elsif f_energy contains 'kcal' %}
+                              {% if a_cals == blank %}{% assign a_cals = f_energy %}{% endif %}
+                            {% else %}
+                              {% if a_kj == blank %}{% assign a_kj = f_energy %}{% endif %}
+                            {% endif %}
+                          {% endif %}
                           {% if field.key == 'calories' and field.value != blank and a_cals == blank %}{% assign a_cals = field.value %}{% endif %}
                           {% if field.key == 'protein' and field.value != blank and a_prot == blank %}{% assign a_prot = field.value %}{% endif %}
-                          {% if field.key == 'energy' and field.value != blank and a_kj == blank %}{% assign a_kj = field.value %}{% endif %}
                           {% if field.key == 'fat' and field.value != blank and a_fat == blank %}{% assign a_fat = field.value %}{% endif %}
                           {% if field.key == 'of_which_saturates' or field.key == 'saturates' and field.value != blank and a_sat == blank %}{% assign a_sat = field.value %}{% endif %}
                           {% if field.key == 'carbohydrates' or field.key == 'carbs' and field.value != blank and a_carbs == blank %}{% assign a_carbs = field.value %}{% endif %}
@@ -1000,24 +1144,24 @@
                         {% if a_sat == blank %}{% assign a_sat = '2.8g' %}{% endif %}
                         {% if a_carbs == blank %}{% assign a_carbs = '40.7g' %}{% endif %}
                         {% if a_sug == blank %}{% assign a_sug = '20.7g' %}{% endif %}
-                        {% if a_fib == blank %}{% assign a_fib = '5.5g' %}{% endif %}
-                        {% if a_salt == blank %}{% assign a_salt = '0.30g' %}{% endif %}
+                        {% if a_fib == blank %}{% assign a_fib = '5.0g' %}{% endif %}
+                        {% if a_salt == blank %}{% assign a_salt = '0.35g' %}{% endif %}
                         {% if a_serv == blank %}{% assign a_serv = 'Per Pot (300g)' %}{% endif %}
                         {% if a_kj == blank %}{% assign a_kj = '1782 kJ' %}{% endif %}
                       {% elsif down_at contains 'biscoff' %}
-                        {% if a_desc == blank %}{% assign a_desc = 'Rich, creamy overnight oats infused with Lotus Biscoff spread, layered with vanilla whey protein and topped with crushed caramelized Biscoff biscuit crumbs.' %}{% endif %}
-                        {% if a_ingr == blank %}{% assign a_ingr = 'Rolled Oats (Gluten) (38%), Skimmed Milk (24%), Greek Style Yoghurt (Milk) (14%), Whey Protein Concentrate (Milk, Soy Lecithin) (10%), Lotus Biscoff Spread (8%) (Caramelised Biscuits (Wheat Flour, Sugar, Vegetable Oils, Candy Sugar Syrup, Raising Agent, Soya Flour, Salt, Cinnamon), Rapeseed Oil, Sugar, Emulsifier (Soya Lecithin), Acid (Citric Acid)), Chia Seeds, Crushed Biscoff Biscuit (Wheat, Soya).' %}{% endif %}
-                        {% if a_aller == blank %}{% assign a_aller = 'Milk, Gluten (Wheat, Oats), Soya' %}{% endif %}
-                        {% if a_cals == blank %}{% assign a_cals = '445 kcal' %}{% endif %}
+                        {% if a_desc == blank %}{% assign a_desc = 'Creamy overnight oats blended with premium whey protein, Greek yoghurt and chia seeds. Topped with a drizzle of Biscoff spread and biscuit crumb.' %}{% endif %}
+                        {% if a_ingr == blank %}{% assign a_ingr = 'Porridge Oats, Whey Protein (Milk, Soya), 0% Fat Greek Yoghurt (Milk), Semi Skimmed Milk, Chia Seeds, Lotus Biscoff Biscuit & Spread [Wheat Flour, Sugar, Vegetable Oils (Palm Oil, Rapeseed Oil), Soya Flour, Emulsifier (Soya Lecithin), Salt, Cinnamon], Chia Seeds.' %}{% endif %}
+                        {% if a_aller == blank %}{% assign a_aller = 'Oats, Milk, Soya, Wheat' %}{% endif %}
+                        {% if a_cals == blank %}{% assign a_cals = '493 kcal' %}{% endif %}
                         {% if a_prot == blank %}{% assign a_prot = '31g' %}{% endif %}
-                        {% if a_fat == blank %}{% assign a_fat = '10.5g' %}{% endif %}
-                        {% if a_sat == blank %}{% assign a_sat = '3.2g' %}{% endif %}
-                        {% if a_carbs == blank %}{% assign a_carbs = '58g' %}{% endif %}
-                        {% if a_sug == blank %}{% assign a_sug = '16g' %}{% endif %}
-                        {% if a_fib == blank %}{% assign a_fib = '5.5g' %}{% endif %}
+                        {% if a_fat == blank %}{% assign a_fat = '15.3g' %}{% endif %}
+                        {% if a_sat == blank %}{% assign a_sat = '4.2g' %}{% endif %}
+                        {% if a_carbs == blank %}{% assign a_carbs = '46.4g' %}{% endif %}
+                        {% if a_sug == blank %}{% assign a_sug = '20.7g' %}{% endif %}
+                        {% if a_fib == blank %}{% assign a_fib = '8.8g' %}{% endif %}
                         {% if a_salt == blank %}{% assign a_salt = '0.38g' %}{% endif %}
                         {% if a_serv == blank %}{% assign a_serv = 'Per Pot (300g)' %}{% endif %}
-                        {% if a_kj == blank %}{% assign a_kj = '1870 kJ' %}{% endif %}
+                        {% if a_kj == blank %}{% assign a_kj = '2062 kJ' %}{% endif %}
                       {% elsif down_at contains 'raspberry' and (down_at contains 'oats' or down_at contains 'choc') %}
                         {% if a_desc == blank %}{% assign a_desc = 'Creamy protein overnight oats folded with juicy tart raspberries, vanilla whey protein, and delicate Belgian white chocolate curls.' %}{% endif %}
                         {% if a_ingr == blank %}{% assign a_ingr = 'Rolled Oats (Gluten) (40%), Skimmed Milk (24%), Greek Style Yoghurt (Milk) (14%), Whey Protein Concentrate (Milk, Soy Lecithin) (10%), Fresh Raspberries (7%), White Chocolate Curls (Milk, Soya, Sugar, Cocoa Butter, Whole Milk Powder) (3%), Chia Seeds (2%).' %}{% endif %}
@@ -1250,13 +1394,13 @@
                 {% endraw %}
                   <!-- Fallback Addons passed from Express Server -->
                   {% for addon in addons %}
-                    {% assign fb_cals = addon.metafields.custom.calories.value | default: addon.metafields.custom.calories | default: addon.macros.calories | default: addon.calories %}
-                    {% assign fb_prot = addon.metafields.custom.protein.value | default: addon.metafields.custom.protein | default: addon.macros.protein | default: addon.protein %}
+                    {% assign fb_cals = addon.metafields.custom.calories.value | default: addon.metafields.custom.calories | default: addon.nutrition.energyKcal | default: addon.macros.calories | default: addon.calories %}
+                    {% assign fb_prot = addon.metafields.custom.protein.value | default: addon.metafields.custom.protein | default: addon.nutrition.protein | default: addon.macros.protein | default: addon.protein %}
                     {% assign fb_desc = addon.metafields.custom.short_description.value | default: addon.metafields.custom.short_description | default: addon.metafields.custom.description.value | default: addon.metafields.custom.description | default: addon.description %}
                     {% assign fb_ingr = addon.metafields.custom.ingredients.value | default: addon.metafields.custom.ingredients | default: addon.ingredients %}
                     {% assign fb_aller = addon.metafields.custom.allergens.value | default: addon.metafields.custom.allergens | default: addon.allergens %}
-                    {% assign fb_carbs = addon.metafields.custom.carbohydrates.value | default: addon.metafields.custom.carbs.value | default: addon.macros.carbs %}
-                    {% assign fb_fat = addon.metafields.custom.fat.value | default: addon.macros.fat %}
+                    {% assign fb_carbs = addon.metafields.custom.carbohydrates.value | default: addon.metafields.custom.carbs.value | default: addon.nutrition.carbs | default: addon.macros.carbs %}
+                    {% assign fb_fat = addon.metafields.custom.fat.value | default: addon.nutrition.fat | default: addon.macros.fat %}
                     {% assign fb_sat = addon.metafields.custom.of_which_saturates.value | default: addon.nutrition.saturates %}
                     {% assign fb_sug = addon.metafields.custom.of_which_sugars.value | default: addon.nutrition.sugars %}
                     {% assign fb_fib = addon.metafields.custom.fibre.value | default: addon.nutrition.fibre %}
@@ -1689,22 +1833,22 @@
         ingredients: cleanIngredients(card.getAttribute('data-ingredients')) || 'Fresh natural ingredients prepared by Gimmie chefs.',
         allergens: cleanIngredients(card.getAttribute('data-allergens')) || 'None',
         macros: {
-          calories: card.getAttribute('data-cals') || '520 kcal',
-          protein: card.getAttribute('data-prot') || '42g Protein',
-          carbs: card.getAttribute('data-carbs') || '45g Carbs',
-          fat: card.getAttribute('data-fat') || '14g Fat'
+          calories: card.getAttribute('data-cals') || '',
+          protein: card.getAttribute('data-prot') || '',
+          carbs: card.getAttribute('data-carbs') || '',
+          fat: card.getAttribute('data-fat') || ''
         },
         nutrition: {
-          serving: card.getAttribute('data-serving') || 'Per Serving (420g)',
-          energyKj: card.getAttribute('data-kj') || '2180 kJ',
-          energyKcal: card.getAttribute('data-cals') || '520 kcal',
-          protein: card.getAttribute('data-prot') || '42g',
-          fat: card.getAttribute('data-fat') || '14.0g',
-          saturates: card.getAttribute('data-saturates') || '3.5g',
-          carbs: card.getAttribute('data-carbs') || '45.0g',
-          sugars: card.getAttribute('data-sugars') || '6.0g',
-          fibre: card.getAttribute('data-fibre') || '5.0g',
-          salt: card.getAttribute('data-salt') || '1.20g'
+          serving: card.getAttribute('data-serving') || 'Per Serving',
+          energyKj: card.getAttribute('data-kj') || '',
+          energyKcal: card.getAttribute('data-cals') || '',
+          protein: card.getAttribute('data-prot') || '',
+          fat: card.getAttribute('data-fat') || '',
+          saturates: card.getAttribute('data-saturates') || '',
+          carbs: card.getAttribute('data-carbs') || '',
+          sugars: card.getAttribute('data-sugars') || '',
+          fibre: card.getAttribute('data-fibre') || '',
+          salt: card.getAttribute('data-salt') || ''
         }
       });
     });
@@ -1753,22 +1897,22 @@
         ingredients: cleanRichIngredients(card.getAttribute('data-ingredients')) || 'Fresh, wholesome ingredients.',
         allergens: cleanIngredients(card.getAttribute('data-allergens')) || 'None',
         macros: {
-          calories: card.getAttribute('data-cals') || '320 kcal',
-          protein: card.getAttribute('data-prot') || '14g Protein',
-          carbs: card.getAttribute('data-carbs') || '35g Carbs',
-          fat: card.getAttribute('data-fat') || '10g Fat'
+          calories: card.getAttribute('data-cals') || '',
+          protein: card.getAttribute('data-prot') || '',
+          carbs: card.getAttribute('data-carbs') || '',
+          fat: card.getAttribute('data-fat') || ''
         },
         nutrition: {
           serving: card.getAttribute('data-serving') || 'Per Serving',
-          energyKj: card.getAttribute('data-kj') || '1340 kJ',
-          energyKcal: card.getAttribute('data-cals') || '320 kcal',
-          protein: card.getAttribute('data-prot') || '14g',
-          fat: card.getAttribute('data-fat') || '10.0g',
-          saturates: card.getAttribute('data-saturates') || '2.5g',
-          carbs: card.getAttribute('data-carbs') || '35.0g',
-          sugars: card.getAttribute('data-sugars') || '8.0g',
-          fibre: card.getAttribute('data-fibre') || '5.0g',
-          salt: card.getAttribute('data-salt') || '0.20g'
+          energyKj: card.getAttribute('data-kj') || '',
+          energyKcal: card.getAttribute('data-cals') || '',
+          protein: card.getAttribute('data-prot') || '',
+          fat: card.getAttribute('data-fat') || '',
+          saturates: card.getAttribute('data-saturates') || '',
+          carbs: card.getAttribute('data-carbs') || '',
+          sugars: card.getAttribute('data-sugars') || '',
+          fibre: card.getAttribute('data-fibre') || '',
+          salt: card.getAttribute('data-salt') || ''
         }
       });
     });
@@ -2435,46 +2579,179 @@
 
       if (!item) return;
 
+      // Extract raw values prioritizing clicked card DOM data-attributes
+      const rawTitle = (card ? card.getAttribute('data-title') : '') || item.title || '';
+      const rawImage = (card ? card.getAttribute('data-image') : '') || item.image || '';
+      const rawDescVal = (card ? card.getAttribute('data-desc') : '') || item.description || '';
+      const rawIngVal = (card ? card.getAttribute('data-ingredients') : '') || item.ingredients || '';
+      const rawAllerVal = (card ? card.getAttribute('data-allergens') : '') || item.allergens || '';
+
       // Populate Image
       const modalImg = document.getElementById('gimmie-modal-image');
       const modalImgWrap = document.getElementById('gimmie-modal-image-wrap');
       if (modalImg && modalImgWrap) {
-        if (item.image) {
-          modalImg.src = item.image;
-          modalImg.alt = item.title || '';
+        if (rawImage) {
+          modalImg.src = rawImage;
+          modalImg.alt = rawTitle;
           modalImgWrap.style.display = 'block';
         } else {
           modalImgWrap.style.display = 'none';
         }
       }
 
-      const titleLower = (item.title || '').toLowerCase();
+      const titleLower = rawTitle.toLowerCase();
 
       // Check if product has dynamic ingredients, description, or allergens already passed from Shopify
-      let cleanDesc = cleanIngredients(item.description);
-      let cleanIng = cleanIngredients(item.ingredients);
-      let cleanAller = cleanIngredients(item.allergens);
+      let cleanDesc = cleanIngredients(rawDescVal);
+      let cleanIng = cleanRichIngredients(rawIngVal);
+      let cleanAller = cleanIngredients(rawAllerVal);
 
       const hasDynamicDesc = cleanDesc && cleanDesc.length > 10 && !cleanDesc.includes('root') && !cleanDesc.includes('Freshly prepared delicious');
       const hasDynamicIng = cleanIng && cleanIng.length > 5 && !cleanIng.includes('wholesome') && !cleanIng.includes('Fresh natural whole') && !cleanIng.includes('Fresh, wholesome');
       const hasDynamicAller = cleanAller && cleanAller !== 'None' && cleanAller !== '';
 
       // If ingredients or allergens are embedded inside product description HTML, extract them dynamically
-      if (!hasDynamicIng && item.description) {
-        const ingMatch = item.description.match(/ingredients?:?\s*([^.\n<]+(?:\.[^.\n<]+)*)/i);
+      if (!hasDynamicIng && rawDescVal) {
+        const ingMatch = rawDescVal.match(/ingredients?:?\s*([^.\n<]+(?:\.[^.\n<]+)*)/i);
         if (ingMatch && ingMatch[1] && ingMatch[1].trim().length > 5) {
           cleanIng = ingMatch[1].trim();
         }
       }
-      if (!hasDynamicAller && item.description) {
-        const allerMatch = item.description.match(/allergens?:?\s*([^.\n<]+)/i);
+      if (!hasDynamicAller && rawDescVal) {
+        const allerMatch = rawDescVal.match(/allergens?:?\s*([^.\n<]+)/i);
         if (allerMatch && allerMatch[1] && allerMatch[1].trim().length > 1) {
           cleanAller = allerMatch[1].trim();
         }
       }
 
       let fallbackDish = null;
-      if (titleLower.includes('blueberry') && (titleLower.includes('oats') || titleLower.includes('lemon'))) {
+      if (titleLower.includes('thai') || (titleLower.includes('red') && titleLower.includes('curry'))) {
+        fallbackDish = {
+          desc: 'Aromatic Thai red coconut chicken curry with fresh red peppers and mangetout. Served alongside fluffy jasmine rice.',
+          ingredients: 'Chicken Breast, Jasmine Rice, Reduced Fat Coconut Milk, Mangetout, Red Pepper, Onion, Red Curry Paste (Dried Red Chilli, Garlic, Shrimp Paste (Crustaceans), Galangal, Lemongrass, Shallot, Lime), Olive Oil, Fresh Coriander, Salt, Black Pepper.',
+          allergens: 'Crustaceans',
+          nutrition: {
+            serving: 'Per Serving (450g)',
+            energyKj: '2502 kJ',
+            energyKcal: '598 kcal',
+            fat: '17.8g',
+            saturates: '11.7g',
+            carbs: '53.3g',
+            sugars: '8.7g',
+            fibre: '3.3g',
+            protein: '60.0g',
+            salt: '1.67g'
+          }
+        };
+      } else if (titleLower.includes('rigatoni') || (titleLower.includes('sausage') && titleLower.includes('ragu'))) {
+        fallbackDish = {
+          desc: 'Slow-cooked sausage ragu in a rich tomato sauce, infused with rosemary and thyme. Served with rigatoni, fresh basil and a dusting of parmesan.',
+          ingredients: 'Rigatoni Pasta (Wheat), Lincolnshire Sausage (Sulphites), Chopped Tomatoes, Tomato Purée, Beef Stock (Celery), Onions, Garlic, Extra Virgin Olive Oil, Fresh Rosemary, Fresh Thyme, Fresh Basil, Parmesan Cheese (Milk), Sea Salt, Black Pepper.',
+          allergens: 'Wheat, Milk, Celery, Sulphites',
+          nutrition: {
+            serving: 'Per Serving (450g)',
+            energyKj: '2548 kJ',
+            energyKcal: '609 kcal',
+            fat: '27.3g',
+            saturates: '9.1g',
+            carbs: '60.9g',
+            sugars: '10.2g',
+            fibre: '5.0g',
+            protein: '28.0g',
+            salt: '2.01g'
+          }
+        };
+      } else if (titleLower.includes('tarragon')) {
+        fallbackDish = {
+          desc: 'Oven-roasted tarragon chicken breast with crispy Hasselback baby potatoes and tender asparagus, served in a creamy garlic mushroom sauce.',
+          ingredients: 'Chicken Breast, Baby Potato, White Mushroom, Asparagus, Shallot, Light Creme Fraiche (Milk), Wholegrain Mustard (Mustard), White Wine Reduction (Sulphites), Fresh Tarragon, Garlic, Olive Oil, Sea Salt, Cracked Black Pepper.',
+          allergens: 'Milk, Mustard, Sulphites',
+          nutrition: {
+            serving: 'Per Serving (450g)',
+            energyKj: '1732 kJ',
+            energyKcal: '414 kcal',
+            fat: '8.0g',
+            saturates: '1.7g',
+            carbs: '31.3g',
+            sugars: '4.9g',
+            fibre: '4.8g',
+            protein: '56.0g',
+            salt: '0.81g'
+          }
+        };
+      } else if (titleLower.includes('hoisin')) {
+        fallbackDish = {
+          desc: 'Sticky beef in a hoisin-soy glaze over fluffy basmati rice with a side of fresh cucumber ribbons. Finished with red chillies, spring onion and sesame seeds.',
+          ingredients: 'Lean Beef Mince (5% fat), Basmati Rice, Cucumber, Spring Onion, Red Chilli Pepper, Hoisin Sauce (Soya, Sesame, Wheat), Tamari Soy Sauce (Soya), Sesame Seeds, Garlic, Ginger, Pure Honey, Black Pepper.',
+          allergens: 'Soya, Sesame, Wheat',
+          nutrition: {
+            serving: 'Per Serving (430g)',
+            energyKj: '1740 kJ',
+            energyKcal: '416 kcal',
+            fat: '10.4g',
+            saturates: '3.8g',
+            carbs: '42.8g',
+            sugars: '6.9g',
+            fibre: '1.5g',
+            protein: '42.0g',
+            salt: '3.23g'
+          }
+        };
+      } else if (titleLower.includes('gnocchi') || titleLower.includes('bolognese')) {
+        fallbackDish = {
+          desc: 'Fluffy potato gnocchi tossed in a rich, slow-simmered beef Bolognese sauce, topped with parmesan and fresh parsley.',
+          ingredients: 'Lean Beef Mince (5% fat), Gnocchi (Fresh Potatoes, Wheat Flour, Salt, Sunflower Oil), Chopped Tomatoes, Onion, Parmesan Cheese (Milk), Beef Stock (Celery), Tomato Purée, Worcestershire Sauce (Fish, Barley), Garlic, Olive Oil, Fresh Parsley, Oregano, Black Pepper. May contain: Soy, Mustard.',
+          allergens: 'Wheat, Milk, Celery, Fish, Barley',
+          nutrition: {
+            serving: 'Per Serving (420g)',
+            energyKj: '1627 kJ',
+            energyKcal: '389 kcal',
+            fat: '10.2g',
+            saturates: '4.1g',
+            carbs: '36.5g',
+            sugars: '11.1g',
+            fibre: '5.4g',
+            protein: '36.0g',
+            salt: '2.01g'
+          }
+        };
+      } else if (titleLower.includes('fajita')) {
+        fallbackDish = {
+          desc: 'Juicy chicken breast, mixed peppers and onions tossed in smoky Mexican spices. Served over zesty coriander and lime rice and a side of slow-simmered black beans.',
+          ingredients: 'Chicken Breast, Basmati Rice, Pepper, Onion, Black Beans, Chopped Tomatoes, Lime, Olive Oil, Fresh Coriander, Sea Salt, Fajita Seasoning.',
+          allergens: 'None',
+          nutrition: {
+            serving: 'Per Serving (450g)',
+            energyKj: '1744 kJ',
+            energyKcal: '417 kcal',
+            fat: '6.6g',
+            saturates: '1.4g',
+            carbs: '45.5g',
+            sugars: '7.4g',
+            fibre: '4.6g',
+            protein: '46.0g',
+            salt: '0.33g'
+          }
+        };
+      } else if (titleLower.includes('biscoff')) {
+        fallbackDish = {
+          desc: 'Creamy overnight oats blended with premium whey protein, Greek yoghurt and chia seeds. Topped with a drizzle of Biscoff spread and biscuit crumb.',
+          ingredients: 'Porridge Oats, Whey Protein (Milk, Soya), 0% Fat Greek Yoghurt (Milk), Semi Skimmed Milk, Chia Seeds, Lotus Biscoff Biscuit & Spread [Wheat Flour, Sugar, Vegetable Oils (Palm Oil, Rapeseed Oil), Soya Flour, Emulsifier (Soya Lecithin), Salt, Cinnamon], Chia Seeds.',
+          allergens: 'Oats, Milk, Soya, Wheat',
+          nutrition: {
+            serving: 'Per Pot (300g)',
+            energyKj: '2062 kJ',
+            energyKcal: '493 kcal',
+            fat: '15.3g',
+            saturates: '4.2g',
+            carbs: '46.4g',
+            sugars: '20.7g',
+            fibre: '8.8g',
+            protein: '31.0g',
+            salt: '0.38g'
+          }
+        };
+      } else if (titleLower.includes('blueberry') && (titleLower.includes('oats') || titleLower.includes('lemon'))) {
         fallbackDish = {
           desc: 'Creamy overnight oats blended with premium whey protein, Greek yoghurt and chia seeds. Loaded with blueberries and lemon zest.',
           ingredients: 'Porridge <strong>Oats</strong>, Whey Protein (<strong>Milk, Soya</strong>), 0% Fat Greek Yoghurt (<strong>Milk</strong>), Semi Skimmed <strong>Milk</strong>, Chia Seeds, Blueberries, Lemon Zest.<br><br>May contain: <strong>Peanuts, Nuts, Sesame</strong>.',
@@ -2487,27 +2764,9 @@
             saturates: '2.8g',
             carbs: '40.7g',
             sugars: '20.7g',
-            fibre: '5.5g',
+            fibre: '5.0g',
             protein: '32.0g',
-            salt: '0.30g'
-          }
-        };
-      } else if (titleLower.includes('biscoff')) {
-        fallbackDish = {
-          desc: 'Rich, creamy overnight oats infused with Lotus Biscoff spread, layered with vanilla whey protein and topped with crushed caramelized Biscoff biscuit crumbs.',
-          ingredients: 'Rolled Oats (Gluten) (38%), Skimmed Milk (24%), Greek Style Yoghurt (Milk) (14%), Whey Protein Concentrate (Milk, Soy Lecithin) (10%), Lotus Biscoff Spread (8%) (Caramelised Biscuits (Wheat Flour, Sugar, Vegetable Oils, Candy Sugar Syrup, Raising Agent, Soya Flour, Salt, Cinnamon), Rapeseed Oil, Sugar, Emulsifier (Soya Lecithin), Acid (Citric Acid)), Chia Seeds, Crushed Biscoff Biscuit (Wheat, Soya).',
-          allergens: 'Milk, Gluten (Wheat, Oats), Soya',
-          nutrition: {
-            serving: 'Per Pot (300g)',
-            energyKj: '1870 kJ',
-            energyKcal: '445 kcal',
-            fat: '10.5g',
-            saturates: '3.2g',
-            carbs: '58.0g',
-            sugars: '16.0g',
-            fibre: '5.5g',
-            protein: '31.0g',
-            salt: '0.38g'
+            salt: '0.35g'
           }
         };
       } else if (titleLower.includes('raspberry') && (titleLower.includes('oats') || titleLower.includes('choc'))) {
@@ -2546,12 +2805,6 @@
             salt: '1.20g'
           }
         };
-      } else if (titleLower.includes('tarragon')) {
-        fallbackDish = {
-          desc: 'Pan-seared tender British chicken breast in a velvety French tarragon, white wine and light cream reduction, served with roasted baby potatoes and steamed seasonal vegetables.',
-          ingredients: 'British Chicken Breast (42%), Roasted Baby Potatoes (30%), Green Beans (16%), Double Cream (Milk), Shallots, White Wine Reduction (Sulphites), Fresh Tarragon, Garlic, Dijon Mustard (Mustard), Olive Oil, Sea Salt, Cracked Black Pepper.',
-          allergens: 'Milk, Mustard, Sulphites'
-        };
       } else if (titleLower.includes('poke') || titleLower.includes('salmon poke')) {
         fallbackDish = {
           desc: 'Flaked roasted Scottish salmon over seasoned sushi rice with edamame beans, crunchy cucumber, pickled ginger and a toasted sesame soy dressing.',
@@ -2563,30 +2816,6 @@
           desc: 'Spicy Cajun chicken and chorizo penne, tossed in a creamy sauce with mushrooms and garden peas. Finished with fresh parsley and parmesan.',
           ingredients: 'Chicken Breast (35%), Penne Pasta (Durum Wheat Semolina), Double Cream (Milk), Chorizo (Pork, Paprika, Salt, Garlic), Mushrooms, Peas, Parmesan (Milk), Cajun Seasoning, Celery Salt, Mustard Seed.',
           allergens: 'Wheat, Milk, Celery, Mustard'
-        };
-      } else if (titleLower.includes('ginger') || titleLower.includes('basil beef')) {
-        fallbackDish = {
-          desc: 'Tender sliced British grass-fed beef tossed with fragrant Thai holy basil, ginger root, mangetout, and sweet peppers in a savoury tamari garlic glaze, served with fragrant jasmine rice.',
-          ingredients: 'British Grass-Fed Beef (38%), Steamed Jasmine Rice (32%), Thai Holy Basil, Ginger Root, Mangetout, Red Peppers, Tamari Soy Sauce (Soya), Toasted Sesame Oil, Garlic.',
-          allergens: 'Soya, Sesame, Wheat'
-        };
-      } else if (titleLower.includes('korean') || titleLower.includes('beef noodles')) {
-        fallbackDish = {
-          desc: 'A sweet and spicy balance of minced beef, wok-fired egg noodles and crunchy beansprouts. Tossed in a sticky gochujang glaze with vibrant peppers, fresh spring onions and sesame seeds.',
-          ingredients: 'Egg Noodles (Wheat, Egg), British Minced Beef (35%), Gochujang Chili Paste, Soya Sauce, Beansprouts, Red Bell Peppers, Spring Onions, Sesame Seeds.',
-          allergens: 'Egg, Wheat, Soya, Sesame'
-        };
-      } else if (titleLower.includes('tuscan') || titleLower.includes('creamy tuscan')) {
-        fallbackDish = {
-          desc: 'Succulent sliced chicken breast in a creamy sun-dried tomato, spinach, and garlic sauce, served alongside crushed baby new potatoes.',
-          ingredients: 'British Chicken Breast (42%), Baby Potatoes (30%), Spinach, Sun-Dried Tomatoes, Double Cream (Milk), Garlic, Parmesan (Milk), Oregano, Black Pepper.',
-          allergens: 'Milk'
-        };
-      } else if (titleLower.includes('lemon') && titleLower.includes('herb')) {
-        fallbackDish = {
-          desc: 'Tender marinated chargrilled chicken breast in lemon zest and Mediterranean garden herbs, served with roasted garlic baby potatoes and steamed green beans.',
-          ingredients: 'British Chicken Breast (40%), Roasted Baby Potatoes (32%), Fine Green Beans (20%), Lemon Juice & Zest, Olive Oil, Oregano, Thyme, Garlic, Sea Salt.',
-          allergens: 'None'
         };
       } else if (titleLower.includes('oats') || titleLower.includes('porridge')) {
         fallbackDish = {
@@ -2606,24 +2835,6 @@
             salt: '0.25g'
           }
         };
-      } else if (titleLower.includes('brownie') || titleLower.includes('cookie') || titleLower.includes('bar') || titleLower.includes('snack') || titleLower.includes('ball')) {
-        fallbackDish = {
-          desc: (item.description && item.description.length > 20 && !item.description.includes('root') && !item.description.includes('gourmet')) ? item.description : 'Wholesome, chef-made high protein snack crafted for a guilt-free energy boost.',
-          ingredients: 'Oat Flour, Whey Protein Isolate (Milk, Soya), Dates, Cocoa Powder, Dark Chocolate Drops, Almond Butter (Nuts), Sea Salt.',
-          allergens: 'Milk, Soya, Nuts, Gluten (Oats)',
-          nutrition: {
-            serving: 'Per Item (85g)',
-            energyKj: '1150 kJ',
-            energyKcal: '275 kcal',
-            fat: '9.0g',
-            saturates: '3.0g',
-            carbs: '28.0g',
-            sugars: '12.0g',
-            fibre: '4.5g',
-            protein: '20.0g',
-            salt: '0.15g'
-          }
-        };
       }
 
       // Dynamic regex extraction from product description for custom/new store products
@@ -2639,7 +2850,7 @@
         }
       }
 
-      if (modalTitle) modalTitle.textContent = item.title;
+      if (modalTitle) modalTitle.textContent = rawTitle || item.title;
 
       // 1. Description: Prioritize 100% Dynamic Product Description from Metafield
       if (modalDesc) {
@@ -2660,21 +2871,21 @@
       // 2. Ingredients: Prioritize 100% Dynamic Product Ingredients from Metafield (Rich HTML preserved)
       const ingredientsEl = document.getElementById('gimmie-modal-ingredients');
       if (ingredientsEl) {
-        let rawIng = item.ingredients || cleanRichIngredients(card ? card.getAttribute('data-ingredients') : '');
+        let rawIng = rawIngVal || item.ingredients || '';
         if (rawIng && rawIng.length > 5 && !rawIng.includes('wholesome ingredients') && !rawIng.includes('Fresh, wholesome') && !rawIng.includes('root')) {
           ingredientsEl.innerHTML = cleanRichIngredients(rawIng);
         } else if (fallbackDish && fallbackDish.ingredients) {
           ingredientsEl.innerHTML = fallbackDish.ingredients;
         } else {
-          ingredientsEl.innerHTML = rawIng || 'Fresh natural ingredients prepared in our kitchen.';
+          ingredientsEl.innerHTML = cleanRichIngredients(rawIng) || 'Fresh natural ingredients prepared in our kitchen.';
         }
       }
 
       // 3. Allergens: Prioritize 100% Dynamic Product Allergens from Metafield (Exact build-your-box style, no warning emoji)
       if (modalAllergens) {
-        let rawAller = item.allergens || cleanIngredients(card ? card.getAttribute('data-allergens') : '');
+        let rawAller = rawAllerVal || item.allergens || '';
         if (rawAller && rawAller !== 'None' && rawAller !== '' && !rawAller.includes('root')) {
-          modalAllergens.textContent = rawAller;
+          modalAllergens.textContent = cleanIngredients(rawAller);
         } else if (fallbackDish && fallbackDish.allergens && fallbackDish.allergens !== 'None') {
           modalAllergens.textContent = fallbackDish.allergens;
         } else {
@@ -2684,67 +2895,81 @@
 
       // 4. Nutritional facts: Check if item has dynamic nutrition attributes from Shopify Metafield
       const rawNutr = item.nutrition || {};
-      const hasDynamicNutr = rawNutr && (
-        (rawNutr.energyKcal && rawNutr.energyKcal !== '-' && rawNutr.energyKcal !== '320 kcal') ||
-        (rawNutr.energyKj && rawNutr.energyKj !== '-' && rawNutr.energyKj !== '1340 kJ') ||
-        (rawNutr.fat && rawNutr.fat !== '-' && rawNutr.fat !== '10.0g') ||
-        (rawNutr.carbs && rawNutr.carbs !== '-' && rawNutr.carbs !== '35.0g') ||
-        (rawNutr.saturates && rawNutr.saturates !== '-' && rawNutr.saturates !== '2.5g')
-      );
+      const c = card;
+      const cardVal = (attr) => (c ? c.getAttribute(attr) : '') || '';
 
-      const n = (hasDynamicNutr ? rawNutr : null) || (fallbackDish && fallbackDish.nutrition) || rawNutr || (item.macros ? {
-        energyKcal: item.macros.calories,
-        protein: item.macros.protein,
-        carbs: item.macros.carbs,
-        fat: item.macros.fat
-      } : null);
+      const rawKj = cardVal('data-kj') || rawNutr.energyKj || rawNutr.kj || '';
+      const rawCals = cardVal('data-cals') || rawNutr.energyKcal || rawNutr.calories || (item.macros && item.macros.calories) || '';
+      const rawFat = cardVal('data-fat') || rawNutr.fat || (item.macros && item.macros.fat) || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.fat) || '';
+      const rawSat = cardVal('data-saturates') || rawNutr.saturates || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.saturates) || '';
+      const rawCarbs = cardVal('data-carbs') || rawNutr.carbs || (item.macros && item.macros.carbs) || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.carbs) || '';
+      const rawSug = cardVal('data-sugars') || rawNutr.sugars || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.sugars) || '';
+      const rawFib = cardVal('data-fibre') || rawNutr.fibre || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.fibre) || '';
+      const rawProt = cardVal('data-prot') || rawNutr.protein || (item.macros && item.macros.protein) || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.protein) || '';
+      const rawSalt = cardVal('data-salt') || rawNutr.salt || (fallbackDish && fallbackDish.nutrition && fallbackDish.nutrition.salt) || '';
 
-      if (modalTableBody && n) {
-        let cleanKj = (n.energyKj || n.kj || '').replace(/kj/i, '').trim();
-        let cleanKcal = (n.energyKcal || n.calories || '').replace(/kcal/i, '').replace(/cals?/i, '').trim();
+      let energyDisplay = '';
+      const combinedEnergy = (rawKj && rawKj.includes('/')) ? rawKj : ((rawCals && rawCals.includes('/')) ? rawCals : '');
+      if (combinedEnergy) {
+        energyDisplay = combinedEnergy.replace(/\s+/g, ' ').trim();
+      } else {
+        let cleanKjNum = null;
+        let cleanKcalNum = null;
 
-        if ((!cleanKj || cleanKj === '-') && cleanKcal && cleanKcal !== '-') {
-          const numKcal = parseFloat(cleanKcal);
-          if (!isNaN(numKcal)) {
-            cleanKj = String(Math.round(numKcal * 4.184));
-          }
+        if (rawKj) {
+          const m = String(rawKj).match(/(\d+(?:\.\d+)?)/);
+          if (m) cleanKjNum = Math.round(parseFloat(m[1]));
         }
-        if ((!cleanKcal || cleanKcal === '-') && cleanKj && cleanKj !== '-') {
-          const numKj = parseFloat(cleanKj);
-          if (!isNaN(numKj)) {
-            cleanKcal = String(Math.round(numKj / 4.184));
-          }
+        if (rawCals) {
+          const m = String(rawCals).match(/(\d+(?:\.\d+)?)/);
+          if (m) cleanKcalNum = Math.round(parseFloat(m[1]));
         }
 
-        let energyDisplay = '';
-        if (cleanKj && cleanKj !== '-' && cleanKcal && cleanKcal !== '-') {
-          energyDisplay = `${cleanKj} kj / ${cleanKcal} kcal`;
-        } else if (cleanKcal && cleanKcal !== '-') {
-          energyDisplay = `${cleanKcal} kcal`;
-        } else if (cleanKj && cleanKj !== '-') {
-          energyDisplay = `${cleanKj} kj`;
+        if (cleanKjNum && !cleanKcalNum) {
+          cleanKcalNum = Math.round(cleanKjNum / 4.184);
+        } else if (cleanKcalNum && !cleanKjNum) {
+          cleanKjNum = Math.round(cleanKcalNum * 4.184);
+        }
+
+        if (cleanKjNum && cleanKcalNum) {
+          energyDisplay = `${cleanKjNum} kj / ${cleanKcalNum} kcal`;
+        } else if (cleanKcalNum) {
+          energyDisplay = `${cleanKcalNum} kcal`;
+        } else if (fallbackDish && fallbackDish.nutrition && (fallbackDish.nutrition.energyKj || fallbackDish.nutrition.energyKcal)) {
+          const fbKj = (fallbackDish.nutrition.energyKj || '').replace(/kj/i, '').trim();
+          const fbKcal = (fallbackDish.nutrition.energyKcal || '').replace(/kcal/i, '').trim();
+          if (fbKj && fbKcal) {
+            energyDisplay = `${fbKj} kj / ${fbKcal} kcal`;
+          } else {
+            energyDisplay = fbKcal ? `${fbKcal} kcal` : (fbKj ? `${fbKj} kj` : '-');
+          }
         } else {
-          energyDisplay = '1782 kj / 426 kcal';
+          energyDisplay = '-';
         }
+      }
 
-        const formatVal = (val, fallback, wordToRemove) => {
-          if (!val || val === '-' || val === 'null' || val === 'undefined') return fallback;
-          let str = String(val).trim();
-          if (wordToRemove) {
-            str = str.replace(new RegExp(wordToRemove, 'i'), '').trim();
-          }
-          if (/^\d+(\.\d+)?$/.test(str)) return str + 'g';
-          return str;
-        };
+      const formatGramVal = (val, wordToRemove) => {
+        if (!val || val === '-' || val === 'null' || val === 'undefined') return '-';
+        let str = String(val).trim();
+        if (wordToRemove) {
+          str = str.replace(new RegExp(wordToRemove, 'i'), '').trim();
+        }
+        str = str.replace(/g$/i, '').trim();
+        if (!isNaN(parseFloat(str)) && isFinite(str)) {
+          return str + 'g';
+        }
+        return str;
+      };
 
-        const cleanFat = formatVal(n.fat, '10.6g', 'fat');
-        const cleanSat = formatVal(n.saturates, '2.8g');
-        const cleanCarbs = formatVal(n.carbs, '40.7g', 'carbs?');
-        const cleanSug = formatVal(n.sugars, '20.7g');
-        const cleanFib = formatVal(n.fibre, '5.0g');
-        const cleanProt = formatVal(n.protein, '32.0g', 'protein');
-        const cleanSalt = formatVal(n.salt, '0.35g');
+      const cleanFat = formatGramVal(rawFat, 'fat');
+      const cleanSat = formatGramVal(rawSat);
+      const cleanCarbs = formatGramVal(rawCarbs, 'carbs?');
+      const cleanSug = formatGramVal(rawSug);
+      const cleanFib = formatGramVal(rawFib);
+      const cleanProt = formatGramVal(rawProt, 'protein');
+      const cleanSalt = formatGramVal(rawSalt);
 
+      if (modalTableBody) {
         modalTableBody.innerHTML = `
           <tr>
             <th scope="row">Energy</th>

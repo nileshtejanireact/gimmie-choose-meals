@@ -1501,4 +1501,207 @@ div#s4t1 .gimmie-build-box__qty-value,
   display: none !important;
 }
 
+/* Exact Modal & Nutrition Table Styling Matching build-your-box */
+.gimmie-build-box__nutrition-table-wrap {
+  overflow: hidden !important;
+  border: 2px solid #8FAF8F !important;
+  border-radius: 1rem !important;
+  background: #FFFDF9 !important;
+}
+
+.gimmie-build-box__nutrition-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-size: 0.95rem !important;
+  line-height: 1.35 !important;
+  color: #102B10 !important;
+}
+
+.gimmie-build-box__nutrition-table th,
+.gimmie-build-box__nutrition-table td {
+  padding: 0.75rem 0.9rem !important;
+  border-bottom: 1px solid rgba(143, 175, 143, 0.45) !important;
+  text-align: left !important;
+  vertical-align: top !important;
+}
+
+.gimmie-build-box__nutrition-table tr:last-child th,
+.gimmie-build-box__nutrition-table tr:last-child td {
+  border-bottom: 0 !important;
+}
+
+.gimmie-build-box__nutrition-table th {
+  width: 58% !important;
+  font-weight: 700 !important;
+}
+
+.gimmie-build-box__nutrition-table td {
+  text-align: right !important;
+  font-weight: 600 !important;
+}
+
+.gimmie-build-box__nutrition-child-row th {
+  padding-left: 1.65rem !important;
+  font-weight: 500 !important;
+  opacity: 0.85 !important;
+}
+
+.gimmie-build-box__meal-modal-text,
+.gimmie-build-box__meal-modal-alert {
+  border: 2px solid #8FAF8F !important;
+  border-radius: 1rem !important;
+  background: #FFFDF9 !important;
+  padding: 0.9rem 1rem !important;
+  font-size: 0.95rem !important;
+  line-height: 1.45 !important;
+  color: #102B10 !important;
+}
+
+.gimmie-build-box__meal-modal-alert {
+  font-weight: 700 !important;
+}
+
+.gimmie-build-box__meal-modal,
+.gimmie-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1.5rem !important;
+  box-sizing: border-box !important;
+}
+
+.gimmie-build-box__meal-modal[hidden],
+.gimmie-modal[hidden] {
+  display: none !important;
+}
+
+.gimmie-build-box__meal-modal-backdrop,
+.gimmie-modal__backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(16, 43, 16, 0.6) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  cursor: pointer !important;
+  z-index: 1 !important;
+}
+
+.gimmie-build-box__meal-modal-dialog,
+.gimmie-modal__content {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  max-width: 900px !important;
+  max-height: 90vh !important;
+  background: #FFFDF9 !important;
+  border: 2px solid #102B10 !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 6px 6px 0 #102B10 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.gimmie-build-box__meal-modal-surface {
+  position: relative !important;
+  padding: 1.5rem !important;
+  overflow-y: auto !important;
+  max-height: 90vh !important;
+}
+
+.gimmie-build-box__meal-modal-close,
+.gimmie-modal__close {
+  position: absolute !important;
+  top: 1rem !important;
+  right: 1rem !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 999px !important;
+  border: 2px solid #102B10 !important;
+  background: #CCE7C2 !important;
+  color: #102B10 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.5rem !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  line-height: 1 !important;
+  box-shadow: 2px 2px 0 #102B10 !important;
+  transition: transform 0.15s ease !important;
+}
+
+.gimmie-build-box__meal-modal-close:hover,
+.gimmie-modal__close:hover {
+  transform: translateY(-1px) !important;
+  background: #B9DDAE !important;
+}
+
+.gimmie-build-box__meal-modal-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) !important;
+  gap: 2rem !important;
+  align-items: start !important;
+}
+
+@media (max-width: 768px) {
+  .gimmie-build-box__meal-modal-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+}
+
+.gimmie-build-box__meal-modal-image-wrap {
+  width: 100% !important;
+  aspect-ratio: 4 / 3 !important;
+  border-radius: 1rem !important;
+  overflow: hidden !important;
+  border: 2px solid #8FAF8F !important;
+  background: #F6F1E7 !important;
+}
+
+.gimmie-build-box__meal-modal-image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
+}
+
+.gimmie-build-box__meal-modal-title {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem) !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  color: #102B10 !important;
+  margin: 0 0 0.5rem 0 !important;
+  line-height: 1.1 !important;
+  padding-right: 2.5rem !important;
+}
+
+.gimmie-build-box__meal-modal-description {
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+  color: #405440 !important;
+  margin-bottom: 1.25rem !important;
+}
+
+.gimmie-build-box__meal-modal-section {
+  margin-top: 1.25rem !important;
+}
+
+.gimmie-build-box__meal-modal-section-title {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  color: #102B10 !important;
+  margin: 0 0 0.5rem 0 !important;
+  letter-spacing: 0.02em !important;
+}
+
 </style>
