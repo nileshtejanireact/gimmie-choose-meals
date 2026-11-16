@@ -918,7 +918,15 @@
                       {% assign a_title = addon_obj.title.value | default: addon_obj.title | default: addon_raw.title | default: addon_raw.name.value | default: addon_raw.name %}
                       
                       {% assign a_img = nil %}
-                      {% if addon_obj.featured_image %}
+                      {% if addon_obj.meal_image.value %}
+                        {% assign a_img = addon_obj.meal_image.value | image_url: width: 800 %}
+                      {% elsif addon_obj.meal_image %}
+                        {% assign a_img = addon_obj.meal_image | image_url: width: 800 %}
+                      {% elsif addon_raw.meal_image.value %}
+                        {% assign a_img = addon_raw.meal_image.value | image_url: width: 800 %}
+                      {% elsif addon_raw.meal_image %}
+                        {% assign a_img = addon_raw.meal_image | image_url: width: 800 %}
+                      {% elsif addon_obj.featured_image %}
                         {% assign a_img = addon_obj.featured_image | image_url: width: 800 %}
                       {% elsif addon_obj.featured_media %}
                         {% assign a_img = addon_obj.featured_media | image_url: width: 800 %}
@@ -936,7 +944,13 @@
 
                       {% if a_img == blank or a_img == '' %}
                         {% assign down_at = a_title | downcase %}
-                        {% if down_at contains 'penne' or down_at contains 'pasta' or down_at contains 'cajun' %}
+                        {% if down_at contains 'biscoff' %}
+                          {% assign a_img = 'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=800&q=80' %}
+                        {% elsif down_at contains 'blueberry' %}
+                          {% assign a_img = 'https://images.unsplash.com/photo-1584985314300-8806c9e0d16a?auto=format&fit=crop&w=800&q=80' %}
+                        {% elsif down_at contains 'raspberry' %}
+                          {% assign a_img = 'https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=800&q=80' %}
+                        {% elsif down_at contains 'penne' or down_at contains 'pasta' or down_at contains 'cajun' %}
                           {% assign a_img = 'https://images.unsplash.com/photo-1621996346565-e3d5d6281745?auto=format&fit=crop&w=800&q=80' %}
                         {% elsif down_at contains 'beef' or down_at contains 'noodle' %}
                           {% assign a_img = 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80' %}
@@ -945,6 +959,7 @@
                         {% else %}
                           {% assign a_img = 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80' %}
                         {% endif %}
+                      {% endif %}
                       {% endif %}
 
                       {% assign raw_p = addon_obj.price_min | default: addon_obj.price | default: addon_obj.variants.first.price | default: addon_raw.price | default: '8.00' %}
@@ -1623,46 +1638,55 @@
     </div>
   </div>
 
-  <!-- Nutrition & Allergen Modal Popup Matching Main Menu -->
-  <div id="gimmie-nutrition-modal" class="gimmie-modal" hidden>
-    <div id="gimmie-modal-backdrop" class="gimmie-modal__backdrop"></div>
-    <div class="gimmie-modal__content" role="dialog" aria-modal="true">
-      <button id="gimmie-modal-close" class="gimmie-modal__close" aria-label="Close modal">&times;</button>
+  <!-- Nutrition & Allergen Modal Popup Matching build-your-box 2-Column Responsive Layout -->
+  <div id="gimmie-nutrition-modal" class="gimmie-modal gimmie-build-box__meal-modal" hidden>
+    <div id="gimmie-modal-backdrop" class="gimmie-modal__backdrop gimmie-build-box__meal-modal-backdrop" data-gimmie-build-meal-close></div>
+    <div class="gimmie-modal__content gimmie-build-box__meal-modal-dialog" role="dialog" aria-modal="true">
+      <div class="gimmie-build-box__meal-modal-surface">
+        <button id="gimmie-modal-close" class="gimmie-modal__close gimmie-build-box__meal-modal-close push-btn" data-gimmie-build-meal-close aria-label="Close modal">
+          <span class="push-btn__surface font-heading">×</span>
+        </button>
 
-      <!-- Meal Image in Popup Matching Choose Your Meals Page Cards -->
-      <div id="gimmie-modal-image-wrap" style="width: 100%; aspect-ratio: 4/3; border-radius: 16px; overflow: hidden; margin-bottom: 18px; border: 1.5px solid var(--gimmie-border); background: #F6F1E7; display: block; padding: 0; box-sizing: border-box; position: relative;">
-        <img id="gimmie-modal-image" src="" alt="" style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover; object-position: center; display: block; transform: scale(1.15); transform-origin: center center;">
-      </div>
+        <div class="gimmie-build-box__meal-modal-grid">
+          <!-- Left Column: Meal Image (Sticky on Desktop) -->
+          <div id="gimmie-modal-image-wrap" class="gimmie-build-box__meal-modal-image-wrap">
+            <img id="gimmie-modal-image" src="" alt="" class="gimmie-build-box__meal-modal-image" loading="lazy" onerror="if(!this.dataset.errored){this.dataset.errored=true;this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';}">
+          </div>
 
-      <div class="gimmie-modal__header">
-        <h2 id="gimmie-modal-title" class="gimmie-modal__title gimmie-build-box__meal-modal-title font-heading uppercase"></h2>
-        <p id="gimmie-modal-desc" class="gimmie-modal__desc gimmie-build-box__meal-modal-description"></p>
-      </div>
+          <!-- Right Column: Details & Scrollable Nutrition Info -->
+          <div class="gimmie-build-box__meal-modal-content">
+            <div class="gimmie-modal__header">
+              <h2 id="gimmie-modal-title" class="gimmie-modal__title gimmie-build-box__meal-modal-title font-heading uppercase"></h2>
+              <div id="gimmie-modal-desc" class="gimmie-modal__desc gimmie-build-box__meal-modal-description"></div>
+            </div>
 
-      <!-- Nutritional Information Section Matching build-your-box -->
-      <div id="gimmie-modal-nutrition-wrap" class="gimmie-build-box__meal-modal-section">
-        <h3 class="gimmie-modal__section-title gimmie-build-box__meal-modal-section-title font-heading uppercase">Nutritional Information</h3>
-        <div class="gimmie-build-box__nutrition-table-wrap">
-          <table class="gimmie-modal__table gimmie-build-box__nutrition-table">
-            <tbody id="gimmie-modal-table-body">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
+            <!-- Nutritional Information Section Matching build-your-box -->
+            <div id="gimmie-modal-nutrition-wrap" class="gimmie-build-box__meal-modal-section">
+              <h3 class="gimmie-modal__section-title gimmie-build-box__meal-modal-section-title font-heading uppercase">Nutritional Information</h3>
+              <div class="gimmie-build-box__nutrition-table-wrap">
+                <table class="gimmie-modal__table gimmie-build-box__nutrition-table">
+                  <tbody id="gimmie-modal-table-body">
+                    <!-- Dynamically populated -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Ingredients Section -->
+            <div id="gimmie-modal-ingredients-wrap" class="gimmie-build-box__meal-modal-section">
+              <h3 class="gimmie-modal__section-title gimmie-build-box__meal-modal-section-title font-heading uppercase">Ingredients</h3>
+              <div class="gimmie-build-box__meal-modal-text rte">
+                <div id="gimmie-modal-ingredients" class="gimmie-modal__ingredients" style="margin: 0;"></div>
+              </div>
+            </div>
+
+            <!-- Allergens Section -->
+            <div id="gimmie-modal-allergens-wrap" class="gimmie-build-box__meal-modal-section">
+              <h3 class="gimmie-modal__section-title gimmie-build-box__meal-modal-section-title font-heading uppercase">Allergens</h3>
+              <div id="gimmie-modal-allergens" class="gimmie-build-box__meal-modal-alert"></div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <!-- Ingredients Section -->
-      <div id="gimmie-modal-ingredients-wrap" class="gimmie-build-box__meal-modal-section">
-        <h3 class="gimmie-modal__section-title gimmie-build-box__meal-modal-section-title font-heading uppercase">Ingredients</h3>
-        <div class="gimmie-build-box__meal-modal-text rte">
-          <div id="gimmie-modal-ingredients" class="gimmie-modal__ingredients" style="margin: 0;"></div>
-        </div>
-      </div>
-
-      <!-- Allergens Section -->
-      <div id="gimmie-modal-allergens-wrap" class="gimmie-build-box__meal-modal-section">
-        <h3 class="gimmie-modal__section-title gimmie-build-box__meal-modal-section-title font-heading uppercase">Allergens</h3>
-        <div id="gimmie-modal-allergens" class="gimmie-build-box__meal-modal-alert"></div>
       </div>
     </div>
   </div>
@@ -2581,25 +2605,48 @@
 
       // Extract raw values prioritizing clicked card DOM data-attributes
       const rawTitle = (card ? card.getAttribute('data-title') : '') || item.title || '';
-      const rawImage = (card ? card.getAttribute('data-image') : '') || item.image || '';
-      const rawDescVal = (card ? card.getAttribute('data-desc') : '') || item.description || '';
-      const rawIngVal = (card ? card.getAttribute('data-ingredients') : '') || item.ingredients || '';
-      const rawAllerVal = (card ? card.getAttribute('data-allergens') : '') || item.allergens || '';
+      const titleLower = rawTitle.toLowerCase();
+
+      // Reliable Image Extraction (Card attribute -> Card img src -> Item object -> Food category fallback)
+      const cardImgEl = card ? card.querySelector('.gimmie-build-box__meal-image, img') : null;
+      let rawImage = (card ? card.getAttribute('data-image') : '') || (cardImgEl ? (cardImgEl.getAttribute('src') || cardImgEl.src) : '') || item.image || '';
+
+      if (!rawImage || rawImage.includes('data:image') || rawImage === 'null') {
+        if (titleLower.includes('thai') || titleLower.includes('curry')) {
+          rawImage = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
+        } else if (titleLower.includes('sausage') || titleLower.includes('ragu') || titleLower.includes('rigatoni')) {
+          rawImage = 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80';
+        } else if (titleLower.includes('tarragon')) {
+          rawImage = 'https://images.unsplash.com/photo-1547496502-affa22d38842?auto=format&fit=crop&w=800&q=80';
+        } else if (titleLower.includes('hoisin') || (titleLower.includes('beef') && titleLower.includes('bowl'))) {
+          rawImage = 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80';
+        } else if (titleLower.includes('gnocchi') || titleLower.includes('bolognese')) {
+          rawImage = 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80';
+        } else if (titleLower.includes('fajita')) {
+          rawImage = 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=800&q=80';
+        } else if (titleLower.includes('biscoff')) {
+          rawImage = 'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=800&q=80';
+        } else if (titleLower.includes('blueberry')) {
+          rawImage = 'https://images.unsplash.com/photo-1584985314300-8806c9e0d16a?auto=format&fit=crop&w=800&q=80';
+        } else if (titleLower.includes('raspberry')) {
+          rawImage = 'https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=800&q=80';
+        } else {
+          rawImage = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
+        }
+      }
 
       // Populate Image
       const modalImg = document.getElementById('gimmie-modal-image');
       const modalImgWrap = document.getElementById('gimmie-modal-image-wrap');
       if (modalImg && modalImgWrap) {
-        if (rawImage) {
-          modalImg.src = rawImage;
-          modalImg.alt = rawTitle;
-          modalImgWrap.style.display = 'block';
-        } else {
-          modalImgWrap.style.display = 'none';
-        }
+        modalImg.src = rawImage;
+        modalImg.alt = rawTitle;
+        modalImgWrap.style.display = 'block';
       }
 
-      const titleLower = rawTitle.toLowerCase();
+      const rawDescVal = (card ? card.getAttribute('data-desc') : '') || item.description || '';
+      const rawIngVal = (card ? card.getAttribute('data-ingredients') : '') || item.ingredients || '';
+      const rawAllerVal = (card ? card.getAttribute('data-allergens') : '') || item.allergens || '';
 
       // Check if product has dynamic ingredients, description, or allergens already passed from Shopify
       let cleanDesc = cleanIngredients(rawDescVal);
@@ -3011,6 +3058,8 @@
       modalEl.style.display = 'flex';
       modalEl.style.zIndex = '9999999';
       document.body.classList.add('gimmie-build-box-modal-open');
+      const scrollSurface = modalEl.querySelector('.gimmie-build-box__meal-modal-surface, .gimmie-modal__content');
+      if (scrollSurface) scrollSurface.scrollTop = 0;
     }
 
     function closeModal() {

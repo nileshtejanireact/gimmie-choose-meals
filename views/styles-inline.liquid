@@ -1594,15 +1594,91 @@ div#s4t1 .gimmie-build-box__qty-value,
   position: relative !important;
   z-index: 2 !important;
   width: 100% !important;
-  max-width: 900px !important;
+  max-width: 920px !important;
   max-height: 90vh !important;
   background: #FFFDF9 !important;
   border: 2px solid #102B10 !important;
   border-radius: 1.5rem !important;
   box-shadow: 6px 6px 0 #102B10 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  display: block !important;
+}
+
+.gimmie-build-box__meal-modal-surface {
+  position: relative !important;
+  padding: 2rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.gimmie-build-box__meal-modal-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) !important;
+  gap: 2rem !important;
+  align-items: start !important;
+}
+
+.gimmie-build-box__meal-modal-image-wrap {
+  width: 100% !important;
+  aspect-ratio: 4 / 3 !important;
+  border-radius: 1rem !important;
   overflow: hidden !important;
-  display: flex !important;
-  flex-direction: column !important;
+  border: 2px solid #8FAF8F !important;
+  background: #F6F1E7 !important;
+  display: block !important;
+  position: sticky !important;
+  top: 0 !important;
+}
+
+.gimmie-build-box__meal-modal-image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
+}
+
+@media (max-width: 768px) {
+  .gimmie-build-box__meal-modal-dialog,
+  .gimmie-modal__content {
+    max-height: 94vh !important;
+    border-radius: 1.25rem !important;
+  }
+  .gimmie-build-box__meal-modal-surface {
+    padding: 1.25rem 1rem !important;
+  }
+  .gimmie-build-box__meal-modal-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+  .gimmie-build-box__meal-modal-image-wrap {
+    position: static !important;
+  }
+}
+
+/* Custom Scrollbar for Smooth Scrolling */
+.gimmie-build-box__meal-modal-dialog::-webkit-scrollbar,
+.gimmie-modal__content::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+.gimmie-build-box__meal-modal-dialog::-webkit-scrollbar-track,
+.gimmie-modal__content::-webkit-scrollbar-track {
+  background: #F6F1E7 !important;
+  border-radius: 8px !important;
+}
+
+.gimmie-build-box__meal-modal-dialog::-webkit-scrollbar-thumb,
+.gimmie-modal__content::-webkit-scrollbar-thumb {
+  background: #8FAF8F !important;
+  border-radius: 8px !important;
+}
+
+.gimmie-build-box__meal-modal-dialog::-webkit-scrollbar-thumb:hover,
+.gimmie-modal__content::-webkit-scrollbar-thumb:hover {
+  background: #102B10 !important;
 }
 
 .gimmie-build-box__meal-modal-surface {
