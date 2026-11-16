@@ -1594,7 +1594,7 @@ div#s4t1 .gimmie-build-box__qty-value,
   position: relative !important;
   z-index: 2 !important;
   width: 100% !important;
-  max-width: 920px !important;
+  max-width: 960px !important;
   max-height: 90vh !important;
   background: #FFFDF9 !important;
   border: 2px solid #102B10 !important;
@@ -1604,13 +1604,26 @@ div#s4t1 .gimmie-build-box__qty-value,
   overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch !important;
   display: block !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #8FAF8F #F6F1E7 !important;
 }
 
+/* Eliminate duplicate inner scrollbar on surface wrapper */
 .gimmie-build-box__meal-modal-surface {
   position: relative !important;
   padding: 2rem !important;
   width: 100% !important;
   box-sizing: border-box !important;
+  overflow: visible !important;
+  max-height: none !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.gimmie-build-box__meal-modal-surface::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .gimmie-build-box__meal-modal-grid {
@@ -1620,24 +1633,32 @@ div#s4t1 .gimmie-build-box__qty-value,
   align-items: start !important;
 }
 
+/* Sticky Image Column on Desktop so Image stays pinned while text scrolls */
 .gimmie-build-box__meal-modal-image-wrap {
   width: 100% !important;
-  aspect-ratio: 4 / 3 !important;
-  border-radius: 1rem !important;
+  min-height: 380px !important;
+  border-radius: 1.25rem !important;
   overflow: hidden !important;
   border: 2px solid #8FAF8F !important;
   background: #F6F1E7 !important;
-  display: block !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1.5rem !important;
+  box-sizing: border-box !important;
   position: sticky !important;
   top: 0 !important;
 }
 
 .gimmie-build-box__meal-modal-image {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
+  max-width: 100% !important;
+  max-height: 320px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
   object-position: center !important;
   display: block !important;
+  margin: 0 auto !important;
 }
 
 @media (max-width: 768px) {
@@ -1655,10 +1676,15 @@ div#s4t1 .gimmie-build-box__qty-value,
   }
   .gimmie-build-box__meal-modal-image-wrap {
     position: static !important;
+    min-height: 240px !important;
+    padding: 1rem !important;
+  }
+  .gimmie-build-box__meal-modal-image {
+    max-height: 220px !important;
   }
 }
 
-/* Custom Scrollbar for Smooth Scrolling */
+/* Single Sleek Scrollbar for Modal Dialog */
 .gimmie-build-box__meal-modal-dialog::-webkit-scrollbar,
 .gimmie-modal__content::-webkit-scrollbar {
   width: 8px !important;
@@ -1679,13 +1705,6 @@ div#s4t1 .gimmie-build-box__qty-value,
 .gimmie-build-box__meal-modal-dialog::-webkit-scrollbar-thumb:hover,
 .gimmie-modal__content::-webkit-scrollbar-thumb:hover {
   background: #102B10 !important;
-}
-
-.gimmie-build-box__meal-modal-surface {
-  position: relative !important;
-  padding: 1.5rem !important;
-  overflow-y: auto !important;
-  max-height: 90vh !important;
 }
 
 .gimmie-build-box__meal-modal-close,
@@ -1715,37 +1734,6 @@ div#s4t1 .gimmie-build-box__qty-value,
 .gimmie-modal__close:hover {
   transform: translateY(-1px) !important;
   background: #B9DDAE !important;
-}
-
-.gimmie-build-box__meal-modal-grid {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) !important;
-  gap: 2rem !important;
-  align-items: start !important;
-}
-
-@media (max-width: 768px) {
-  .gimmie-build-box__meal-modal-grid {
-    grid-template-columns: 1fr !important;
-    gap: 1.25rem !important;
-  }
-}
-
-.gimmie-build-box__meal-modal-image-wrap {
-  width: 100% !important;
-  aspect-ratio: 4 / 3 !important;
-  border-radius: 1rem !important;
-  overflow: hidden !important;
-  border: 2px solid #8FAF8F !important;
-  background: #F6F1E7 !important;
-}
-
-.gimmie-build-box__meal-modal-image {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  display: block !important;
 }
 
 .gimmie-build-box__meal-modal-title {
