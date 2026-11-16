@@ -431,8 +431,21 @@
                       {% if m_ingr == blank %}
                         {% assign m_ingr = meal_raw.ingredients.value | default: meal_raw.ingredients | default: meal_obj.ingredients.value | default: meal_obj.ingredients %}
                       {% endif %}
+                      {% if m_ingr contains 'root' or m_ingr contains 'children' or m_ingr contains '=>' %}
+                        {% assign meta_ingr_tag = meal_raw.ingredients | default: meal_obj.ingredients | metafield_tag %}
+                        {% if meta_ingr_tag != blank and meta_ingr_tag != '' %}
+                          {% assign m_ingr = meta_ingr_tag %}
+                        {% endif %}
+                      {% endif %}
+
                       {% if m_aller == blank %}
                         {% assign m_aller = meal_raw.allergens.value | default: meal_raw.allergens | default: meal_obj.allergens.value | default: meal_obj.allergens %}
+                      {% endif %}
+                      {% if m_aller contains 'root' or m_aller contains 'children' or m_aller contains '=>' %}
+                        {% assign meta_aller_tag = meal_raw.allergens | default: meal_obj.allergens | metafield_tag | strip_html | strip %}
+                        {% if meta_aller_tag != blank and meta_aller_tag != '' %}
+                          {% assign m_aller = meta_aller_tag %}
+                        {% endif %}
                       {% endif %}
 
                       {% if m_desc == blank %}
@@ -1726,9 +1739,20 @@
     function cleanRichIngredients(raw) {
       if (!raw) return '';
       let text = String(raw).trim();
-      if (text.startsWith('{') && (text.includes('"root"') || text.includes('"children"'))) {
+
+      // If already clean HTML or plain text without root/children/=>
+      if (!text.includes('root') && !text.includes('children') && !text.includes('=>') && !text.startsWith('{')) {
+        return text.replace(/\\n/g, '<br>');
+      }
+
+      // 1. Try JSON conversion (handles standard JSON and Ruby hash syntax from Shopify)
+      if (text.includes('root') || text.includes('children') || text.includes('=>') || text.startsWith('{')) {
+        let jsonCompatible = text
+          .replace(/=>/g, ':')
+          .replace(/\bnil\b/g, 'null');
+
         try {
-          const parsed = JSON.parse(text);
+          const parsed = JSON.parse(jsonCompatible);
           const extractHtml = (node) => {
             if (!node) return '';
             if (node.type === 'text') {
@@ -1737,71 +1761,65 @@
               if (node.italic) t = '<em>' + t + '</em>';
               return t;
             }
-            if (node.children) {
+            if (node.children && Array.isArray(node.children)) {
               const inner = node.children.map(extractHtml).join('');
-              if (node.type === 'paragraph') return '<p>' + inner + '</p>';
+              if (node.type === 'paragraph') return inner;
               if (node.type === 'list-item') return '<li>' + inner + '</li>';
               if (node.type === 'list') return '<ul>' + inner + '</ul>';
               return inner;
             }
             return '';
           };
-          text = extractHtml(parsed.root);
+          const rootNode = parsed.root || parsed;
+          const html = extractHtml(rootNode);
+          if (html && html.trim().length > 0 && !html.includes('"type"') && !html.includes('=>')) {
+            return html.trim();
+          }
         } catch (e) {
-          text = text.replace(/\\n/g, '<br>');
+          // Fall back to regex parser
         }
+
+        // 2. Robust Regex Extraction fallback for Ruby Hash or unquoted strings
+        try {
+          const parts = [];
+          const nodeRegex = /\{[^{}]*?"value"\s*(?:=>|:)\s*"([^"]*)"(?:[^{}]*?"bold"\s*(?:=>|:)\s*(true|false))?[^{}]*?\}/g;
+          let m;
+          while ((m = nodeRegex.exec(text)) !== null) {
+            const val = m[1] || '';
+            const isBold = m[2] === 'true';
+            if (isBold) {
+              parts.push('<strong>' + val + '</strong>');
+            } else {
+              parts.push(val);
+            }
+          }
+          if (parts.length > 0) {
+            const combined = parts.join('');
+            if (combined.trim().length > 0 && !combined.includes('"type"')) {
+              return combined.trim();
+            }
+          }
+        } catch (e2) {}
       }
-      return text;
+
+      // Strip any lingering JSON/Ruby metadata brackets if fallback failed
+      return text
+        .replace(/\{"type"=>[^}]*\}/g, '')
+        .replace(/\{"type":[^}]*\}/g, '')
+        .replace(/["'{}\[\]]/g, '')
+        .trim();
     }
 
     function cleanIngredients(raw) {
       if (!raw) return '';
-      let text = raw;
-      if (typeof raw === 'string' && (raw.includes('value') || raw.includes('root') || raw.includes('children') || raw.includes('=>') || raw.includes('{'))) {
-        try {
-          const parsed = JSON.parse(raw);
-          const parts = [];
-          function traverse(obj) {
-            if (!obj) return;
-            if (typeof obj === 'string') {
-              parts.push(obj);
-              return;
-            }
-            if (Array.isArray(obj)) {
-              obj.forEach(traverse);
-              return;
-            }
-            if (typeof obj === 'object') {
-              if (obj.value && typeof obj.value === 'string') parts.push(obj.value);
-              if (obj.children) traverse(obj.children);
-            }
-          }
-          traverse(parsed);
-          if (parts.length > 0) text = parts.join(' ');
-        } catch (e) {
-          try {
-            const parts = [];
-            const regex = /"value"\s*(?:=>|:)\s*"([^"]*)"/g;
-            let m;
-            while ((m = regex.exec(raw)) !== null) {
-              if (m[1]) parts.push(m[1]);
-            }
-            if (parts.length > 0) text = parts.join(' ');
-          } catch (e2) {}
-        }
-      }
-      if (typeof text === 'string') {
-        text = text
-          .replace(/<[^>]*>/g, ' ')
-          .replace(/\\n/g, ' ')
-          .replace(/\\r/g, '')
-          .replace(/\\t/g, ' ')
-          .replace(/\n+/g, ' ')
-          .replace(/\r+/g, '')
-          .replace(/\s+/g, ' ')
-          .trim();
-      }
-      return text;
+      const html = cleanRichIngredients(raw);
+      return html
+        .replace(/<[^>]*>/g, '')
+        .replace(/\\n/g, ' ')
+        .replace(/\\r/g, '')
+        .replace(/\\t/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
     }
 
     const configEl = document.getElementById('gimmie-config');
@@ -1853,7 +1871,7 @@
         title: card.getAttribute('data-title') || (titleEl ? titleEl.textContent.trim() : 'Meal'),
         image: card.getAttribute('data-image') || (imgEl ? imgEl.src : ''),
         description: finalDesc,
-        ingredients: cleanIngredients(card.getAttribute('data-ingredients')) || 'Fresh natural ingredients prepared by Gimmie chefs.',
+        ingredients: cleanRichIngredients(card.getAttribute('data-ingredients')) || 'Fresh natural ingredients prepared by Gimmie chefs.',
         allergens: cleanIngredients(card.getAttribute('data-allergens')) || 'None',
         macros: {
           calories: card.getAttribute('data-cals') || '',
@@ -2482,63 +2500,6 @@
       // Status text reserved for save confirmation
     }
 
-    function cleanIngredients(raw) {
-      if (!raw) return '';
-      let text = raw;
-      if (typeof raw === 'string' && (raw.includes('value') || raw.includes('root') || raw.includes('children') || raw.includes('=>') || raw.includes('{'))) {
-        try {
-          const parsed = JSON.parse(raw);
-          const parts = [];
-          function traverse(obj) {
-            if (!obj) return;
-            if (typeof obj === 'string') {
-              parts.push(obj);
-              return;
-            }
-            if (Array.isArray(obj)) {
-              obj.forEach(traverse);
-              return;
-            }
-            if (typeof obj === 'object') {
-              if (obj.value && typeof obj.value === 'string') {
-                parts.push(obj.value);
-              }
-              if (obj.children) {
-                traverse(obj.children);
-              }
-            }
-          }
-          traverse(parsed);
-          if (parts.length > 0) {
-            text = parts.join(' ');
-          }
-        } catch (e) {
-          try {
-            const parts = [];
-            const regex = /"value"s*(?:=>|:)s*"([^"]*)"/g;
-            let m;
-            while ((m = regex.exec(raw)) !== null) {
-              if (m[1]) parts.push(m[1]);
-            }
-            if (parts.length > 0) {
-              text = parts.join(' ');
-            }
-          } catch (e2) {}
-        }
-      }
-      if (typeof text === 'string') {
-        text = text
-          .replace(/<[^>]*>/g, ' ')
-          .replace(/\\n/g, ' ')
-          .replace(/\\r/g, '')
-          .replace(/\\t/g, ' ')
-          .replace(/\n+/g, ' ')
-          .replace(/\r+/g, '')
-          .replace(/\s+/g, ' ')
-          .trim();
-      }
-      return text;
-    }
 
     function openModal(itemId, triggerEl) {
       if (!modalEl) modalEl = document.getElementById('gimmie-nutrition-modal');
@@ -2918,12 +2879,13 @@
       const ingredientsEl = document.getElementById('gimmie-modal-ingredients');
       if (ingredientsEl) {
         let rawIng = rawIngVal || item.ingredients || '';
-        if (rawIng && rawIng.length > 5 && !rawIng.includes('wholesome ingredients') && !rawIng.includes('Fresh, wholesome') && !rawIng.includes('root')) {
-          ingredientsEl.innerHTML = cleanRichIngredients(rawIng);
+        let processedIng = cleanRichIngredients(rawIng);
+        if (processedIng && processedIng.length > 5 && !processedIng.includes('root') && !processedIng.includes('children') && !processedIng.includes('wholesome ingredients') && !processedIng.includes('Fresh, wholesome')) {
+          ingredientsEl.innerHTML = processedIng;
         } else if (fallbackDish && fallbackDish.ingredients) {
           ingredientsEl.innerHTML = fallbackDish.ingredients;
         } else {
-          ingredientsEl.innerHTML = cleanRichIngredients(rawIng) || 'Fresh natural ingredients prepared in our kitchen.';
+          ingredientsEl.innerHTML = processedIng || 'Fresh natural ingredients prepared in our kitchen.';
         }
       }
 
