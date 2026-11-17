@@ -518,11 +518,11 @@ html.gimmie-build-box-modal-open {
   overflow-y: auto;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
-  border: 3px solid var(--gimmie-border);
+  border: 2px solid #8FAF8F;
   border-radius: 24px;
   background: var(--gimmie-panel);
   color: var(--gimmie-text);
-  box-shadow: 8px 8px 0 var(--gimmie-border);
+  box-shadow: 0 20px 48px rgba(16, 43, 16, 0.18);
   padding: clamp(20px, 3vw, 32px);
 }
 
@@ -540,7 +540,7 @@ html.gimmie-build-box-modal-open {
   right: 16px;
   width: 40px;
   height: 40px;
-  border: 2px solid var(--gimmie-border);
+  border: 2px solid #8FAF8F;
   border-radius: 999px;
   background: var(--gimmie-accent);
   color: var(--gimmie-text);
@@ -550,7 +550,7 @@ html.gimmie-build-box-modal-open {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 2px 2px 0 var(--gimmie-border);
+  box-shadow: 0 2px 6px rgba(16, 43, 16, 0.15);
 }
 
 .gimmie-modal__grid {

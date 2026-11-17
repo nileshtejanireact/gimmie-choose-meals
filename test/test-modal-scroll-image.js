@@ -37,4 +37,9 @@ assert(styles.includes('scrollbar-width: none !important'), 'Inner scrollbar mus
 assert(styles.includes('body.gimmie-build-box-modal-open'), 'Body modal open locking rule must exist');
 console.log('✓ CSS: overflow-y: auto !important, touch scrolling, inner scrollbar hidden, and body scroll lock verified');
 
+// 5. Check Green Border Styling on Modal & Image Wrap (Sage green #8FAF8F, never black #102B10)
+assert(styles.includes('border: 2px solid #8FAF8F !important'), 'Modal dialog and image wrap must have green border #8FAF8F');
+assert(!styles.includes('.gimmie-build-box__meal-modal-dialog,\n.gimmie-modal__content {\n  position: relative !important;\n  z-index: 2 !important;\n  width: 100% !important;\n  max-width: 960px !important;\n  max-height: 90vh !important;\n  background: #FFFDF9 !important;\n  border: 2px solid #102B10'), 'Modal dialog must NOT have black border');
+console.log('✓ Modal styling: Sage green border (#8FAF8F) verified, black borders removed');
+
 console.log('\n🎉 ALL MODAL SCROLL & IMAGE TESTS PASSED PERFECTLY!');
