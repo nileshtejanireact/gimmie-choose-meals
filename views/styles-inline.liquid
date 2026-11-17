@@ -453,7 +453,7 @@
 .gimmie-modal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.6) !important;
   backdrop-filter: blur(3px);
 }
 
@@ -1588,7 +1588,7 @@ div#s4t1 .gimmie-build-box__qty-value,
 .gimmie-modal__backdrop {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(16, 43, 16, 0.6) !important;
+  background: rgba(0, 0, 0, 0.6) !important;
   backdrop-filter: blur(4px) !important;
   -webkit-backdrop-filter: blur(4px) !important;
   cursor: pointer !important;
@@ -1780,13 +1780,41 @@ html.gimmie-build-box-modal-open {
   z-index: 10 !important;
   line-height: 1 !important;
   box-shadow: 0 2px 6px rgba(16, 43, 16, 0.15) !important;
-  transition: transform 0.15s ease !important;
+  transition: transform 0.15s ease, background 0.15s ease !important;
+  padding: 0 !important;
+  outline: none !important;
+}
+
+/* Eliminate duplicate icons or inherited theme pseudo-elements on close button */
+.gimmie-build-box__meal-modal-close::before,
+.gimmie-build-box__meal-modal-close::after,
+.gimmie-modal__close::before,
+.gimmie-modal__close::after,
+.gimmie-build-box__meal-modal-close:hover::before,
+.gimmie-build-box__meal-modal-close:hover::after,
+.gimmie-modal__close:hover::before,
+.gimmie-modal__close:hover::after {
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 .gimmie-build-box__meal-modal-close:hover,
 .gimmie-modal__close:hover {
   transform: translateY(-1px) !important;
   background: #B9DDAE !important;
+}
+
+.gimmie-modal-close-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  font-size: 1.5rem !important;
+  font-family: inherit !important;
+  pointer-events: none !important;
+  transform: none !important;
 }
 
 .gimmie-build-box__meal-modal-title {

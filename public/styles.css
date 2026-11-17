@@ -500,7 +500,7 @@ div#s4t1 .gimmie-build-box__qty-button:disabled,
 .gimmie-modal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.6) !important;
 }
 
 /* Lock page scroll and prevent dual scrollbar when modal is open */
