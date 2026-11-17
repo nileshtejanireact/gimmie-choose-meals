@@ -40,6 +40,9 @@ console.log('✓ CSS: overflow-y: auto !important, touch scrolling, inner scroll
 // 5. Check Green Border Styling on Modal & Image Wrap (Sage green #8FAF8F, never black #102B10)
 assert(styles.includes('border: 2px solid #8FAF8F !important'), 'Modal dialog and image wrap must have green border #8FAF8F');
 assert(!styles.includes('.gimmie-build-box__meal-modal-dialog,\n.gimmie-modal__content {\n  position: relative !important;\n  z-index: 2 !important;\n  width: 100% !important;\n  max-width: 960px !important;\n  max-height: 90vh !important;\n  background: #FFFDF9 !important;\n  border: 2px solid #102B10'), 'Modal dialog must NOT have black border');
-console.log('✓ Modal styling: Sage green border (#8FAF8F) verified, black borders removed');
+assert(styles.includes('align-items: stretch !important'), 'Modal grid must align items stretch so image height matches right text');
+assert(styles.includes('align-self: stretch !important'), 'Image wrap must stretch to fill column');
+assert(styles.includes('filter: drop-shadow'), 'Image must have soft natural dish shadow');
+console.log('✓ Modal styling: Sage green border (#8FAF8F), full-height left column stretch, and natural dish shadow verified');
 
 console.log('\n🎉 ALL MODAL SCROLL & IMAGE TESTS PASSED PERFECTLY!');
