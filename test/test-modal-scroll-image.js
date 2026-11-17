@@ -29,10 +29,12 @@ assert(liquid.includes('modalImgWrap.style.display = \'block\''), 'JS must ensur
 assert(liquid.includes('scrollSurface.scrollTop = 0'), 'JS must reset scroll position to top when opened');
 console.log('✓ JS openModal image resolution & scroll reset logic verified');
 
-// 4. Check CSS Overflow & Scrolling Capabilities
+// 4. Check CSS Overflow & Scrolling Capabilities (Hide inner duplicate scrollbar, lock page scroll)
 assert(styles.includes('overflow-y: auto !important'), 'Modal dialog must have overflow-y: auto !important for full scrolling');
 assert(styles.includes('-webkit-overflow-scrolling: touch !important'), 'Modal must support smooth iOS touch momentum scrolling');
-assert(styles.includes('.gimmie-build-box__meal-modal-dialog::-webkit-scrollbar'), 'Custom sleek scrollbar must be configured');
-console.log('✓ CSS: overflow-y: auto !important, touch scrolling, and custom scrollbars verified');
+assert(styles.includes('.gimmie-build-box__meal-modal-dialog::-webkit-scrollbar'), 'Custom sleek scrollbar selector must be configured');
+assert(styles.includes('scrollbar-width: none !important'), 'Inner scrollbar must be hidden via scrollbar-width: none');
+assert(styles.includes('body.gimmie-build-box-modal-open'), 'Body modal open locking rule must exist');
+console.log('✓ CSS: overflow-y: auto !important, touch scrolling, inner scrollbar hidden, and body scroll lock verified');
 
 console.log('\n🎉 ALL MODAL SCROLL & IMAGE TESTS PASSED PERFECTLY!');

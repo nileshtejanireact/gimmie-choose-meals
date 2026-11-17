@@ -503,18 +503,35 @@ div#s4t1 .gimmie-build-box__qty-button:disabled,
   background: rgba(0, 0, 0, 0.65);
 }
 
+/* Lock page scroll and prevent dual scrollbar when modal is open */
+body.gimmie-build-box-modal-open,
+html.gimmie-build-box-modal-open {
+  overflow: hidden !important;
+  height: 100% !important;
+}
+
 .gimmie-modal__dialog {
   position: relative;
   z-index: 1;
   width: min(850px, 100%);
   max-height: 90vh;
   overflow-y: auto;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
   border: 3px solid var(--gimmie-border);
   border-radius: 24px;
   background: var(--gimmie-panel);
   color: var(--gimmie-text);
   box-shadow: 8px 8px 0 var(--gimmie-border);
   padding: clamp(20px, 3vw, 32px);
+}
+
+.gimmie-modal__dialog::-webkit-scrollbar,
+.gimmie-build-box__meal-modal-dialog::-webkit-scrollbar,
+.gimmie-modal__content::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .gimmie-modal__close {

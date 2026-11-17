@@ -1604,8 +1604,8 @@ div#s4t1 .gimmie-build-box__qty-value,
   overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch !important;
   display: block !important;
-  scrollbar-width: thin !important;
-  scrollbar-color: #8FAF8F #F6F1E7 !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
 /* Eliminate duplicate inner scrollbar on surface wrapper */
@@ -1684,27 +1684,19 @@ div#s4t1 .gimmie-build-box__qty-value,
   }
 }
 
-/* Single Sleek Scrollbar for Modal Dialog */
+/* Lock page scroll and prevent dual scrollbar when modal is open */
+body.gimmie-build-box-modal-open,
+html.gimmie-build-box-modal-open {
+  overflow: hidden !important;
+  height: 100% !important;
+}
+
+/* Hide Inner Scrollbar for Modal Dialog to avoid dual scrollbars */
 .gimmie-build-box__meal-modal-dialog::-webkit-scrollbar,
 .gimmie-modal__content::-webkit-scrollbar {
-  width: 8px !important;
-}
-
-.gimmie-build-box__meal-modal-dialog::-webkit-scrollbar-track,
-.gimmie-modal__content::-webkit-scrollbar-track {
-  background: #F6F1E7 !important;
-  border-radius: 8px !important;
-}
-
-.gimmie-build-box__meal-modal-dialog::-webkit-scrollbar-thumb,
-.gimmie-modal__content::-webkit-scrollbar-thumb {
-  background: #8FAF8F !important;
-  border-radius: 8px !important;
-}
-
-.gimmie-build-box__meal-modal-dialog::-webkit-scrollbar-thumb:hover,
-.gimmie-modal__content::-webkit-scrollbar-thumb:hover {
-  background: #102B10 !important;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .gimmie-build-box__meal-modal-close,

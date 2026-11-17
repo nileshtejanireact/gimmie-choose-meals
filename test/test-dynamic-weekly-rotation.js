@@ -100,11 +100,29 @@ async function testDynamicWeeklyRotation() {
     }
   };
 
+  // A direct Shopify Metaobject Drop simulation (no .fields property, pure direct keys from Shopify Admin)
+  const metaobjectRotationMeal = {
+    id: 'gid://shopify/Metaobject/616841281917',
+    name: { value: 'Biscoff Biscuit Protein Oats' },
+    meal_image: { value: 'https://cdn.shopify.com/s/files/1/02._Final_Biscoff.png' },
+    description: { value: 'Creamy overnight oats blended with premium whey protein, Greek yoghurt and chia seeds. Topped with a drizzle of Biscoff spread and biscuit crumb.' },
+    ingredients: { value: 'Porridge Oats, Whey Protein (Milk, Soya), 0% Fat Greek Yoghurt (Milk), Semi Skimmed Milk, Chia Seeds, Lotus Biscoff Biscuit & Spread [Wheat Flour, Sugar, Vegetable Oils (Palm Oil, Rapeseed Oil), Soya Flour, Emulsifier (Soya Lecithin), Salt, Cinnamon].' },
+    allergens: { value: 'Oats, Milk, Soya, Wheat' },
+    energy: { value: '2062 kj / 493 kcal' },
+    fat: { value: '15.3' },
+    of_which_saturates: { value: '4.2' },
+    carbohydrates: { value: '46.4' },
+    of_which_sugars: { value: '20.7' },
+    fibre: { value: '8.8' },
+    protein: { value: '39.0' },
+    salt: { value: '0.76' }
+  };
+
   const rendered = await engine.renderFile('choose-meals', {
     customerName: 'Hannah Conway',
     customerEmail: 'hannahconway@hotmail.co.uk',
     mealQuota: 6,
-    meals: [newRotationMeal],
+    meals: [newRotationMeal, metaobjectRotationMeal],
     addons: [newRotationAddon],
     activeContractId: 'sub_12345',
     formattedDeliveryDate: 'Mon 26 Oct',
@@ -124,6 +142,11 @@ async function testDynamicWeeklyRotation() {
     { name: 'Weekly Meal: Dynamic fat attribute (11.5g)', pass: rendered.includes('data-fat="11.5g"') },
     { name: 'Weekly Meal: Dynamic serving size attribute (Per Serving (450g))', pass: rendered.includes('data-serving="Per Serving (450g)"') },
     { name: 'Weekly Meal: Dynamic ingredients attribute matches metafield', pass: rendered.includes('Chicken Breast (42%), Brown Rice (30%), Courgette, Red Pepper') },
+    { name: 'Metaobject Drop: Direct Fibre extraction (8.8g) without .fields', pass: rendered.includes('data-fibre="8.8g"') },
+    { name: 'Metaobject Drop: Direct Protein extraction (39.0g) without .fields', pass: rendered.includes('data-prot="39.0g Protein"') || rendered.includes('data-prot="39.0g"') },
+    { name: 'Metaobject Drop: Direct Salt extraction (0.76g) without .fields', pass: rendered.includes('data-salt="0.76g"') },
+    { name: 'Metaobject Drop: Direct Fat extraction (15.3g) without .fields', pass: rendered.includes('data-fat="15.3g"') },
+    { name: 'Metaobject Drop: Direct Carbs extraction (46.4g) without .fields', pass: rendered.includes('data-carbs="46.4g"') },
     { name: 'Weekly Add-on: Dynamic title rendered', pass: rendered.includes('SALTED CARAMEL PROTEIN OATS') },
     { name: 'Weekly Add-on: Dynamic calories attribute (450 kcal)', pass: rendered.includes('data-cals="450 kcal"') },
     { name: 'Weekly Add-on: Dynamic protein attribute (36.0g)', pass: rendered.includes('data-prot="36.0g"') },

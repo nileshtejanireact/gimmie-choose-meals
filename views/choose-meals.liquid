@@ -397,22 +397,36 @@
                       {% assign m_ingr = nil %}
                       {% assign m_aller = nil %}
 
+                      {% comment %} 1. Direct Metaobject Property Extraction from current_meal {% endcomment %}
+                      {% assign m_desc = current_meal.description.value | default: current_meal.description | default: current_meal['description'].value | default: current_meal['description'] | default: current_meal.summary.value | default: current_meal.summary | default: current_meal['summary'].value | default: current_meal['summary'] %}
+                      {% assign m_energy = current_meal.energy.value | default: current_meal.energy | default: current_meal['energy'].value | default: current_meal['energy'] | default: current_meal.calories.value | default: current_meal.calories | default: current_meal['calories'].value | default: current_meal['calories'] %}
+                      {% assign m_prot = current_meal.protein.value | default: current_meal.protein | default: current_meal['protein'].value | default: current_meal['protein'] | default: current_meal.proteins.value | default: current_meal.proteins | default: current_meal['proteins'].value | default: current_meal['proteins'] %}
+                      {% assign m_fat = current_meal.fat.value | default: current_meal.fat | default: current_meal['fat'].value | default: current_meal['fat'] %}
+                      {% assign m_saturates = current_meal.of_which_saturates.value | default: current_meal.of_which_saturates | default: current_meal['of_which_saturates'].value | default: current_meal['of_which_saturates'] | default: current_meal.saturates.value | default: current_meal.saturates | default: current_meal['saturates'].value | default: current_meal['saturates'] %}
+                      {% assign m_carbs = current_meal.carbohydrates.value | default: current_meal.carbohydrates | default: current_meal['carbohydrates'].value | default: current_meal['carbohydrates'] | default: current_meal.carbs.value | default: current_meal.carbs | default: current_meal['carbs'].value | default: current_meal['carbs'] %}
+                      {% assign m_sugars = current_meal.of_which_sugars.value | default: current_meal.of_which_sugars | default: current_meal['of_which_sugars'].value | default: current_meal['of_which_sugars'] | default: current_meal.sugars.value | default: current_meal.sugars | default: current_meal['sugars'].value | default: current_meal['sugars'] %}
+                      {% assign m_fibre = current_meal.fibre.value | default: current_meal.fibre | default: current_meal['fibre'].value | default: current_meal['fibre'] | default: current_meal.fiber.value | default: current_meal.fiber | default: current_meal['fiber'].value | default: current_meal['fiber'] %}
+                      {% assign m_salt = current_meal.salt.value | default: current_meal.salt | default: current_meal['salt'].value | default: current_meal['salt'] | default: current_meal.sodium.value | default: current_meal.sodium | default: current_meal['sodium'].value | default: current_meal['sodium'] %}
+                      {% assign m_serving = current_meal.serving_size.value | default: current_meal.serving_size | default: current_meal['serving_size'].value | default: current_meal['serving_size'] | default: current_meal.serving.value | default: current_meal.serving %}
+                      {% assign m_ingr = current_meal.ingredients.value | default: current_meal.ingredients | default: current_meal['ingredients'].value | default: current_meal['ingredients'] %}
+                      {% assign m_aller = current_meal.allergens.value | default: current_meal.allergens | default: current_meal['allergens'].value | default: current_meal['allergens'] %}
+
                       {% comment %} Extract via field iterator for direct metaobject Drops {% endcomment %}
                       {% if current_meal.fields %}
                         {% for field in current_meal.fields %}
                           {% if field.value != blank %}
-                            {% if field.key == 'description' %}{% assign m_desc = field.value %}{% endif %}
-                            {% if field.key == 'energy' or field.key == 'calories' %}{% assign m_energy = field.value %}{% endif %}
-                            {% if field.key == 'protein' or field.key == 'proteins' %}{% assign m_prot = field.value %}{% endif %}
-                            {% if field.key == 'fat' %}{% assign m_fat = field.value %}{% endif %}
-                            {% if field.key == 'of_which_saturates' or field.key == 'saturates' %}{% assign m_saturates = field.value %}{% endif %}
-                            {% if field.key == 'carbohydrates' or field.key == 'carbs' %}{% assign m_carbs = field.value %}{% endif %}
-                            {% if field.key == 'of_which_sugars' or field.key == 'sugars' %}{% assign m_sugars = field.value %}{% endif %}
-                            {% if field.key == 'fibre' or field.key == 'fiber' %}{% assign m_fibre = field.value %}{% endif %}
-                            {% if field.key == 'salt' or field.key == 'sodium' %}{% assign m_salt = field.value %}{% endif %}
-                            {% if field.key == 'serving_size' or field.key == 'serving' %}{% assign m_serving = field.value %}{% endif %}
-                            {% if field.key == 'allergens' %}{% assign m_aller = field.value %}{% endif %}
-                            {% if field.key == 'ingredients' %}{% assign m_ingr = field.value %}{% endif %}
+                            {% if field.key == 'description' and m_desc == blank %}{% assign m_desc = field.value %}{% endif %}
+                            {% if field.key == 'energy' or field.key == 'calories' %}{% if m_energy == blank %}{% assign m_energy = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'protein' or field.key == 'proteins' %}{% if m_prot == blank %}{% assign m_prot = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'fat' and m_fat == blank %}{% assign m_fat = field.value %}{% endif %}
+                            {% if field.key == 'of_which_saturates' or field.key == 'saturates' %}{% if m_saturates == blank %}{% assign m_saturates = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'carbohydrates' or field.key == 'carbs' %}{% if m_carbs == blank %}{% assign m_carbs = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'of_which_sugars' or field.key == 'sugars' %}{% if m_sugars == blank %}{% assign m_sugars = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'fibre' or field.key == 'fiber' %}{% if m_fibre == blank %}{% assign m_fibre = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'salt' or field.key == 'sodium' %}{% if m_salt == blank %}{% assign m_salt = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'serving_size' or field.key == 'serving' %}{% if m_serving == blank %}{% assign m_serving = field.value %}{% endif %}{% endif %}
+                            {% if field.key == 'allergens' and m_aller == blank %}{% assign m_aller = field.value %}{% endif %}
+                            {% if field.key == 'ingredients' and m_ingr == blank %}{% assign m_ingr = field.value %}{% endif %}
                           {% endif %}
                         {% endfor %}
                       {% endif %}
@@ -464,31 +478,31 @@
                       {% endif %}
 
                       {% if m_energy == blank %}
-                        {% assign m_energy = meal_raw.energy.value | default: meal_raw.energy | default: meal_obj.energy.value | default: meal_obj.energy | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_raw.calories | default: m_prod.metafields.custom.energy.value | default: m_prod.metafields.custom.energy | default: m_prod.metafields.custom.calories.value | default: m_prod.metafields.custom.calories %}
+                        {% assign m_energy = current_meal.energy.value | default: current_meal.energy | default: current_meal['energy'].value | default: current_meal['energy'] | default: current_meal.calories.value | default: current_meal.calories | default: meal_raw.energy.value | default: meal_raw.energy | default: meal_obj.energy.value | default: meal_obj.energy | default: meal_obj.calories.value | default: meal_obj.calories | default: meal_raw.calories | default: m_prod.metafields.custom.energy.value | default: m_prod.metafields.custom.energy | default: m_prod.metafields.custom.calories.value | default: m_prod.metafields.custom.calories %}
                       {% endif %}
                       {% if m_prot == blank %}
-                        {% assign m_prot = meal_raw.protein.value | default: meal_raw.protein | default: meal_obj.protein.value | default: meal_obj.protein | default: m_prod.metafields.custom.protein.value | default: m_prod.metafields.custom.protein | default: m_prod.metafields.nutrition.protein.value | default: m_prod.metafields.nutrition.protein | default: m_prod.metafields.food.protein.value | default: m_prod.metafields.food.protein | default: m_prod.metafields.shopify.protein.value | default: m_prod.metafields.shopify.protein %}
+                        {% assign m_prot = current_meal.protein.value | default: current_meal.protein | default: current_meal['protein'].value | default: current_meal['protein'] | default: current_meal.proteins.value | default: current_meal.proteins | default: meal_raw.protein.value | default: meal_raw.protein | default: meal_obj.protein.value | default: meal_obj.protein | default: m_prod.metafields.custom.protein.value | default: m_prod.metafields.custom.protein | default: m_prod.metafields.nutrition.protein.value | default: m_prod.metafields.nutrition.protein | default: m_prod.metafields.food.protein.value | default: m_prod.metafields.food.protein | default: m_prod.metafields.shopify.protein.value | default: m_prod.metafields.shopify.protein %}
                       {% endif %}
                       {% if m_fat == blank %}
-                        {% assign m_fat = meal_raw.fat.value | default: meal_raw.fat | default: meal_obj.fat.value | default: meal_obj.fat | default: m_prod.metafields.custom.fat.value | default: m_prod.metafields.custom.fat | default: m_prod.metafields.nutrition.fat.value | default: m_prod.metafields.food.fat.value %}
+                        {% assign m_fat = current_meal.fat.value | default: current_meal.fat | default: current_meal['fat'].value | default: current_meal['fat'] | default: meal_raw.fat.value | default: meal_raw.fat | default: meal_obj.fat.value | default: meal_obj.fat | default: m_prod.metafields.custom.fat.value | default: m_prod.metafields.custom.fat | default: m_prod.metafields.nutrition.fat.value | default: m_prod.metafields.food.fat.value %}
                       {% endif %}
                       {% if m_saturates == blank %}
-                        {% assign m_saturates = meal_raw.of_which_saturates.value | default: meal_raw.of_which_saturates | default: meal_raw.saturates.value | default: meal_raw.saturates | default: meal_obj.of_which_saturates.value | default: meal_obj.of_which_saturates | default: meal_obj.saturates.value | default: meal_obj.saturates | default: m_prod.metafields.custom.of_which_saturates.value | default: m_prod.metafields.custom.of_which_saturates | default: m_prod.metafields.custom.saturates.value | default: m_prod.metafields.custom.saturates | default: m_prod.metafields.nutrition.saturates.value %}
+                        {% assign m_saturates = current_meal.of_which_saturates.value | default: current_meal.of_which_saturates | default: current_meal['of_which_saturates'].value | default: current_meal['of_which_saturates'] | default: current_meal.saturates.value | default: current_meal.saturates | default: meal_raw.of_which_saturates.value | default: meal_raw.of_which_saturates | default: meal_raw.saturates.value | default: meal_raw.saturates | default: meal_obj.of_which_saturates.value | default: meal_obj.of_which_saturates | default: meal_obj.saturates.value | default: meal_obj.saturates | default: m_prod.metafields.custom.of_which_saturates.value | default: m_prod.metafields.custom.of_which_saturates | default: m_prod.metafields.custom.saturates.value | default: m_prod.metafields.custom.saturates | default: m_prod.metafields.nutrition.saturates.value %}
                       {% endif %}
                       {% if m_carbs == blank %}
-                        {% assign m_carbs = meal_raw.carbohydrates.value | default: meal_raw.carbohydrates | default: meal_raw.carbs.value | default: meal_raw.carbs | default: meal_obj.carbohydrates.value | default: meal_obj.carbohydrates | default: meal_obj.carbs.value | default: meal_obj.carbs | default: m_prod.metafields.custom.carbohydrates.value | default: m_prod.metafields.custom.carbohydrates | default: m_prod.metafields.custom.carbs.value | default: m_prod.metafields.custom.carbs | default: m_prod.metafields.nutrition.carbohydrates.value %}
+                        {% assign m_carbs = current_meal.carbohydrates.value | default: current_meal.carbohydrates | default: current_meal['carbohydrates'].value | default: current_meal['carbohydrates'] | default: current_meal.carbs.value | default: current_meal.carbs | default: meal_raw.carbohydrates.value | default: meal_raw.carbohydrates | default: meal_raw.carbs.value | default: meal_raw.carbs | default: meal_obj.carbohydrates.value | default: meal_obj.carbohydrates | default: meal_obj.carbs.value | default: meal_obj.carbs | default: m_prod.metafields.custom.carbohydrates.value | default: m_prod.metafields.custom.carbohydrates | default: m_prod.metafields.custom.carbs.value | default: m_prod.metafields.custom.carbs | default: m_prod.metafields.nutrition.carbohydrates.value %}
                       {% endif %}
                       {% if m_sugars == blank %}
-                        {% assign m_sugars = meal_raw.of_which_sugars.value | default: meal_raw.of_which_sugars | default: meal_raw.sugars.value | default: meal_raw.sugars | default: meal_obj.of_which_sugars.value | default: meal_obj.of_which_sugars | default: meal_obj.sugars.value | default: meal_obj.sugars | default: m_prod.metafields.custom.of_which_sugars.value | default: m_prod.metafields.custom.of_which_sugars | default: m_prod.metafields.custom.sugars.value | default: m_prod.metafields.custom.sugars | default: m_prod.metafields.nutrition.sugars.value %}
+                        {% assign m_sugars = current_meal.of_which_sugars.value | default: current_meal.of_which_sugars | default: current_meal['of_which_sugars'].value | default: current_meal['of_which_sugars'] | default: current_meal.sugars.value | default: current_meal.sugars | default: meal_raw.of_which_sugars.value | default: meal_raw.of_which_sugars | default: meal_raw.sugars.value | default: meal_raw.sugars | default: meal_obj.of_which_sugars.value | default: meal_obj.of_which_sugars | default: meal_obj.sugars.value | default: meal_obj.sugars | default: m_prod.metafields.custom.of_which_sugars.value | default: m_prod.metafields.custom.of_which_sugars | default: m_prod.metafields.custom.sugars.value | default: m_prod.metafields.custom.sugars | default: m_prod.metafields.nutrition.sugars.value %}
                       {% endif %}
                       {% if m_fibre == blank %}
-                        {% assign m_fibre = meal_raw.fibre.value | default: meal_raw.fibre | default: meal_raw.fiber.value | default: meal_raw.fiber | default: meal_obj.fibre.value | default: meal_obj.fibre | default: meal_obj.fiber.value | default: meal_obj.fiber | default: m_prod.metafields.custom.fibre.value | default: m_prod.metafields.custom.fibre | default: m_prod.metafields.custom.fiber.value | default: m_prod.metafields.custom.fiber | default: m_prod.metafields.nutrition.fibre.value | default: m_prod.metafields.nutrition.fibre | default: m_prod.metafields.nutrition.fiber.value | default: m_prod.metafields.food.fibre.value | default: m_prod.metafields.shopify.fibre.value %}
+                        {% assign m_fibre = current_meal.fibre.value | default: current_meal.fibre | default: current_meal['fibre'].value | default: current_meal['fibre'] | default: current_meal.fiber.value | default: current_meal.fiber | default: current_meal['fiber'].value | default: current_meal['fiber'] | default: meal_raw.fibre.value | default: meal_raw.fibre | default: meal_raw.fiber.value | default: meal_raw.fiber | default: meal_obj.fibre.value | default: meal_obj.fibre | default: meal_obj.fiber.value | default: meal_obj.fiber | default: m_prod.metafields.custom.fibre.value | default: m_prod.metafields.custom.fibre | default: m_prod.metafields.custom.fiber.value | default: m_prod.metafields.custom.fiber | default: m_prod.metafields.nutrition.fibre.value | default: m_prod.metafields.nutrition.fibre | default: m_prod.metafields.nutrition.fiber.value | default: m_prod.metafields.food.fibre.value | default: m_prod.metafields.shopify.fibre.value %}
                       {% endif %}
                       {% if m_salt == blank %}
-                        {% assign m_salt = meal_raw.salt.value | default: meal_raw.salt | default: meal_obj.salt.value | default: meal_obj.salt | default: m_prod.metafields.custom.salt.value | default: m_prod.metafields.custom.salt | default: m_prod.metafields.custom.sodium.value | default: m_prod.metafields.nutrition.salt.value | default: m_prod.metafields.nutrition.salt | default: m_prod.metafields.food.salt.value | default: m_prod.metafields.shopify.salt.value %}
+                        {% assign m_salt = current_meal.salt.value | default: current_meal.salt | default: current_meal['salt'].value | default: current_meal['salt'] | default: current_meal.sodium.value | default: current_meal.sodium | default: current_meal['sodium'].value | default: current_meal['sodium'] | default: meal_raw.salt.value | default: meal_raw.salt | default: meal_obj.salt.value | default: meal_obj.salt | default: m_prod.metafields.custom.salt.value | default: m_prod.metafields.custom.salt | default: m_prod.metafields.custom.sodium.value | default: m_prod.metafields.nutrition.salt.value | default: m_prod.metafields.nutrition.salt | default: m_prod.metafields.food.salt.value | default: m_prod.metafields.shopify.salt.value %}
                       {% endif %}
                       {% if m_serving == blank %}
-                        {% assign m_serving = meal_raw.serving_size.value | default: meal_raw.serving_size | default: meal_obj.serving_size.value | default: meal_obj.serving_size | default: 'Per Serving (420g)' %}
+                        {% assign m_serving = current_meal.serving_size.value | default: current_meal.serving_size | default: current_meal['serving_size'].value | default: current_meal['serving_size'] | default: current_meal.serving.value | default: current_meal.serving | default: meal_raw.serving_size.value | default: meal_raw.serving_size | default: meal_obj.serving_size.value | default: meal_obj.serving_size | default: 'Per Serving (420g)' %}
                       {% endif %}
                       {% comment %} 1. DYNAMIC INGREDIENTS FROM METAFIELD / METAOBJECT / PRODUCT {% endcomment %}
                       {% if m_ingr == blank %}
@@ -937,24 +951,88 @@
                   {% else %}
                 {% endraw %}
                     {% for meal in meals %}
-                      {% assign fb_m_title = meal.title | escape %}
-                      {% assign fb_m_desc = meal.description | escape %}
-                      {% assign fb_m_ingr = meal.ingredients | escape %}
-                      {% assign fb_m_aller = meal.allergens | escape %}
-                      {% assign fb_m_cals = meal.nutrition.energyKcal | default: meal.macros.calories | escape %}
-                      {% assign fb_m_prot = meal.nutrition.protein | default: meal.macros.protein | escape %}
-                      {% assign fb_m_carbs = meal.nutrition.carbs | default: meal.macros.carbs | escape %}
-                      {% assign fb_m_fat = meal.nutrition.fat | default: meal.macros.fat | escape %}
-                      {% assign fb_m_sat = meal.nutrition.saturates | escape %}
-                      {% assign fb_m_sug = meal.nutrition.sugars | escape %}
-                      {% assign fb_m_fib = meal.nutrition.fibre | escape %}
-                      {% assign fb_m_salt = meal.nutrition.salt | escape %}
-                      {% assign fb_m_serv = meal.nutrition.serving | escape %}
-                      {% assign fb_m_kj = meal.nutrition.energyKj | escape %}
+                      {% assign fb_m_title = meal.name.value | default: meal.name | default: meal.title.value | default: meal.title | escape %}
+                      {% assign fb_m_desc = meal.description.value | default: meal.description | escape %}
+                      {% assign fb_m_ingr = meal.ingredients.value | default: meal.ingredients | escape %}
+                      {% assign fb_m_aller = meal.allergens.value | default: meal.allergens | escape %}
+                      {% assign fb_m_cals = meal.energy.value | default: meal.energy | default: meal.nutrition.energyKcal | default: meal.macros.calories | escape %}
+                      {% assign raw_prot = meal.protein.value | default: meal.protein | default: meal.nutrition.protein | default: meal.macros.protein %}
+                      {% if raw_prot != blank and raw_prot != '' %}
+                        {% assign raw_prot_str = raw_prot | append: '' %}
+                        {% unless raw_prot_str contains 'g' or raw_prot_str contains 'G' %}
+                          {% assign raw_prot_str = raw_prot_str | append: 'g' %}
+                        {% endunless %}
+                        {% assign fb_m_prot = raw_prot_str | escape %}
+                      {% else %}
+                        {% assign fb_m_prot = '' %}
+                      {% endif %}
+                      {% assign raw_carbs = meal.carbohydrates.value | default: meal.carbohydrates | default: meal.nutrition.carbs | default: meal.macros.carbs %}
+                      {% if raw_carbs != blank and raw_carbs != '' %}
+                        {% assign raw_carbs_str = raw_carbs | append: '' %}
+                        {% unless raw_carbs_str contains 'g' %}
+                          {% assign raw_carbs_str = raw_carbs_str | append: 'g' %}
+                        {% endunless %}
+                        {% assign fb_m_carbs = raw_carbs_str | escape %}
+                      {% else %}
+                        {% assign fb_m_carbs = '' %}
+                      {% endif %}
+                      {% assign raw_fat = meal.fat.value | default: meal.fat | default: meal.nutrition.fat | default: meal.macros.fat %}
+                      {% if raw_fat != blank and raw_fat != '' %}
+                        {% assign raw_fat_str = raw_fat | append: '' %}
+                        {% unless raw_fat_str contains 'g' %}
+                          {% assign raw_fat_str = raw_fat_str | append: 'g' %}
+                        {% endunless %}
+                        {% assign fb_m_fat = raw_fat_str | escape %}
+                      {% else %}
+                        {% assign fb_m_fat = '' %}
+                      {% endif %}
+                      {% assign raw_sat = meal.of_which_saturates.value | default: meal.of_which_saturates | default: meal.saturates.value | default: meal.saturates | default: meal.nutrition.saturates %}
+                      {% if raw_sat != blank and raw_sat != '' %}
+                        {% assign raw_sat_str = raw_sat | append: '' %}
+                        {% unless raw_sat_str contains 'g' %}
+                          {% assign raw_sat_str = raw_sat_str | append: 'g' %}
+                        {% endunless %}
+                        {% assign fb_m_sat = raw_sat_str | escape %}
+                      {% else %}
+                        {% assign fb_m_sat = '' %}
+                      {% endif %}
+                      {% assign raw_sug = meal.of_which_sugars.value | default: meal.of_which_sugars | default: meal.sugars.value | default: meal.sugars | default: meal.nutrition.sugars %}
+                      {% if raw_sug != blank and raw_sug != '' %}
+                        {% assign raw_sug_str = raw_sug | append: '' %}
+                        {% unless raw_sug_str contains 'g' %}
+                          {% assign raw_sug_str = raw_sug_str | append: 'g' %}
+                        {% endunless %}
+                        {% assign fb_m_sug = raw_sug_str | escape %}
+                      {% else %}
+                        {% assign fb_m_sug = '' %}
+                      {% endif %}
+                      {% assign raw_fib = meal.fibre.value | default: meal.fibre | default: meal.fiber.value | default: meal.fiber | default: meal.nutrition.fibre %}
+                      {% if raw_fib != blank and raw_fib != '' %}
+                        {% assign raw_fib_str = raw_fib | append: '' %}
+                        {% unless raw_fib_str contains 'g' %}
+                          {% assign raw_fib_str = raw_fib_str | append: 'g' %}
+                        {% endunless %}
+                        {% assign fb_m_fib = raw_fib_str | escape %}
+                      {% else %}
+                        {% assign fb_m_fib = '' %}
+                      {% endif %}
+                      {% assign raw_salt = meal.salt.value | default: meal.salt | default: meal.nutrition.salt %}
+                      {% if raw_salt != blank and raw_salt != '' %}
+                        {% assign raw_salt_str = raw_salt | append: '' %}
+                        {% unless raw_salt_str contains 'g' %}
+                          {% assign raw_salt_str = raw_salt_str | append: 'g' %}
+                        {% endunless %}
+                        {% assign fb_m_salt = raw_salt_str | escape %}
+                      {% else %}
+                        {% assign fb_m_salt = '' %}
+                      {% endif %}
+                      {% assign fb_m_serv = meal.serving_size.value | default: meal.serving_size | default: meal.nutrition.serving | default: 'Per Serving (450g)' | escape %}
+                      {% assign fb_m_kj = meal.energy_kj.value | default: meal.energy_kj | default: meal.nutrition.energyKj | escape %}
+                      {% assign fb_m_img = meal.meal_image.value | default: meal.meal_image | default: meal.image | default: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80' %}
                       <article class="gimmie-build-box__meal" 
                                data-meal-id="{{ meal.id }}" 
                                data-title="{{ fb_m_title }}"
-                               data-image="{{ meal.image | escape }}"
+                               data-image="{{ fb_m_img | escape }}"
                                data-desc="{{ fb_m_desc }}"
                                data-ingredients="{{ fb_m_ingr }}"
                                data-allergens="{{ fb_m_aller }}"
@@ -970,21 +1048,21 @@
                                data-kj="{{ fb_m_kj }}"
                                style="display: flex !important; flex-direction: column !important; min-width: 0 !important;">
                         <div class="gimmie-build-box__meal-image-wrap" data-open-modal="{{ meal.id }}">
-                          <img src="{{ meal.image }}" alt="{{ meal.title }}" class="gimmie-build-box__meal-image" loading="lazy">
+                          <img src="{{ fb_m_img }}" alt="{{ fb_m_title }}" class="gimmie-build-box__meal-image" loading="lazy">
                           <button type="button" class="gimmie-build-box__info-btn" title="View Nutrition & Ingredients" data-open-modal="{{ meal.id }}" aria-label="View Nutrition & Ingredients"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 109px; display: block; pointer-events: none;"><path d="M4 0.5H20C21.933 0.5 23.5 2.067 23.5 4V20C23.5 21.933 21.933 23.5 20 23.5H4C2.067 23.5 0.5 21.933 0.5 20V4C0.5 2.067 2.067 0.5 4 0.5Z" fill="white"></path><path d="M4 0.5H20C21.933 0.5 23.5 2.067 23.5 4V20C23.5 21.933 21.933 23.5 20 23.5H4C2.067 23.5 0.5 21.933 0.5 20V4C0.5 2.067 2.067 0.5 4 0.5Z" stroke="white"></path><path d="M12.9928 9.792V18H11.0088V9.792H12.9928ZM13.2648 7.4C13.2648 7.57067 13.2301 7.73067 13.1608 7.88C13.0914 8.02933 12.9981 8.16 12.8808 8.272C12.7688 8.384 12.6354 8.47467 12.4808 8.544C12.3261 8.608 12.1608 8.64 11.9848 8.64C11.8141 8.64 11.6514 8.608 11.4968 8.544C11.3474 8.47467 11.2168 8.384 11.1048 8.272C10.9928 8.16 10.9021 8.02933 10.8328 7.88C10.7688 7.73067 10.7368 7.57067 10.7368 7.4C10.7368 7.224 10.7688 7.05867 10.8328 6.904C10.9021 6.74933 10.9928 6.616 11.1048 6.504C11.2168 6.392 11.3474 6.304 11.4968 6.24C11.6514 6.17067 11.8141 6.136 11.9848 6.136C12.1608 6.136 12.3261 6.17067 12.4808 6.24C12.6354 6.304 12.7688 6.392 12.8808 6.504C12.9981 6.616 13.0914 6.74933 13.1608 6.904C13.2301 7.05867 13.2648 7.224 13.2648 7.4Z" fill="#262421"></path></svg></button>
                         </div>
                         <div class="gimmie-build-box__meal-content">
-                          <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ meal.id }}">{{ meal.title }}</h3>
-                          <p class="gimmie-build-box__meal-description">{{ meal.description }}</p>
+                          <h3 class="gimmie-build-box__meal-title" data-open-modal="{{ meal.id }}">{{ fb_m_title }}</h3>
+                          <p class="gimmie-build-box__meal-description">{{ fb_m_desc }}</p>
                           <div class="gimmie-build-box__meal-macros">
-                            <span class="gimmie-macro-bubble">{{ meal.macros.calories | upcase }}</span>
-                            {% assign fb_m_prot = meal.macros.protein | strip_html | strip %}
-                            {% if fb_m_prot contains 'Protein' or fb_m_prot contains 'PROTEIN' %}
-                              {% assign fb_m_prot_display = fb_m_prot | upcase %}
-                            {% elsif fb_m_prot contains 'g' or fb_m_prot contains 'G' %}
-                              {% assign fb_m_prot_display = fb_m_prot | upcase | append: ' PROTEIN' %}
+                            <span class="gimmie-macro-bubble">{{ fb_m_cals | upcase }}</span>
+                            {% assign fb_m_prot_clean = fb_m_prot | strip_html | strip %}
+                            {% if fb_m_prot_clean contains 'Protein' or fb_m_prot_clean contains 'PROTEIN' %}
+                              {% assign fb_m_prot_display = fb_m_prot_clean | upcase %}
+                            {% elsif fb_m_prot_clean contains 'g' or fb_m_prot_clean contains 'G' %}
+                              {% assign fb_m_prot_display = fb_m_prot_clean | upcase | append: ' PROTEIN' %}
                             {% else %}
-                              {% assign fb_m_prot_display = fb_m_prot | append: 'G PROTEIN' %}
+                              {% assign fb_m_prot_display = fb_m_prot_clean | append: 'G PROTEIN' %}
                             {% endif %}
                             <span class="gimmie-macro-bubble">{{ fb_m_prot_display }}</span>
                           </div>
@@ -1066,11 +1144,16 @@
                 {% raw %}
                   {% if active_meta_addons and active_meta_addons.size > 0 %}
                     {% for addon_raw in active_meta_addons %}
-                      {% assign addon_obj = addon_raw.product.value | default: addon_raw.product | default: addon_raw %}
-                      {% assign a_title = addon_obj.title.value | default: addon_obj.title | default: addon_raw.title | default: addon_raw.name.value | default: addon_raw.name %}
+                      {% assign current_addon = addon_raw.value | default: addon_raw %}
+                      {% assign addon_obj = current_addon.product.value | default: current_addon.product | default: current_addon %}
+                      {% assign a_title = addon_obj.title.value | default: addon_obj.title | default: current_addon.title.value | default: current_addon.title | default: current_addon.name.value | default: current_addon.name | default: addon_raw.title | default: addon_raw.name.value | default: addon_raw.name %}
                       
                       {% assign a_img = nil %}
-                      {% if addon_obj.meal_image.value %}
+                      {% if current_addon.meal_image.value %}
+                        {% assign a_img = current_addon.meal_image.value | image_url: width: 800 %}
+                      {% elsif current_addon.meal_image %}
+                        {% assign a_img = current_addon.meal_image | image_url: width: 800 %}
+                      {% elsif addon_obj.meal_image.value %}
                         {% assign a_img = addon_obj.meal_image.value | image_url: width: 800 %}
                       {% elsif addon_obj.meal_image %}
                         {% assign a_img = addon_obj.meal_image | image_url: width: 800 %}
@@ -1149,7 +1232,7 @@
                         {% assign a_variant_id = 'addon_' | append: forloop.index %}
                       {% endif %}
 
-                      {% assign a_handle = addon_raw.system.handle | default: addon_obj.system.handle | default: addon_obj.handle | default: addon_raw.handle %}
+                      {% assign a_handle = current_addon.system.handle | default: current_addon.handle | default: addon_raw.system.handle | default: addon_obj.system.handle | default: addon_obj.handle | default: addon_raw.handle %}
                       {% if a_handle == blank or a_handle == '' %}
                         {% assign a_handle = a_title | handleize %}
                       {% endif %}
@@ -1177,7 +1260,7 @@
                       {% endif %}
 
                       {% comment %} 1. DYNAMIC SHORT DESCRIPTION EXTRACTION FROM PRODUCT {% endcomment %}
-                      {% assign a_desc = direct_addon.description.value | default: direct_addon.description | default: addon_raw.description.value | default: addon_raw.description | default: addon_obj.metafields.custom.short_description.value | default: addon_obj.metafields.custom.short_description | default: addon_obj.metafields.custom.summary.value | default: addon_obj.metafields.custom.summary | default: direct_addon.summary.value | default: direct_addon.summary | default: addon_obj.metafields.custom.description.value | default: addon_obj.metafields.custom.description | default: addon_raw.summary %}
+                      {% assign a_desc = current_addon.description.value | default: current_addon.description | default: current_addon['description'].value | default: current_addon['description'] | default: current_addon.summary.value | default: current_addon.summary | default: direct_addon.description.value | default: direct_addon.description | default: addon_raw.description.value | default: addon_raw.description | default: addon_obj.metafields.custom.short_description.value | default: addon_obj.metafields.custom.short_description | default: addon_obj.metafields.custom.summary.value | default: addon_obj.metafields.custom.summary | default: direct_addon.summary.value | default: direct_addon.summary | default: addon_obj.metafields.custom.description.value | default: addon_obj.metafields.custom.description | default: addon_raw.summary %}
                       
                       {% comment %} If description is rich text JSON, convert cleanly {% endcomment %}
                       {% if a_desc contains 'root' or a_desc contains 'children' %}
@@ -1202,7 +1285,7 @@
                       {% endif %}
 
                       {% comment %} 2. DYNAMIC INGREDIENTS EXTRACTION FROM PRODUCT {% endcomment %}
-                      {% assign a_ingr = direct_addon.ingredients.value | default: direct_addon.ingredients | default: addon_raw.ingredients.value | default: addon_raw.ingredients | default: addon_obj.metafields.custom.ingredients.value | default: addon_obj.metafields.custom.ingredients | default: addon_obj.metafields.shopify.ingredients.value | default: addon_obj.metafields.shopify.ingredients | default: addon_obj.metafields.food.ingredients.value | default: addon_obj.metafields.food.ingredients | default: addon_obj.metafields.nutrition.ingredients.value | default: addon_obj.metafields.nutrition.ingredients | default: addon_obj.metafields.details.ingredients.value | default: addon_obj.metafields.details.ingredients | default: addon_obj.metafields.my_fields.ingredients.value | default: addon_obj.metafields.my_fields.ingredients %}
+                      {% assign a_ingr = current_addon.ingredients.value | default: current_addon.ingredients | default: current_addon['ingredients'].value | default: current_addon['ingredients'] | default: direct_addon.ingredients.value | default: direct_addon.ingredients | default: addon_raw.ingredients.value | default: addon_raw.ingredients | default: addon_obj.metafields.custom.ingredients.value | default: addon_obj.metafields.custom.ingredients | default: addon_obj.metafields.shopify.ingredients.value | default: addon_obj.metafields.shopify.ingredients | default: addon_obj.metafields.food.ingredients.value | default: addon_obj.metafields.food.ingredients | default: addon_obj.metafields.nutrition.ingredients.value | default: addon_obj.metafields.nutrition.ingredients | default: addon_obj.metafields.details.ingredients.value | default: addon_obj.metafields.details.ingredients | default: addon_obj.metafields.my_fields.ingredients.value | default: addon_obj.metafields.my_fields.ingredients %}
 
                       {% if a_ingr contains 'root' or a_ingr contains 'children' %}
                         {% assign meta_ingr_tag = direct_addon.ingredients | default: addon_raw.ingredients | default: addon_obj.metafields.custom.ingredients | metafield_tag | strip_html | strip %}
@@ -1222,7 +1305,7 @@
                       {% endif %}
 
                       {% comment %} 3. DYNAMIC ALLERGENS EXTRACTION FROM PRODUCT {% endcomment %}
-                      {% assign a_aller = direct_addon.allergens.value | default: direct_addon.allergens | default: addon_raw.allergens.value | default: addon_raw.allergens | default: addon_obj.metafields.custom.allergens.value | default: addon_obj.metafields.custom.allergens | default: addon_obj.metafields.shopify.allergens.value | default: addon_obj.metafields.shopify.allergens | default: addon_obj.metafields.food.allergens.value | default: addon_obj.metafields.food.allergens | default: addon_obj.metafields.nutrition.allergens.value | default: addon_obj.metafields.nutrition.allergens | default: addon_obj.metafields.details.allergens.value | default: addon_obj.metafields.details.allergens | default: addon_obj.metafields.my_fields.allergens.value | default: addon_obj.metafields.my_fields.allergens %}
+                      {% assign a_aller = current_addon.allergens.value | default: current_addon.allergens | default: current_addon['allergens'].value | default: current_addon['allergens'] | default: direct_addon.allergens.value | default: direct_addon.allergens | default: addon_raw.allergens.value | default: addon_raw.allergens | default: addon_obj.metafields.custom.allergens.value | default: addon_obj.metafields.custom.allergens | default: addon_obj.metafields.shopify.allergens.value | default: addon_obj.metafields.shopify.allergens | default: addon_obj.metafields.food.allergens.value | default: addon_obj.metafields.food.allergens | default: addon_obj.metafields.nutrition.allergens.value | default: addon_obj.metafields.nutrition.allergens | default: addon_obj.metafields.details.allergens.value | default: addon_obj.metafields.details.allergens | default: addon_obj.metafields.my_fields.allergens.value | default: addon_obj.metafields.my_fields.allergens %}
 
                       {% if a_aller contains 'root' or a_aller contains 'children' %}
                         {% assign meta_aller_tag = direct_addon.allergens | default: addon_raw.allergens | default: addon_obj.metafields.custom.allergens | metafield_tag | strip_html | strip %}
@@ -1242,7 +1325,7 @@
                       {% endif %}
 
                       {% comment %} 4. DYNAMIC NUTRITIONAL FACTS & MACROS FROM PRODUCT {% endcomment %}
-                      {% assign a_energy_raw = direct_addon.energy.value | default: direct_addon.energy | default: addon_raw.energy.value | default: addon_raw.energy | default: addon_obj.metafields.custom.energy.value | default: addon_obj.metafields.custom.energy | default: addon_obj.metafields.custom.calories.value | default: addon_obj.metafields.custom.calories %}
+                      {% assign a_energy_raw = current_addon.energy.value | default: current_addon.energy | default: current_addon['energy'].value | default: current_addon['energy'] | default: current_addon.calories.value | default: current_addon.calories | default: direct_addon.energy.value | default: direct_addon.energy | default: addon_raw.energy.value | default: addon_raw.energy | default: addon_obj.metafields.custom.energy.value | default: addon_obj.metafields.custom.energy | default: addon_obj.metafields.custom.calories.value | default: addon_obj.metafields.custom.calories %}
                       {% assign a_cals = nil %}
                       {% assign a_kj = nil %}
                       {% if a_energy_raw contains '/' %}
@@ -1256,17 +1339,17 @@
                       {% endif %}
 
                       {% if a_cals == blank %}
-                        {% assign a_cals = direct_addon.calories.value | default: direct_addon.calories | default: direct_addon.energy_kcal.value | default: direct_addon.energy_kcal | default: addon_raw.calories.value | default: addon_raw.calories | default: addon_obj.metafields.custom.calories.value | default: addon_obj.metafields.custom.calories %}
+                        {% assign a_cals = current_addon.calories.value | default: current_addon.calories | default: current_addon['calories'].value | default: current_addon['calories'] | default: direct_addon.calories.value | default: direct_addon.calories | default: direct_addon.energy_kcal.value | default: direct_addon.energy_kcal | default: addon_raw.calories.value | default: addon_raw.calories | default: addon_obj.metafields.custom.calories.value | default: addon_obj.metafields.custom.calories %}
                       {% endif %}
 
-                      {% assign a_prot = direct_addon.protein.value | default: direct_addon.protein | default: addon_raw.protein.value | default: addon_raw.protein | default: addon_obj.metafields.custom.protein.value | default: addon_obj.metafields.custom.protein %}
-                      {% assign a_fat = direct_addon.fat.value | default: direct_addon.fat | default: addon_raw.fat.value | default: addon_raw.fat | default: addon_obj.metafields.custom.fat.value | default: addon_obj.metafields.custom.fat %}
-                      {% assign a_sat = direct_addon.of_which_saturates.value | default: direct_addon.of_which_saturates | default: direct_addon.saturates.value | default: direct_addon.saturates | default: addon_raw.of_which_saturates.value | default: addon_raw.of_which_saturates | default: addon_raw.saturates.value | default: addon_raw.saturates | default: addon_obj.metafields.custom.of_which_saturates.value | default: addon_obj.metafields.custom.saturates.value %}
-                      {% assign a_carbs = direct_addon.carbohydrates.value | default: direct_addon.carbohydrates | default: direct_addon.carbs.value | default: direct_addon.carbs | default: addon_raw.carbohydrates.value | default: addon_raw.carbohydrates | default: addon_raw.carbs.value | default: addon_raw.carbs | default: addon_obj.metafields.custom.carbohydrates.value | default: addon_obj.metafields.custom.carbs.value %}
-                      {% assign a_sug = direct_addon.of_which_sugars.value | default: direct_addon.of_which_sugars | default: direct_addon.sugars.value | default: direct_addon.sugars | default: addon_raw.of_which_sugars.value | default: addon_raw.of_which_sugars | default: addon_raw.sugars.value | default: addon_raw.sugars | default: addon_obj.metafields.custom.of_which_sugars.value | default: addon_obj.metafields.custom.sugars.value %}
-                      {% assign a_fib = direct_addon.fibre.value | default: direct_addon.fibre | default: direct_addon.fiber.value | default: direct_addon.fiber | default: addon_raw.fibre.value | default: addon_raw.fibre | default: addon_raw.fiber.value | default: addon_raw.fiber | default: addon_obj.metafields.custom.fibre.value | default: addon_obj.metafields.custom.fiber.value %}
-                      {% assign a_salt = direct_addon.salt.value | default: direct_addon.salt | default: addon_raw.salt.value | default: addon_raw.salt | default: addon_obj.metafields.custom.salt.value | default: addon_obj.metafields.custom.salt %}
-                      {% assign a_serv = direct_addon.serving_size.value | default: direct_addon.serving_size | default: addon_raw.serving_size.value | default: addon_raw.serving_size | default: addon_obj.metafields.custom.serving_size.value | default: addon_obj.metafields.custom.serving_size %}
+                      {% assign a_prot = current_addon.protein.value | default: current_addon.protein | default: current_addon['protein'].value | default: current_addon['protein'] | default: current_addon.proteins.value | default: current_addon.proteins | default: direct_addon.protein.value | default: direct_addon.protein | default: addon_raw.protein.value | default: addon_raw.protein | default: addon_obj.metafields.custom.protein.value | default: addon_obj.metafields.custom.protein %}
+                      {% assign a_fat = current_addon.fat.value | default: current_addon.fat | default: current_addon['fat'].value | default: current_addon['fat'] | default: direct_addon.fat.value | default: direct_addon.fat | default: addon_raw.fat.value | default: addon_raw.fat | default: addon_obj.metafields.custom.fat.value | default: addon_obj.metafields.custom.fat %}
+                      {% assign a_sat = current_addon.of_which_saturates.value | default: current_addon.of_which_saturates | default: current_addon['of_which_saturates'].value | default: current_addon['of_which_saturates'] | default: current_addon.saturates.value | default: current_addon.saturates | default: direct_addon.of_which_saturates.value | default: direct_addon.of_which_saturates | default: addon_raw.of_which_saturates.value | default: addon_raw.of_which_saturates | default: addon_raw.saturates.value | default: addon_raw.saturates | default: addon_obj.metafields.custom.of_which_saturates.value | default: addon_obj.metafields.custom.saturates.value %}
+                      {% assign a_carbs = current_addon.carbohydrates.value | default: current_addon.carbohydrates | default: current_addon['carbohydrates'].value | default: current_addon['carbohydrates'] | default: current_addon.carbs.value | default: current_addon.carbs | default: direct_addon.carbohydrates.value | default: direct_addon.carbohydrates | default: addon_raw.carbohydrates.value | default: addon_raw.carbohydrates | default: addon_raw.carbs.value | default: addon_raw.carbs | default: addon_obj.metafields.custom.carbohydrates.value | default: addon_obj.metafields.custom.carbs.value %}
+                      {% assign a_sug = current_addon.of_which_sugars.value | default: current_addon.of_which_sugars | default: current_addon['of_which_sugars'].value | default: current_addon['of_which_sugars'] | default: current_addon.sugars.value | default: current_addon.sugars | default: direct_addon.of_which_sugars.value | default: direct_addon.of_which_sugars | default: addon_raw.of_which_sugars.value | default: addon_raw.of_which_sugars | default: addon_raw.sugars.value | default: addon_raw.sugars | default: addon_obj.metafields.custom.of_which_sugars.value | default: addon_obj.metafields.custom.sugars.value %}
+                      {% assign a_fib = current_addon.fibre.value | default: current_addon.fibre | default: current_addon['fibre'].value | default: current_addon['fibre'] | default: current_addon.fiber.value | default: current_addon.fiber | default: current_addon['fiber'].value | default: current_addon['fiber'] | default: direct_addon.fibre.value | default: direct_addon.fibre | default: direct_addon.fiber.value | default: direct_addon.fiber | default: addon_raw.fibre.value | default: addon_raw.fibre | default: addon_raw.fiber.value | default: addon_raw.fiber | default: addon_obj.metafields.custom.fibre.value | default: addon_obj.metafields.custom.fiber.value %}
+                      {% assign a_salt = current_addon.salt.value | default: current_addon.salt | default: current_addon['salt'].value | default: current_addon['salt'] | default: current_addon.sodium.value | default: current_addon.sodium | default: direct_addon.salt.value | default: direct_addon.salt | default: addon_raw.salt.value | default: addon_raw.salt | default: addon_obj.metafields.custom.salt.value | default: addon_obj.metafields.custom.salt %}
+                      {% assign a_serv = current_addon.serving_size.value | default: current_addon.serving_size | default: current_addon['serving_size'].value | default: current_addon['serving_size'] | default: current_addon.serving.value | default: current_addon.serving | default: direct_addon.serving_size.value | default: direct_addon.serving_size | default: addon_raw.serving_size.value | default: addon_raw.serving_size | default: addon_obj.metafields.custom.serving_size.value | default: addon_obj.metafields.custom.serving_size %}
 
                       {% comment %} Extract via field iterator for direct metaobject Drops {% endcomment %}
                       {% if addon_raw.fields %}
@@ -3166,6 +3249,7 @@
       const formatGramVal = (val, wordToRemove) => {
         if (!val || val === '-' || val === 'null' || val === 'undefined') return '-';
         let str = String(val).trim();
+        str = str.replace(/[#]/g, '').trim();
         if (wordToRemove) {
           str = str.replace(new RegExp(wordToRemove, 'i'), '').trim();
         }
