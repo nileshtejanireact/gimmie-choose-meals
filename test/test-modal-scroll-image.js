@@ -36,13 +36,13 @@ assert(styles.includes('scrollbar-color: #8FAF8F transparent'), 'Right column mu
 assert(styles.includes('body.gimmie-build-box-modal-open'), 'Body modal open locking rule must exist');
 console.log('✓ CSS: right column scroll (overflow-y: auto), custom scrollbar, and body scroll lock verified');
 
-// 5. Check Green Border & Styling on Image Wrap (Sage green #8FAF8F, radial gradient, 4px shadow, align-self start)
-assert(styles.includes('border: 2px solid #8FAF8F !important'), 'Modal dialog and image wrap must have green border #8FAF8F');
-assert(!styles.includes('.gimmie-build-box__meal-modal-dialog,\n.gimmie-modal__content {\n  position: relative !important;\n  z-index: 2 !important;\n  width: 100% !important;\n  max-width: 960px !important;\n  max-height: 90vh !important;\n  background: #FFFDF9 !important;\n  border: 2px solid #102B10'), 'Modal dialog must NOT have black border');
-assert(styles.includes('align-self: start !important'), 'Image wrap must have align-self: start matching live reference');
-assert(styles.includes('box-shadow: 4px 4px 0 #8FAF8F !important'), 'Image wrap must have retro 4px shadow #8FAF8F');
-assert(styles.includes('radial-gradient'), 'Image wrap must have radial gradient background');
+// 5. Check Styling on Modal Dialog & Image Wrap (Modal dialog #8FAF8F, Image wrap black #102B10 & cream #F6F1E7)
+assert(styles.includes('border: 2px solid #8FAF8F !important'), 'Modal dialog must have green border #8FAF8F');
+assert(styles.includes('border: 2px solid #102B10 !important'), 'Image wrap must have black border #102B10 matching page');
+assert(styles.includes('background-color: #F6F1E7 !important'), 'Image wrap must have cream background #F6F1E7 matching page');
+assert(styles.includes('box-shadow: 4px 4px 0 #102B10 !important'), 'Image wrap must have retro 4px shadow #102B10');
+assert(styles.includes('align-self: start !important'), 'Image wrap must have align-self: start');
 assert(styles.includes('filter: drop-shadow'), 'Image must have soft natural dish shadow');
-console.log('✓ Modal styling: Sage green border (#8FAF8F), radial gradient, retro 4px shadow, align-self: start, and natural dish shadow verified');
+console.log('✓ Modal styling: Sage green modal border (#8FAF8F), black image border (#102B10), cream background (#F6F1E7), and align-self: start verified');
 
 console.log('\n🎉 ALL MODAL SCROLL & IMAGE TESTS PASSED PERFECTLY!');
