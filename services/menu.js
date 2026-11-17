@@ -604,7 +604,7 @@ class MenuService {
         badges: ['ADD-ON', 'SWEET & HEALTHY'],
         macros: {
           calories: '410 kcal',
-          protein: '32g Protein',
+          protein: '40.0g Protein',
           carbs: '52g Carbs',
           fat: '8.8g Fat'
         },
@@ -616,9 +616,9 @@ class MenuService {
           saturates: '3.0g',
           carbs: '52.0g',
           sugars: '13.0g',
-          fibre: '6.2g',
-          protein: '32g',
-          salt: '0.28g'
+          fibre: '11.1g',
+          protein: '40.0g',
+          salt: '0.63g'
         },
         allergens: 'Milk, Gluten (Oats), Soya',
         ingredients: 'Rolled Oats (Gluten) (40%), Skimmed Milk (24%), Greek Style Yoghurt (Milk) (14%), Whey Protein Concentrate (Milk, Soy Lecithin) (10%), Fresh Raspberries (7%), White Chocolate Curls (Milk, Soya, Sugar, Cocoa Butter, Whole Milk Powder) (3%), Chia Seeds (2%).'
