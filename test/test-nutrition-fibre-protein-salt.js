@@ -78,6 +78,11 @@ async function runNutritionTest() {
   assert(liquid.includes("m_prod.metafields.custom.salt"), 'Must inspect product custom metafields for salt');
   console.log('✓ Metafield and metaobject fields extraction logic for protein, fibre, and salt verified');
 
+  // 6. Verify formatGramVal rounds whole numbers / .0 and rounds Protein to integer
+  assert(liquid.includes("isProtein"), 'formatGramVal must accept isProtein flag');
+  assert(liquid.includes("Math.round(num) + 'g'"), 'formatGramVal must round integers to whole numbers with g');
+  console.log('✓ formatGramVal rounds whole numbers (e.g. 39.0g -> 39g) and rounds Protein to whole number');
+
   console.log('\n🎉 ALL NUTRITION FIBRE, PROTEIN, AND SALT TESTS PASSED PERFECTLY!');
 }
 

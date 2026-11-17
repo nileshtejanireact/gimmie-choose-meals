@@ -847,12 +847,13 @@
 
                       {% assign m_prot_raw = m_prot | strip_html | strip %}
                       {% if m_prot_raw != blank and m_prot_raw != '' %}
-                        {% if m_prot_raw contains 'Protein' or m_prot_raw contains 'PROTEIN' %}
-                          {% assign m_prot_display = m_prot_raw %}
-                        {% elsif m_prot_raw contains 'g' or m_prot_raw contains 'G' %}
-                          {% assign m_prot_display = m_prot_raw | append: ' Protein' %}
+                        {% assign m_prot_rounded = m_prot_raw | replace: '.0g', 'g' | replace: '.0G', 'G' | replace: '.0', '' %}
+                        {% if m_prot_rounded contains 'Protein' or m_prot_rounded contains 'PROTEIN' %}
+                          {% assign m_prot_display = m_prot_rounded %}
+                        {% elsif m_prot_rounded contains 'g' or m_prot_rounded contains 'G' %}
+                          {% assign m_prot_display = m_prot_rounded | append: ' Protein' %}
                         {% else %}
-                          {% assign m_prot_display = m_prot_raw | append: 'g Protein' %}
+                          {% assign m_prot_display = m_prot_rounded | append: 'g Protein' %}
                         {% endif %}
                       {% else %}
                         {% assign m_prot_display = '' %}
@@ -1639,12 +1640,13 @@
 
 
                       {% assign a_prot_raw = a_prot | strip_html | strip %}
-                      {% if a_prot_raw contains 'Protein' or a_prot_raw contains 'PROTEIN' %}
-                        {% assign a_prot_display = a_prot_raw | upcase %}
-                      {% elsif a_prot_raw contains 'g' or a_prot_raw contains 'G' %}
-                        {% assign a_prot_display = a_prot_raw | upcase | append: ' PROTEIN' %}
+                      {% assign a_prot_rounded = a_prot_raw | replace: '.0g', 'g' | replace: '.0G', 'G' | replace: '.0', '' %}
+                      {% if a_prot_rounded contains 'Protein' or a_prot_rounded contains 'PROTEIN' %}
+                        {% assign a_prot_display = a_prot_rounded | upcase %}
+                      {% elsif a_prot_rounded contains 'g' or a_prot_rounded contains 'G' %}
+                        {% assign a_prot_display = a_prot_rounded | upcase | append: ' PROTEIN' %}
                       {% else %}
-                        {% assign a_prot_display = a_prot_raw | append: 'G PROTEIN' %}
+                        {% assign a_prot_display = a_prot_rounded | append: 'G PROTEIN' %}
                       {% endif %}
 
                       <article
@@ -3294,7 +3296,7 @@
       let energyDisplay = '';
       const combinedEnergy = (rawKj && rawKj.includes('/')) ? rawKj : ((rawCals && rawCals.includes('/')) ? rawCals : '');
       if (combinedEnergy) {
-        energyDisplay = combinedEnergy.replace(/\s+/g, ' ').trim();
+        energyDisplay = combinedEnergy.replace(/(\d+)\.0+\s*(kj|kcal)/gi, '$1 $2').replace(/\s+/g, ' ').trim();
       } else {
         let cleanKjNum = null;
         let cleanKcalNum = null;
@@ -3322,16 +3324,18 @@
           const fbKj = (fallbackDish.nutrition.energyKj || '').replace(/kj/i, '').trim();
           const fbKcal = (fallbackDish.nutrition.energyKcal || '').replace(/kcal/i, '').trim();
           if (fbKj && fbKcal) {
-            energyDisplay = `${fbKj} kj / ${fbKcal} kcal`;
+            const kjR = Math.round(parseFloat(fbKj)) || fbKj;
+            const kcalR = Math.round(parseFloat(fbKcal)) || fbKcal;
+            energyDisplay = `${kjR} kj / ${kcalR} kcal`;
           } else {
-            energyDisplay = fbKcal ? `${fbKcal} kcal` : (fbKj ? `${fbKj} kj` : '-');
+            energyDisplay = fbKcal ? `${Math.round(parseFloat(fbKcal)) || fbKcal} kcal` : (fbKj ? `${Math.round(parseFloat(fbKj)) || fbKj} kj` : '-');
           }
         } else {
           energyDisplay = '-';
         }
       }
 
-      const formatGramVal = (val, wordToRemove) => {
+      const formatGramVal = (val, wordToRemove, isProtein = false) => {
         if (!val || val === '-' || val === 'null' || val === 'undefined') return '-';
         let str = String(val).trim();
         str = str.replace(/[#]/g, '').trim();
@@ -3340,8 +3344,19 @@
         }
         str = str.replace(/g$/i, '').trim();
         if (str === '' || isNaN(parseFloat(str))) return '-';
-        if (!isNaN(parseFloat(str)) && isFinite(str)) {
-          return str + 'g';
+        const num = parseFloat(str);
+        if (!isNaN(num) && isFinite(num)) {
+          // Protein is always rounded to a clean integer (e.g. 39.0g -> 39g, 40.0g -> 40g)
+          if (isProtein) {
+            return Math.round(num) + 'g';
+          }
+          // If any nutrient has a whole number or ends in .0, round to integer (e.g. 3.0g -> 3g, 13.0g -> 13g, 40.0g -> 40g)
+          if (Math.abs(num - Math.round(num)) < 0.0001) {
+            return Math.round(num) + 'g';
+          }
+          // Preserve exact decimal precision without trailing zeros (e.g. 10.6g, 0.62g)
+          const rounded = parseFloat(num.toFixed(2));
+          return rounded + 'g';
         }
         return str;
       };
@@ -3351,7 +3366,7 @@
       const cleanCarbs = formatGramVal(rawCarbs, 'carbs?');
       const cleanSug = formatGramVal(rawSug);
       const cleanFib = formatGramVal(rawFib);
-      const cleanProt = formatGramVal(rawProt, 'protein');
+      const cleanProt = formatGramVal(rawProt, 'protein', true);
       const cleanSalt = formatGramVal(rawSalt);
 
       if (modalTableBody) {
