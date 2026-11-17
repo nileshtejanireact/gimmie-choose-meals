@@ -30,14 +30,14 @@ async function testOatsInfo() {
     { name: 'Contains BISCOFF BISCUIT PROTEIN OATS', pass: rendered.includes('BISCOFF BISCUIT PROTEIN OATS') },
     { name: 'Contains RASPBERRY & WHITE CHOC PROTEIN OATS', pass: rendered.includes('RASPBERRY & WHITE CHOC PROTEIN OATS') },
     { name: 'Blueberry Oats calories is 426 KCAL (not 567)', pass: rendered.includes('426 KCAL') },
-    { name: 'Blueberry Oats protein is 32G PROTEIN (not 46G)', pass: rendered.includes('32G PROTEIN') },
+    { name: 'Blueberry Oats protein is 39G / 39.0G PROTEIN (not 32G or 46G)', pass: rendered.includes('39G PROTEIN') || rendered.includes('39.0G PROTEIN') },
     { name: 'Biscoff Oats calories is 493 KCAL (not 567)', pass: rendered.includes('493 KCAL') },
     { name: 'Biscoff Oats protein is 39G / 39.0G PROTEIN (not 46G)', pass: rendered.includes('39G PROTEIN') || rendered.includes('39.0G PROTEIN') || rendered.includes('31G PROTEIN') || rendered.includes('31.0G PROTEIN') },
     { name: 'Raspberry Oats calories is 410 KCAL (not 567)', pass: rendered.includes('410 KCAL') },
     { name: 'Raspberry Oats protein is 40G / 40.0G PROTEIN (not 32G)', pass: rendered.includes('40G PROTEIN') || rendered.includes('40.0G PROTEIN') },
     { name: 'Contains Real Blueberry Oats Ingredients with bolding', pass: rendered.includes('Porridge &lt;strong&gt;Oats&lt;/strong&gt;') || rendered.includes('Porridge <strong>Oats</strong>') },
     { name: 'Contains Real Blueberry Oats Allergens (Oats, Milk, Soya)', pass: rendered.includes('Oats, Milk, Soya') },
-    { name: 'Client JS openModal contains Blueberry Oats definition', pass: rendered.includes("titleLower.includes('blueberry')") }
+    { name: 'Client JS openModal contains Blueberry Oats definition', pass: rendered.includes("titleNorm.includes('blueberry')") || rendered.includes("titleLower.includes('blueberry')") }
   ];
 
   let ok = true;

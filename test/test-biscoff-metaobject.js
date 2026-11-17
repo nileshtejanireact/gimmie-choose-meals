@@ -50,6 +50,9 @@ async function testBiscoffMetaobject() {
   assert(rendered.includes('data-saturates="2.8g"'), 'Blueberry data-saturates must be 2.8g');
   assert(rendered.includes('data-carbs="40.7g"'), 'Blueberry data-carbs must be 40.7g');
   assert(rendered.includes('data-sugars="20.7g"'), 'Blueberry data-sugars must be 20.7g');
+  assert(rendered.includes('data-fibre="9.9g"'), 'Blueberry data-fibre must be 9.9g');
+  assert(rendered.includes('data-prot="39.0g"') || rendered.includes('data-prot="39g"'), 'Blueberry data-prot must be 39.0g or 39g');
+  assert(rendered.includes('data-salt="0.62g"'), 'Blueberry data-salt must be 0.62g');
   console.log('✓ Blueberry Oats Card DOM attributes match store reality 100%');
 
   // Verify JS openModal extraction logic

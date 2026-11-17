@@ -40,6 +40,12 @@ async function runNutritionTest() {
   assert(rendered.includes('data-prot="40.0g"') || rendered.includes('data-prot="40g"'), 'Raspberry Oats data-prot must be 40.0g or 40g');
   console.log('✓ Raspberry Oats: fibre (11.1g), protein (40.0g), salt (0.63g) verified in DOM card');
 
+  // 1c. Verify Blueberry Oats DOM card attributes match Shopify Admin Metaobject reality exactly
+  assert(rendered.includes('data-fibre="9.9g"'), 'Blueberry Oats data-fibre must be 9.9g');
+  assert(rendered.includes('data-salt="0.62g"'), 'Blueberry Oats data-salt must be 0.62g');
+  assert(rendered.includes('data-prot="39.0g"') || rendered.includes('data-prot="39g"'), 'Blueberry Oats data-prot must be 39.0g or 39g');
+  console.log('✓ Blueberry Oats: fibre (9.9g), protein (39.0g), salt (0.62g) verified in DOM card');
+
   // 2. Verify no corrupted blank attributes exist like data-fibre="g" or data-salt="g" or data-prot="g Protein"
   assert(!rendered.includes('data-fibre="g"'), 'Must never render data-fibre="g"');
   assert(!rendered.includes('data-salt="g"'), 'Must never render data-salt="g"');

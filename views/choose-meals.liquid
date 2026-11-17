@@ -367,11 +367,17 @@
                       {% endif %}
 
                       {% assign direct_meal = shop.metaobjects.meal[meal_handle] %}
-                      {% if direct_meal == blank %}
+                      {% if direct_meal == blank or direct_meal.protein == blank %}
+                        {% assign mh1 = m_title | handleize %}
+                        {% assign mh2 = m_title | replace: '&', 'and' | handleize %}
+                        {% assign mh3 = m_title | replace: '&', '' | handleize %}
+                        {% assign mh4 = m_title | replace: ' & ', ' and ' | handleize %}
+                        {% assign mh5 = m_title | replace: ' & ', '-' | handleize %}
                         {% assign handle_alt = m_title | downcase | replace: ' ', '-' | replace: '&', 'and' | replace: "'", "" %}
-                        {% assign direct_meal = shop.metaobjects.meal[handle_alt] %}
+                        {% assign handle_alt2 = m_title | downcase | replace: ' ', '-' | replace: '&', '' | replace: "'", "" %}
+                        {% assign direct_meal = shop.metaobjects.meal[mh1] | default: shop.metaobjects.meal[mh2] | default: shop.metaobjects.meal[mh3] | default: shop.metaobjects.meal[mh4] | default: shop.metaobjects.meal[mh5] | default: shop.metaobjects.meal[handle_alt] | default: shop.metaobjects.meal[handle_alt2] %}
                       {% endif %}
-                      {% if direct_meal == blank %}
+                      {% if direct_meal == blank or direct_meal.protein == blank %}
                         {% assign down_check = m_title | downcase %}
                         {% if down_check contains 'thai' and down_check contains 'curry' %}
                           {% assign direct_meal = shop.metaobjects.meal['thai-red-chicken-curry'] %}
@@ -387,7 +393,24 @@
                           {% assign direct_meal = shop.metaobjects.meal['chicken-fajita-bowl'] | default: shop.metaobjects.meal['chicken-fajita'] %}
                         {% elsif down_check contains 'white wine' or down_check contains 'creamy white wine' %}
                           {% assign direct_meal = shop.metaobjects.meal['creamy-white-wine-chicken'] | default: shop.metaobjects.meal['white-wine-chicken'] | default: shop.metaobjects.meal['creamy-white-wine'] %}
+                        {% elsif down_check contains 'lemon' and down_check contains 'herb' %}
+                          {% assign direct_meal = shop.metaobjects.meal['lemon-herb-chicken'] | default: shop.metaobjects.meal['lemon-and-herb-chicken'] | default: shop.metaobjects.meal['mediterranean-lemon-herb-chicken'] %}
                         {% endif %}
+                      {% endif %}
+                      {% if direct_meal == blank or direct_meal.protein == blank %}
+                        {% assign m_norm_title = m_title | downcase | replace: '&', 'and' | replace: '  ', ' ' | strip %}
+                        {% for mm in shop.metaobjects.meal.values %}
+                          {% assign mm_name = mm.name.value | default: mm.name | default: mm.title.value | default: mm.title | default: '' | downcase | replace: '&', 'and' | replace: '  ', ' ' | strip %}
+                          {% if mm_name != '' %}
+                            {% if mm_name == m_norm_title %}
+                              {% assign direct_meal = mm %}
+                              {% break %}
+                            {% elsif m_norm_title contains mm_name or mm_name contains m_norm_title %}
+                              {% assign direct_meal = mm %}
+                              {% break %}
+                            {% endif %}
+                          {% endif %}
+                        {% endfor %}
                       {% endif %}
 
                       {% assign m_desc = nil %}
@@ -1252,26 +1275,41 @@
                         {% assign a_handle = a_title | handleize %}
                       {% endif %}
                       {% assign direct_addon = current_addon %}
-                      {% if direct_addon.name == blank and direct_addon.title == blank %}
-                        {% assign direct_addon = shop.metaobjects.meal[a_handle] | default: shop.metaobjects.addon[a_handle] | default: shop.metaobjects.add_on[a_handle] | default: shop.metaobjects.addon_product[a_handle] | default: shop.metaobjects.dish[a_handle] %}
+                      {% assign ah1 = a_title | handleize %}
+                      {% assign ah2 = a_title | replace: '&', 'and' | handleize %}
+                      {% assign ah3 = a_title | replace: '&', '' | handleize %}
+                      {% assign ah4 = a_title | replace: ' & ', ' and ' | handleize %}
+                      {% assign ah5 = a_title | replace: ' & ', '-' | handleize %}
+                      {% assign handle_alt = a_title | downcase | replace: ' ', '-' | replace: '&', 'and' | replace: "'", "" %}
+                      {% assign handle_alt2 = a_title | downcase | replace: ' ', '-' | replace: ' & ', '-' | replace: '&', '' | replace: "'", "" %}
+
+                      {% if direct_addon.name == blank and direct_addon.title == blank or direct_addon.protein == blank or direct_addon.fibre == blank %}
+                        {% assign direct_addon = shop.metaobjects.meal[a_handle] | default: shop.metaobjects.meal[ah1] | default: shop.metaobjects.meal[ah2] | default: shop.metaobjects.meal[ah3] | default: shop.metaobjects.meal[ah4] | default: shop.metaobjects.meal[ah5] | default: shop.metaobjects.meal[handle_alt] | default: shop.metaobjects.meal[handle_alt2] | default: shop.metaobjects.addon[a_handle] | default: shop.metaobjects.add_on[a_handle] | default: shop.metaobjects.addon_product[a_handle] | default: shop.metaobjects.dish[a_handle] %}
                       {% endif %}
-                      {% if direct_addon == blank %}
-                        {% assign handle_alt = a_title | downcase | replace: ' ', '-' | replace: '&', 'and' | replace: "'", "" %}
-                        {% assign direct_addon = shop.metaobjects.meal[handle_alt] %}
-                      {% endif %}
-                      {% if direct_addon == blank %}
-                        {% assign handle_alt2 = a_title | downcase | replace: ' ', '-' | replace: ' & ', '-' | replace: '&', '' | replace: "'", "" %}
-                        {% assign direct_addon = shop.metaobjects.meal[handle_alt2] %}
-                      {% endif %}
-                      {% if direct_addon == blank %}
+                      {% if direct_addon == blank or direct_addon.protein == blank or direct_addon.fibre == blank %}
                         {% assign a_down = a_title | downcase %}
                         {% if a_down contains 'biscoff' %}
                           {% assign direct_addon = shop.metaobjects.meal['biscoff-protein-oats'] | default: shop.metaobjects.meal['biscoff-biscuit-protein-oats'] %}
                         {% elsif a_down contains 'blueberry' %}
-                          {% assign direct_addon = shop.metaobjects.meal['blueberry-lemon-protein-oats'] | default: shop.metaobjects.meal['blueberry-protein-oats'] %}
+                          {% assign direct_addon = shop.metaobjects.meal['blueberry-and-lemon-protein-oats'] | default: shop.metaobjects.meal['blueberry-lemon-protein-oats'] | default: shop.metaobjects.meal['blueberry-protein-oats'] %}
                         {% elsif a_down contains 'raspberry' %}
                           {% assign direct_addon = shop.metaobjects.meal['raspberry-white-choc-protein-oats'] | default: shop.metaobjects.meal['raspberry-and-white-choc-protein-oats'] | default: shop.metaobjects.meal['raspberry-white-chocolate-protein-oats'] | default: shop.metaobjects.meal['raspberry-protein-oats'] %}
                         {% endif %}
+                      {% endif %}
+                      {% if direct_addon == blank or direct_addon.protein == blank or direct_addon.fibre == blank %}
+                        {% assign a_norm_title = a_title | downcase | replace: '&', 'and' | replace: '  ', ' ' | strip %}
+                        {% for am in shop.metaobjects.meal.values %}
+                          {% assign am_name = am.name.value | default: am.name | default: am.title.value | default: am.title | default: '' | downcase | replace: '&', 'and' | replace: '  ', ' ' | strip %}
+                          {% if am_name != '' %}
+                            {% if am_name == a_norm_title %}
+                              {% assign direct_addon = am %}
+                              {% break %}
+                            {% elsif a_norm_title contains am_name or am_name contains a_norm_title %}
+                              {% assign direct_addon = am %}
+                              {% break %}
+                            {% endif %}
+                          {% endif %}
+                        {% endfor %}
                       {% endif %}
 
                       {% comment %} Full Shopify Product Drop Lookup for Metafields {% endcomment %}
@@ -1467,13 +1505,13 @@
                         {% if a_ingr == blank %}{% assign a_ingr = 'Porridge <strong>Oats</strong>, Whey Protein (<strong>Milk, Soya</strong>), 0% Fat Greek Yoghurt (<strong>Milk</strong>), Semi Skimmed <strong>Milk</strong>, Chia Seeds, Blueberries, Lemon Zest.<br><br>May contain: <strong>Peanuts, Nuts, Sesame</strong>.' %}{% endif %}
                         {% if a_aller == blank %}{% assign a_aller = 'Oats, Milk, Soya' %}{% endif %}
                         {% if a_cals == blank %}{% assign a_cals = '426 kcal' %}{% endif %}
-                        {% if a_prot == blank %}{% assign a_prot = '32g' %}{% endif %}
+                        {% if a_prot == blank %}{% assign a_prot = '39.0g' %}{% endif %}
                         {% if a_fat == blank %}{% assign a_fat = '10.6g' %}{% endif %}
                         {% if a_sat == blank %}{% assign a_sat = '2.8g' %}{% endif %}
                         {% if a_carbs == blank %}{% assign a_carbs = '40.7g' %}{% endif %}
                         {% if a_sug == blank %}{% assign a_sug = '20.7g' %}{% endif %}
-                        {% if a_fib == blank %}{% assign a_fib = '5.0g' %}{% endif %}
-                        {% if a_salt == blank %}{% assign a_salt = '0.35g' %}{% endif %}
+                        {% if a_fib == blank %}{% assign a_fib = '9.9g' %}{% endif %}
+                        {% if a_salt == blank %}{% assign a_salt = '0.62g' %}{% endif %}
                         {% if a_serv == blank %}{% assign a_serv = 'Per Pot (300g)' %}{% endif %}
                         {% if a_kj == blank %}{% assign a_kj = '1782 kJ' %}{% endif %}
                       {% elsif down_at contains 'biscoff' %}
@@ -2867,29 +2905,30 @@
       // Extract raw values prioritizing clicked card DOM data-attributes
       const rawTitle = (card ? card.getAttribute('data-title') : '') || item.title || '';
       const titleLower = rawTitle.toLowerCase();
+      const titleNorm = titleLower.replace(/&/g, 'and').replace(/\s+/g, ' ').trim();
 
       // Reliable Image Extraction (Card attribute -> Card img src -> Item object -> Food category fallback)
       const cardImgEl = card ? card.querySelector('.gimmie-build-box__meal-image, img') : null;
       let rawImage = (card ? card.getAttribute('data-image') : '') || (cardImgEl ? (cardImgEl.getAttribute('src') || cardImgEl.src) : '') || item.image || '';
 
       if (!rawImage || rawImage.includes('data:image') || rawImage === 'null') {
-        if (titleLower.includes('thai') || titleLower.includes('curry')) {
+        if (titleNorm.includes('thai') || titleNorm.includes('curry')) {
           rawImage = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
-        } else if (titleLower.includes('sausage') || titleLower.includes('ragu') || titleLower.includes('rigatoni')) {
+        } else if (titleNorm.includes('sausage') || titleNorm.includes('ragu') || titleNorm.includes('rigatoni')) {
           rawImage = 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80';
-        } else if (titleLower.includes('tarragon')) {
+        } else if (titleNorm.includes('tarragon')) {
           rawImage = 'https://images.unsplash.com/photo-1547496502-affa22d38842?auto=format&fit=crop&w=800&q=80';
-        } else if (titleLower.includes('hoisin') || (titleLower.includes('beef') && titleLower.includes('bowl'))) {
+        } else if (titleNorm.includes('hoisin') || (titleNorm.includes('beef') && titleNorm.includes('bowl'))) {
           rawImage = 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80';
-        } else if (titleLower.includes('gnocchi') || titleLower.includes('bolognese')) {
+        } else if (titleNorm.includes('gnocchi') || titleNorm.includes('bolognese')) {
           rawImage = 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80';
-        } else if (titleLower.includes('fajita')) {
+        } else if (titleNorm.includes('fajita')) {
           rawImage = 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=800&q=80';
-        } else if (titleLower.includes('biscoff')) {
+        } else if (titleNorm.includes('biscoff')) {
           rawImage = 'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=800&q=80';
-        } else if (titleLower.includes('blueberry')) {
+        } else if (titleNorm.includes('blueberry')) {
           rawImage = 'https://images.unsplash.com/photo-1584985314300-8806c9e0d16a?auto=format&fit=crop&w=800&q=80';
-        } else if (titleLower.includes('raspberry')) {
+        } else if (titleNorm.includes('raspberry')) {
           rawImage = 'https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=800&q=80';
         } else {
           rawImage = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
@@ -3077,7 +3116,7 @@
             salt: '0.76g'
           }
         };
-      } else if (titleLower.includes('blueberry') && (titleLower.includes('oats') || titleLower.includes('lemon'))) {
+      } else if (titleNorm.includes('blueberry') && (titleNorm.includes('oats') || titleNorm.includes('lemon'))) {
         fallbackDish = {
           desc: 'Creamy overnight oats blended with premium whey protein, Greek yoghurt and chia seeds. Loaded with blueberries and lemon zest.',
           ingredients: 'Porridge <strong>Oats</strong>, Whey Protein (<strong>Milk, Soya</strong>), 0% Fat Greek Yoghurt (<strong>Milk</strong>), Semi Skimmed <strong>Milk</strong>, Chia Seeds, Blueberries, Lemon Zest.<br><br>May contain: <strong>Peanuts, Nuts, Sesame</strong>.',
@@ -3090,12 +3129,12 @@
             saturates: '2.8g',
             carbs: '40.7g',
             sugars: '20.7g',
-            fibre: '5.0g',
-            protein: '32.0g',
-            salt: '0.35g'
+            fibre: '9.9g',
+            protein: '39.0g',
+            salt: '0.62g'
           }
         };
-      } else if (titleLower.includes('raspberry') && (titleLower.includes('oats') || titleLower.includes('choc'))) {
+      } else if (titleNorm.includes('raspberry') && (titleNorm.includes('oats') || titleNorm.includes('choc'))) {
         fallbackDish = {
           desc: 'Creamy protein overnight oats folded with juicy tart raspberries, vanilla whey protein, and delicate Belgian white chocolate curls.',
           ingredients: 'Rolled Oats (Gluten) (40%), Skimmed Milk (24%), Greek Style Yoghurt (Milk) (14%), Whey Protein Concentrate (Milk, Soy Lecithin) (10%), Fresh Raspberries (7%), White Chocolate Curls (Milk, Soya, Sugar, Cocoa Butter, Whole Milk Powder) (3%), Chia Seeds (2%).',
@@ -3113,7 +3152,7 @@
             salt: '0.63g'
           }
         };
-      } else if (titleLower.includes('cottage') && titleLower.includes('pie')) {
+      } else if (titleNorm.includes('cottage') && titleNorm.includes('pie')) {
         fallbackDish = {
           desc: 'Slow-simmered lean British minced beef and sweet garden carrots in a rich, herbed red wine and beef gravy, topped with velvety sweet potato mash.',
           ingredients: 'British Minced Beef (38%), Sweet Potato Mash (35%) (Sweet Potato, Unsalted Butter (Milk), Salt, White Pepper), Diced Carrots (12%), Chopped Tomatoes, Beef Stock (Celery), Onions, Tomato Purée, Worcestershire Sauce (Fish, Barley), Garlic, Fresh Thyme, Sea Salt, Black Pepper.',

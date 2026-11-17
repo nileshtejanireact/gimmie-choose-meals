@@ -544,7 +544,7 @@ class MenuService {
         badges: ['ADD-ON', 'PROTEIN BREAKFAST'],
         macros: {
           calories: '426 kcal',
-          protein: '32g Protein',
+          protein: '39.0g Protein',
           carbs: '40.7g Carbs',
           fat: '10.6g Fat'
         },
@@ -556,9 +556,9 @@ class MenuService {
           saturates: '2.8g',
           carbs: '40.7g',
           sugars: '20.7g',
-          fibre: '5.5g',
-          protein: '32g',
-          salt: '0.30g'
+          fibre: '9.9g',
+          protein: '39.0g',
+          salt: '0.62g'
         },
         allergens: 'Oats, Milk, Soya',
         ingredients: 'Porridge <strong>Oats</strong>, Whey Protein (<strong>Milk, Soya</strong>), 0% Fat Greek Yoghurt (<strong>Milk</strong>), Semi Skimmed <strong>Milk</strong>, Chia Seeds, Blueberries, Lemon Zest.<br><br>May contain: <strong>Peanuts, Nuts, Sesame</strong>.'
