@@ -1420,19 +1420,19 @@ div#s4t1 .gimmie-build-box__qty-value,
 
 #gimmie-modal-image-wrap {
   width: 100% !important;
-  height: 100% !important;
-  min-height: 440px !important;
-  align-self: stretch !important;
-  background: #F6F1E7 !important;
+  height: auto !important;
+  overflow: hidden !important;
+  border: 2px solid #8FAF8F !important;
+  border-radius: 1.25rem !important;
+  background-color: #F6F1E7 !important;
+  background-image: radial-gradient(circle at 18% 16%, rgba(143, 175, 143, 0.28), transparent 34%), radial-gradient(circle at 86% 82%, rgba(16, 43, 16, 0.10), transparent 34%), linear-gradient(135deg, #fffaf0 0%, #F6F1E7 100%) !important;
+  box-shadow: 4px 4px 0 #8FAF8F !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 2.25rem !important;
+  align-self: start !important;
+  padding: clamp(0.9rem, 2vw, 1.5rem) !important;
   box-sizing: border-box !important;
-  overflow: hidden !important;
-  border-radius: 1.25rem !important;
-  border: 2px solid #8FAF8F !important;
-  box-shadow: 0 4px 16px rgba(16, 43, 16, 0.05) !important;
   margin-bottom: 0 !important;
   position: sticky !important;
   top: 0 !important;
@@ -1601,14 +1601,13 @@ div#s4t1 .gimmie-build-box__qty-value,
   z-index: 2 !important;
   width: min(1140px, 94vw) !important;
   max-width: 1140px !important;
-  max-height: 88vh !important;
+  max-height: var(--gimmie-build-modal-max-height, 88vh) !important;
+  --gimmie-build-modal-max-height: min(88vh, 820px);
   background: #FFFDF9 !important;
   border: 2px solid #8FAF8F !important;
   border-radius: 1.5rem !important;
   box-shadow: 0 24px 60px rgba(16, 43, 16, 0.22), 0 4px 16px rgba(16, 43, 16, 0.08) !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  -webkit-overflow-scrolling: touch !important;
+  overflow: hidden !important;
   display: block !important;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
@@ -1636,27 +1635,28 @@ div#s4t1 .gimmie-build-box__qty-value,
   display: grid !important;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.15fr) !important;
   gap: 2.25rem !important;
-  align-items: stretch !important;
+  align-items: start !important;
 }
 
-/* Sticky Image Column on Desktop so Image stretches to match right text and stays pinned */
+/* Left Image Column with retro border, radial gradient & shadow matching build-your-box */
 .gimmie-build-box__meal-modal-image-wrap {
   width: 100% !important;
-  height: 100% !important;
-  min-height: 440px !important;
-  align-self: stretch !important;
-  border-radius: 1.25rem !important;
+  height: auto !important;
   overflow: hidden !important;
   border: 2px solid #8FAF8F !important;
-  background: #F6F1E7 !important;
+  border-radius: 1.25rem !important;
+  background-color: #F6F1E7 !important;
+  background-image: radial-gradient(circle at 18% 16%, rgba(143, 175, 143, 0.28), transparent 34%), radial-gradient(circle at 86% 82%, rgba(16, 43, 16, 0.10), transparent 34%), linear-gradient(135deg, #fffaf0 0%, #F6F1E7 100%) !important;
+  box-shadow: 4px 4px 0 #8FAF8F !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 2.25rem !important;
+  align-self: start !important;
+  padding: clamp(0.9rem, 2vw, 1.5rem) !important;
   box-sizing: border-box !important;
-  box-shadow: 0 4px 16px rgba(16, 43, 16, 0.05) !important;
   position: sticky !important;
   top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .gimmie-build-box__meal-modal-image {
@@ -1671,10 +1671,33 @@ div#s4t1 .gimmie-build-box__qty-value,
   filter: drop-shadow(0 16px 32px rgba(16, 43, 16, 0.18)) !important;
 }
 
+/* Right Column with Scroll matching build-your-box */
+.gimmie-build-box__meal-modal-content {
+  max-height: calc(var(--gimmie-build-modal-max-height, 88vh) - 2.5rem) !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding: 0.5rem 0.85rem 0.35rem 0.35rem !important;
+  scrollbar-width: thin;
+  scrollbar-color: #8FAF8F transparent;
+  box-sizing: border-box !important;
+}
+
+.gimmie-build-box__meal-modal-content::-webkit-scrollbar {
+  width: 6px !important;
+}
+.gimmie-build-box__meal-modal-content::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+.gimmie-build-box__meal-modal-content::-webkit-scrollbar-thumb {
+  background-color: #8FAF8F !important;
+  border-radius: 4px !important;
+}
+
 @media (max-width: 768px) {
   .gimmie-build-box__meal-modal-dialog,
   .gimmie-modal__content {
     max-height: 94vh !important;
+    overflow-y: auto !important;
     border-radius: 1.25rem !important;
   }
   .gimmie-build-box__meal-modal-surface {
@@ -1693,6 +1716,11 @@ div#s4t1 .gimmie-build-box__qty-value,
     aspect-ratio: 4 / 3 !important;
     padding: 1rem !important;
     margin-bottom: 1rem !important;
+  }
+  .gimmie-build-box__meal-modal-content {
+    max-height: none !important;
+    overflow-y: visible !important;
+    padding: 0 !important;
   }
   #gimmie-modal-image,
   .gimmie-build-box__meal-modal-image {

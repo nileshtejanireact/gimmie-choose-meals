@@ -29,20 +29,20 @@ assert(liquid.includes('modalImgWrap.style.display = \'block\''), 'JS must ensur
 assert(liquid.includes('scrollSurface.scrollTop = 0'), 'JS must reset scroll position to top when opened');
 console.log('✓ JS openModal image resolution & scroll reset logic verified');
 
-// 4. Check CSS Overflow & Scrolling Capabilities (Hide inner duplicate scrollbar, lock page scroll)
-assert(styles.includes('overflow-y: auto !important'), 'Modal dialog must have overflow-y: auto !important for full scrolling');
-assert(styles.includes('-webkit-overflow-scrolling: touch !important'), 'Modal must support smooth iOS touch momentum scrolling');
-assert(styles.includes('.gimmie-build-box__meal-modal-dialog::-webkit-scrollbar'), 'Custom sleek scrollbar selector must be configured');
-assert(styles.includes('scrollbar-width: none !important'), 'Inner scrollbar must be hidden via scrollbar-width: none');
+// 4. Check CSS Overflow & Scrolling Capabilities (Right scrollable column, hide outer duplicate scrollbar, lock page scroll)
+assert(styles.includes('overflow-y: auto !important'), 'Modal content or dialog must have overflow-y: auto !important for scrolling');
+assert(styles.includes('.gimmie-build-box__meal-modal-content'), 'Modal must style right content container');
+assert(styles.includes('scrollbar-color: #8FAF8F transparent'), 'Right column must have custom sage green scrollbar');
 assert(styles.includes('body.gimmie-build-box-modal-open'), 'Body modal open locking rule must exist');
-console.log('✓ CSS: overflow-y: auto !important, touch scrolling, inner scrollbar hidden, and body scroll lock verified');
+console.log('✓ CSS: right column scroll (overflow-y: auto), custom scrollbar, and body scroll lock verified');
 
-// 5. Check Green Border Styling on Modal & Image Wrap (Sage green #8FAF8F, never black #102B10)
+// 5. Check Green Border & Styling on Image Wrap (Sage green #8FAF8F, radial gradient, 4px shadow, align-self start)
 assert(styles.includes('border: 2px solid #8FAF8F !important'), 'Modal dialog and image wrap must have green border #8FAF8F');
 assert(!styles.includes('.gimmie-build-box__meal-modal-dialog,\n.gimmie-modal__content {\n  position: relative !important;\n  z-index: 2 !important;\n  width: 100% !important;\n  max-width: 960px !important;\n  max-height: 90vh !important;\n  background: #FFFDF9 !important;\n  border: 2px solid #102B10'), 'Modal dialog must NOT have black border');
-assert(styles.includes('align-items: stretch !important'), 'Modal grid must align items stretch so image height matches right text');
-assert(styles.includes('align-self: stretch !important'), 'Image wrap must stretch to fill column');
+assert(styles.includes('align-self: start !important'), 'Image wrap must have align-self: start matching live reference');
+assert(styles.includes('box-shadow: 4px 4px 0 #8FAF8F !important'), 'Image wrap must have retro 4px shadow #8FAF8F');
+assert(styles.includes('radial-gradient'), 'Image wrap must have radial gradient background');
 assert(styles.includes('filter: drop-shadow'), 'Image must have soft natural dish shadow');
-console.log('✓ Modal styling: Sage green border (#8FAF8F), full-height left column stretch, and natural dish shadow verified');
+console.log('✓ Modal styling: Sage green border (#8FAF8F), radial gradient, retro 4px shadow, align-self: start, and natural dish shadow verified');
 
 console.log('\n🎉 ALL MODAL SCROLL & IMAGE TESTS PASSED PERFECTLY!');
