@@ -308,7 +308,7 @@ async function handleAppProxy(req, res) {
       currentLines: subscription.currentLines || [],
       meals: meals,
       addons: addons,
-      isDuplicateTheme: true,
+      isDuplicateTheme: isDuplicateTheme,
       discount: activeDiscount
     });
 

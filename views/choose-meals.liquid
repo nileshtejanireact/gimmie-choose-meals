@@ -191,8 +191,8 @@
         {% assign has_meta_addons = true %}
       {% endif %}
 
-      {% comment %} 🛡️ Live & Preview Themes Rollout — Enabled for All Themes (Live Main Theme + Preview Themes) {% endcomment %}
-      {% assign is_duplicate_theme = true %}
+      {% comment %} 🛡️ Live vs Duplicate Theme Isolation (Shapes - Shubham 13.Oct) {% endcomment %}
+      {% assign is_duplicate_theme = false %}
       {% if theme.role != 'main' %}
         {% assign is_duplicate_theme = true %}
       {% endif %}
@@ -2299,10 +2299,10 @@
       });
     });
     const hasAddonsOnPage = activeAddonList.length > 0;
-    const addons = (hasAddonsOnPage ? activeAddonList : (config.addons || []));
+    const addons = config.isDuplicateTheme ? (hasAddonsOnPage ? activeAddonList : (config.addons || [])) : [];
 
     // Unified lookup list for the nutrition modal (works for both meals & add-ons)
-    const allModalItems = [...meals, ...activeAddonList, ...(config.addons || [])];
+    const allModalItems = [...meals, ...addons];
 
     let customerEmail = config.customerEmail || '';
     let customerName = config.customerName || 'Subscriber';
