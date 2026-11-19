@@ -191,8 +191,8 @@
         {% assign has_meta_addons = true %}
       {% endif %}
 
-      {% comment %} 🛡️ Live vs Duplicate Theme Isolation (Shapes - Shubham 13.Oct) {% endcomment %}
-      {% assign is_duplicate_theme = false %}
+      {% comment %} 🛡️ Live & Preview Themes Rollout — Enabled for All Themes (Live Main Theme + Preview Themes) {% endcomment %}
+      {% assign is_duplicate_theme = true %}
       {% if theme.role != 'main' %}
         {% assign is_duplicate_theme = true %}
       {% endif %}
